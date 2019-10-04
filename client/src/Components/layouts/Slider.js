@@ -23,21 +23,12 @@ const slides = [
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: "100%",
-    flexGrow: 1
+    maxHeight: "50%"
   },
-  header: {
-    display: "flex",
-    alignItems: "center",
-    height: "50%",
-    paddingLeft: theme.spacing(4),
-    backgroundColor: theme.palette.background.default
-  },
-  img: {
-    maxHeight: "50%",
-    display: "block",
-    maxWidth: "100%",
-    overflow: "hidden",
-    width: "100%"
+  imgDiv: {
+    height: "400px",
+    backgroundSize: "100% 100%",
+    backgroundRepeat: "no-repeat"
   }
 }));
 
@@ -56,17 +47,15 @@ function Slider() {
         onChangeIndex={handleStepChange}
         enableMouseEvents
       >
-        {slides.map((step, index) => (
-          <div key={step.label}>
-            {Math.abs(activeStep - index) <= 2 ? (
-              <img
-                className={classes.img}
-                src={step.imgPath}
-                alt={step.label}
-              />
-            ) : null}
-          </div>
-        ))}
+        {slides.map((step, index) =>
+          Math.abs(activeStep - index) <= 2 ? (
+            <div
+              key={step.label}
+              className={classes.imgDiv}
+              style={{ backgroundImage: `url(${step.imgPath})` }}
+            ></div>
+          ) : null
+        )}
       </AutoPlaySwipeableViews>
     </div>
   );
