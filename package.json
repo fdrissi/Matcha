@@ -1,0 +1,33 @@
+{
+  "name": "matcha",
+  "version": "1.0.0",
+  "description": "A dating web app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "server": "nodemon server",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fdrissi/matcha.git"
+  },
+  "author": "fdrissi & abelomar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fdrissi/matcha/issues"
+  },
+  "homepage": "https://github.com/fdrissi/matcha#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "config": "^3.2.2",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "react-swipeable-views": "^0.13.3"
+  },
+  "devDependencies": {
+    "concurrently": "^4.1.2",
+    "nodemon": "^1.19.3"
+  }
+}
