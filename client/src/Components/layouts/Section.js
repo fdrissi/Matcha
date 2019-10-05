@@ -7,13 +7,17 @@ const useStyle = makeStyles({
   section: {
     width: "100%",
     color: "#2e3c43",
-    marginTop: "5%"
+    marginTop: "10%"
   },
   widget: {
     display: "inline-block",
     padding: "2% 5%",
     width: "20%",
     marginRight: "5%"
+  },
+  image: {
+    width: "50%",
+    height: "50%"
   }
 });
 
@@ -46,7 +50,7 @@ const images = [
 
 const Widget = ({ classes, img, title, text }) => {
   return (
-    <div className={classes}>
+    <div className={classes.widget}>
       <Image src={img.img} aspectRatio={2} />
       <Typography variant='h6' align='center'>
         {title}
@@ -76,17 +80,19 @@ const Title = () => {
 const Section = () => {
   const classes = useStyle();
   return (
-    <div className={classes.section}>
-      <Title />
-      {images.map(img => (
-        <Widget
-          key={img.id}
-          classes={classes.widget}
-          img={img}
-          title={img.title}
-          text={img.text}
-        />
-      ))}
+    <div className='container'>
+      <div className={classes.section}>
+        <Title />
+        {images.map(img => (
+          <Widget
+            key={img.id}
+            classes={classes}
+            img={img}
+            title={img.title}
+            text={img.text}
+          />
+        ))}
+      </div>
     </div>
   );
 };

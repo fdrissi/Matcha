@@ -50,22 +50,24 @@ const Footer = () => {
   const classes = useStyle();
   return (
     <div className={classes.footer}>
-      <Widget
-        classes={classes.widget}
-        title='About'
-        text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
-      />
-      <Widget
-        classes={classes.widget}
-        title='Contact'
-        text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
-      />
-      <Widget
-        classes={classes.widget}
-        title='Links'
-        text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
-      />
-      <CopyRight />
+      <div className='container'>
+        <Widget
+          classes={classes.widget}
+          title='About'
+          text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
+        />
+        <Widget
+          classes={classes.widget}
+          title='Contact'
+          text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
+        />
+        <Widget
+          classes={classes.widget}
+          title='Links'
+          text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
+        />
+        <CopyRight />
+      </div>
     </div>
   );
 };
