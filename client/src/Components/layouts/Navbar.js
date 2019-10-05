@@ -23,7 +23,7 @@ const style = {
   bar: {
     backgroundColor: "rgba(0, 0, 0, 0.68)",
     borderBottom: "1px solid #e74c3c",
-    opacity: "0.8"
+    opacity: "0.9"
   },
   link: {
     color: "white",
