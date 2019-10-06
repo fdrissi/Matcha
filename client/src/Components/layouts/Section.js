@@ -12,8 +12,8 @@ const useStyle = makeStyles({
   widget: {
     display: "inline-block",
     padding: "2% 5%",
-    width: "20%",
-    marginRight: "5%"
+    width: "15%",
+    marginRight: "10%"
   },
   image: {
     width: "50%",
@@ -26,25 +26,25 @@ const images = [
     id: 1,
     img: "./img/members.png",
     title: "1611",
-    text: "Total Members"
+    text: "Total"
   },
   {
     id: 2,
     img: "./img/online.png",
     title: "500",
-    text: "Members online"
+    text: "Online"
   },
   {
     id: 3,
     img: "./img/men.png",
     title: "300",
-    text: "Men online"
+    text: "Men"
   },
   {
     id: 4,
     img: "./img/women.png",
     title: "200",
-    text: "Women online"
+    text: "Women"
   }
 ];
 
