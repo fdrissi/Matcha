@@ -22,7 +22,7 @@ const useStyle = makeStyles({
 const Widget = ({ classes, title, text }) => {
   return (
     <div className={classes}>
-      <Typography variant='h5' align='center' color='secondary'>
+      <Typography variant='h5' align='center' gutterBottom={true}>
         {title}
       </Typography>
       <Typography variant='subtitle1' align='justify'>
@@ -54,12 +54,13 @@ const Footer = () => {
         <Widget
           classes={classes.widget}
           title='About'
-          text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
+          text='An app allowing two potential lovers to meet,
+          from the registration to the final encounter.'
         />
         <Widget
           classes={classes.widget}
           title='Contact'
-          text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
+          text='For business enquiries, for Ads or for any complaints, contact us: admin@matcha.com'
         />
         <Widget
           classes={classes.widget}
