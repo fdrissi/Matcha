@@ -36,7 +36,9 @@ const style = {
 
 const NavBrand = ({ style, children }) => (
   <Typography variant='h4' className={style}>
-    {children}
+    <Link to='/' style={{ color: "white", textDecoration: "none" }}>
+      {children}
+    </Link>
   </Typography>
 );
 
