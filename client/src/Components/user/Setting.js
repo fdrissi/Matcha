@@ -177,11 +177,15 @@ const Form = () => {
 
 const Setting = () => {
   return (
-    <>
+    <div
+      style={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}
+    >
       <Navbar />
-      <Form />
+      <div style={{ flex: 1 }}>
+        <Form />
+      </div>
       <Footer />
-    </>
+    </div>
   );
 };
 

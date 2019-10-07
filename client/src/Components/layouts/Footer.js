@@ -5,10 +5,7 @@ import { Typography } from "@material-ui/core";
 const useStyle = makeStyles({
   footer: {
     backgroundColor: "#2e3c43",
-    position: "absolute",
-    bottom: "0",
-    width: "100%",
-    height: "15rem"
+    width: "100%"
   },
   widget: {
     display: "inline-block",

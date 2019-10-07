@@ -6,9 +6,11 @@ import Footer from "./Footer";
 
 const Landing = () => {
   return (
-    <div style={{ position: "relative", minHeight: "100vh" }}>
+    <div
+      style={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}
+    >
       <Navbar />
-      <div style={{ paddingBottom: "15rem" }}>
+      <div style={{ flex: 1 }}>
         <Slider />
         <Section />
       </div>

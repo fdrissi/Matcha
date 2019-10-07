@@ -168,11 +168,15 @@ function SignIn() {
 
 const Login = () => {
   return (
-    <>
+    <div
+      style={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}
+    >
       <Navbar />
-      <SignIn />
+      <div style={{ flex: 1 }}>
+        <SignIn />
+      </div>
       <Footer />
-    </>
+    </div>
   );
 };
 
