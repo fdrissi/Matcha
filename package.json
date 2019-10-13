@@ -22,8 +22,12 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "config": "^3.2.2",
+    "db-migrate": "^0.11.6",
+    "db-migrate-mysql": "^1.1.10",
     "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "mysql": "^2.17.1",
+    "mysql2": "^1.7.0"
   },
   "devDependencies": {
     "concurrently": "^4.1.2",

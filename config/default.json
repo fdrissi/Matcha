@@ -1,0 +1,9 @@
+{
+  "database": {
+    "user": "root",
+    "password": "159357",
+    "host": "localhost",
+    "database": "matcha"
+  },
+  "keyOrSecret": "1337matcha"
+}

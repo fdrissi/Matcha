@@ -1,6 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import { Grid } from "@material-ui/core";
 import Image from "material-ui-image";
 
 const useStyle = makeStyles({
@@ -13,11 +14,11 @@ const useStyle = makeStyles({
     display: "inline-block",
     padding: "2% 5%",
     width: "15%",
-    marginRight: "10%"
+    marginRight: "5%"
   },
   image: {
-    width: "50%",
-    height: "50%"
+    display: "block",
+    margin: "0 auto"
   }
 });
 
@@ -26,7 +27,7 @@ const images = [
     id: 1,
     img: "./img/members.png",
     title: "1611",
-    text: "Total"
+    text: "Total Members"
   },
   {
     id: 2,
@@ -38,27 +39,27 @@ const images = [
     id: 3,
     img: "./img/men.png",
     title: "300",
-    text: "Men"
+    text: "Men Online"
   },
   {
     id: 4,
     img: "./img/women.png",
     title: "200",
-    text: "Women"
+    text: "Women  Online"
   }
 ];
 
 const Widget = ({ classes, img, title, text }) => {
   return (
-    <div className={classes.widget}>
-      <Image src={img.img} aspectRatio={2} />
+    <>
+      <img src={img.img} alt={img.title} className={classes.image} />
       <Typography variant='h6' align='center'>
         {title}
       </Typography>
       <Typography variant='subtitle2' align='center'>
         {text}
       </Typography>
-    </div>
+    </>
   );
 };
 
@@ -68,6 +69,7 @@ const Title = () => {
       <Typography variant='h4' align='center'>
         Welcome to <span style={{ color: "#e74c3c" }}>Mat</span>Cha
       </Typography>
+
       <Image
         src='./img/underTitleLine.png'
         aspectRatio={50}
@@ -80,20 +82,21 @@ const Title = () => {
 const Section = () => {
   const classes = useStyle();
   return (
-    <div className='container'>
-      <div className={classes.section}>
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
         <Title />
-        {images.map(img => (
+      </Grid>
+      {images.map(img => (
+        <Grid key={img.id} item sm={3} xs={6}>
           <Widget
-            key={img.id}
             classes={classes}
             img={img}
             title={img.title}
             text={img.text}
           />
-        ))}
-      </div>
-    </div>
+        </Grid>
+      ))}
+    </Grid>
   );
 };
 

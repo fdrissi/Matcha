@@ -51,13 +51,12 @@ const Footer = () => {
         <Widget
           classes={classes.widget}
           title='About'
-          text='An app allowing two potential lovers to meet,
-          from the registration to the final encounter.'
+          text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
         />
         <Widget
           classes={classes.widget}
           title='Contact'
-          text='For business enquiries, for Ads or for any complaints, contact us: admin@matcha.com'
+          text='lorem ipsum dolor sit amet, consecteur adipiscing elit blanditiis tenetur unde '
         />
         <Widget
           classes={classes.widget}
