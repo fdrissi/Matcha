@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
-import { login } from "../../actions/users";
+import { login } from "../../actions/authAction";
 import { REMOVE_ALERT } from "../../actions/actionTypes";
 import Navbar from "../layouts/Navbar";
 import Footer from "../layouts/Footer";
@@ -53,6 +53,7 @@ function SignIn() {
   const classes = useStyles();
 
   const [state, dispatch] = useUserStore();
+  console.log(state.auth);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -70,9 +71,9 @@ function SignIn() {
     login(email, password, dispatch);
   };
 
-  useEffect(() => {
-    dispatch({ type: REMOVE_ALERT });
-  }, [email, password]);
+  // useEffect(() => {
+  //   dispatch({ type: REMOVE_ALERT });
+  // }, [email, password]);
 
   // useEffect(() => {
   //   console.log(state.auth.user.isAuthenticated);
