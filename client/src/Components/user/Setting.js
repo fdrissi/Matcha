@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import axios from 'axios';
+import { useUserStore } from '../../Context/appStore';
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -43,6 +45,21 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Form = () => {
+  const { state, dispatch } = useUserStore();
+  
+  // useEffect(() => {
+  //   const currentUser = async () => {
+  //     const config = {
+  //       headers: {
+  //         'x-auth-token': localStorage.token
+  //       }
+  //     }
+  //     const res = await axios.get('/api/users/current', config);
+  //     dispatch({ type: 'login', user: res.data.user});
+  //   }
+  //   currentUser();
+  // }, [])
+
   const classes = useStyles();
 
   const [formData, setFormData] = useState({

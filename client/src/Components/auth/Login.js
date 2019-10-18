@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { useUserStore } from "../../Context/appStore";
+import { login } from "../../actions/users";
+import { REMOVE_ALERT } from "../../actions/types";
 import Navbar from "../layouts/Navbar";
 import Footer from "../layouts/Footer";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Grid from "@material-ui/core/Grid";
@@ -14,6 +16,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import Alert from "../layouts/Alert";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -49,6 +52,8 @@ const useStyles = makeStyles(theme => ({
 function SignIn() {
   const classes = useStyles();
 
+  const [state, dispatch] = useUserStore();
+
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -59,105 +64,82 @@ function SignIn() {
   const handleChange = e =>
     setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
 
-  const [inputErrors, setInputErrors] = useState({
-    emailError: false,
-    emailErrorDescription: "Empty email",
-    passwordError: false,
-    passwordErrorDescription: "Empty password"
-  });
-
-  const {
-    emailError,
-    emailErrorDescription,
-    passwordError,
-    passwordErrorDescription
-  } = inputErrors;
-
-  const submitForm = form => {
+  const submitForm = async form => {
     form.preventDefault();
-    if (email.length === 0 || password.length === 0)
-      setInputErrors({
-        ...inputErrors,
-        emailError: email.length ? false : true,
-        passwordError: password.length ? false : true
-      });
+
+    login(email, password, dispatch);
   };
 
   useEffect(() => {
-    setInputErrors({
-      emailError: false,
-      emailErrorDescription: "Empty email",
-      passwordError: false,
-      passwordErrorDescription: "Empty password"
-    });
+    dispatch({ type: REMOVE_ALERT });
   }, [email, password]);
 
+  // useEffect(() => {
+  //   console.log(state.auth.user.isAuthenticated);
+  // }, [state.auth.user.isAuthenticated]);
+
   return (
-    <Container component='main' maxWidth='xs'>
+    <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
+        {state.alert.payload && (
+          <Alert
+            message={state.alert.payload.msg}
+            type={state.alert.payload.type}
+          />
+        )}
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
-        <Typography component='h1' variant='h5'>
+        <Typography component="h1" variant="h5">
           Sign in
         </Typography>
         <form className={classes.form} onSubmit={form => submitForm(form)}>
           <TextField
-            error={emailError}
-            variant='standard'
-            margin='normal'
+            variant="standard"
+            margin="normal"
             fullWidth
-            id='email'
-            label='Email Address or Username'
-            name='email'
-            autoComplete='email'
+            id="email"
+            label="Email Address or Username"
+            name="email"
+            autoComplete="email"
             value={email}
             onChange={e => handleChange(e)}
             autoFocus
           />
-          {emailError && (
-            <FormHelperText id='component-error-text' style={{ color: "red" }}>
-              {emailErrorDescription}
-            </FormHelperText>
-          )}
+
           <TextField
-            error={passwordError}
-            variant='standard'
-            margin='normal'
+            variant="standard"
+            margin="normal"
             fullWidth
-            name='password'
-            label='Password'
-            type='password'
-            id='password'
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
             value={password}
             onChange={e => handleChange(e)}
-            autoComplete='current-password'
+            autoComplete="current-password"
           />
-          {passwordError && (
-            <FormHelperText id='component-error-text' style={{ color: "red" }}>
-              {passwordErrorDescription}
-            </FormHelperText>
-          )}
+
           <FormControlLabel
-            control={<Checkbox value='remember' color='primary' />}
-            label='Remember me'
+            control={<Checkbox value="remember" color="primary" />}
+            label="Remember me"
           />
           <Button
-            type='submit'
+            type="submit"
             fullWidth
-            variant='contained'
-            color='primary'
+            variant="contained"
+            color="primary"
             className={classes.submit}
           >
             Sign In
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link to='/recovery'>Forgot password?</Link>
+              <Link to="/recovery">Forgot password?</Link>
             </Grid>
             <Grid item>
-              <Link to='/register'>{"Don't have an account? Sign Up"}</Link>
+              <Link to="/register">{"Don't have an account? Sign Up"}</Link>
             </Grid>
           </Grid>
         </form>

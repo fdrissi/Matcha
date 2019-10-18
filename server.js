@@ -1,15 +1,15 @@
 const express = require("express");
+const cors = require('cors');
 //const db = require("./config/db");
 
 const app = express();
+app.use(cors());
 
 // Database connection
 // db.connectDb();
 
 // Init Middleware
 app.use(express.json({ extended: false }));
-
-app.get("/", (req, res) => res.send("Api Running"));
 
 // Routes
 app.use("/api/users", require("./routes/api/users"));
