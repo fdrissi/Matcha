@@ -1,5 +1,5 @@
 import axios from "axios";
-import { LOGIN_SUCCESS, LOGIN_FAIL, SET_ALERT } from "../actions/types";
+import { LOGIN_SUCCESS, LOGIN_FAIL, SET_ALERT } from "./actionTypes";
 
 export const login = async (email, password, dispatch) => {
   const config = {

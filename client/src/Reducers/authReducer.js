@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGIN_FAIL } from "../actions/types";
+import { LOGIN_SUCCESS, LOGIN_FAIL } from "../actions/actionTypes";
 
 export const authInitState = {
   user: {

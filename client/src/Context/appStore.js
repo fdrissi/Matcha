@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { useReducer } from "react";
 import useCombinedReducers from "use-combined-reducers";
-import { alertReducer, alertInitState } from "../Reducers/alert";
-import { authReducer, authInitState } from "../Reducers/auth";
+import { alertReducer, alertInitState } from "../Reducers/alertReducer";
+import { authReducer, authInitState } from "../Reducers/authReducer";
 
 export const appStore = React.createContext();
 
