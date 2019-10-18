@@ -1,6 +1,6 @@
 {
   "dev": {
-    "host": "localhost",
+    "host": "10.12.7.10",
     "database": "matcha",
     "user": "root",
     "password": "159357",

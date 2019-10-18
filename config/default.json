@@ -2,7 +2,7 @@
   "database": {
     "user": "root",
     "password": "159357",
-    "host": "localhost",
+    "host": "10.12.7.10",
     "database": "matcha"
   },
   "keyOrSecret": "1337matcha"

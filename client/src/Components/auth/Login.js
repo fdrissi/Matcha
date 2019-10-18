@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
-import { login } from "../../actions/users";
+import { login } from "../../actions/authAction";
 import { REMOVE_ALERT } from "../../actions/actionTypes";
 import Navbar from "../layouts/Navbar";
 import Footer from "../layouts/Footer";
