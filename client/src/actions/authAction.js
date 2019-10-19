@@ -29,15 +29,19 @@ export const login = async (email, password, dispatch) => {
         });
       }, 5000);
     } else {
+      const token = res.data.token;
       config = {
         headers: {
-          "x-auth-token": res.data.token
+          "x-auth-token": token
         }
       };
       res = await axios.get("/api/users/current", config);
       dispatch({
         type: LOGIN_SUCCESS,
-        payload: res.data.user
+        payload: {
+          token,
+          user: res.data.user
+        }
       });
     }
   } catch (error) {

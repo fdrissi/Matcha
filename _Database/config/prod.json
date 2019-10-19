@@ -2,7 +2,7 @@
   "dev": {
     "host": "localhost",
     "user": "root",
-    "password": "159357",
+    "password": "tiger",
     "driver": "mysql",
     "multipleStatments": true
   },
