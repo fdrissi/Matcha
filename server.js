@@ -1,12 +1,25 @@
 const express = require("express");
-const cors = require('cors');
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
 //const db = require("./config/db");
 
 const app = express();
 app.use(cors());
 
-// Database connection
-// db.connectDb();
+// Set up express session middleware
+app.use(cookieParser());
+// app.use(
+//   session({
+//     secret: "fdrissiabelomar",
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: {
+//       maxAge: 3600,
+//       httpOnly: true
+//     }
+//   })
+// );
 
 // Init Middleware
 app.use(express.json({ extended: false }));

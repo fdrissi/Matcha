@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import axios from 'axios';
-import { useUserStore } from '../../Context/appStore';
+import React, { useState, useEffect } from "react";
+import { Redirect } from "react-router-dom";
+import { useUserStore } from "../../Context/appStore";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -45,28 +45,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Form = () => {
-  const { state, dispatch } = useUserStore();
-  
-  // useEffect(() => {
-  //   const currentUser = async () => {
-  //     const config = {
-  //       headers: {
-  //         'x-auth-token': localStorage.token
-  //       }
-  //     }
-  //     const res = await axios.get('/api/users/current', config);
-  //     dispatch({ type: 'login', user: res.data.user});
-  //   }
-  //   currentUser();
-  // }, [])
+  const [{ auth }, dispatch] = useUserStore();
 
   const classes = useStyles();
 
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
+    firstName: auth.userInfo.first_name,
+    lastName: auth.userInfo.laste_name,
+    username: auth.userInfo.username,
+    email: auth.userInfo.email,
     oldPassword: "",
     newPassword: "",
     newPassword2: ""
@@ -85,26 +72,38 @@ const Form = () => {
   const handleChange = e =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  return (
-    <Container component='main' maxWidth='xs'>
+  useEffect(() => {
+    setFormData(formData => ({
+      ...formData,
+      firstName: auth.userInfo.first_name,
+      lastName: auth.userInfo.last_name,
+      username: auth.userInfo.username,
+      email: auth.userInfo.email
+    }));
+  }, [auth]);
+
+  if (auth.loading) return null;
+  if (!auth.loading && !auth.isAuthenticated) return <Redirect to="/login" />;
+  return auth.loading ? null : (
+    <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <AccountCircle />
         </Avatar>
-        <Typography component='h1' variant='h5'>
+        <Typography component="h1" variant="h5">
           Update Account Informations
         </Typography>
         <form className={classes.form}>
           <Grid container spacing={2}>
             <Grid item sx={12} sm={6}>
               <TextField
-                variant='standard'
-                margin='normal'
+                variant="standard"
+                margin="normal"
                 fullWidth
-                id='first-name'
-                label='First Name'
-                name='firstName'
+                id="first-name"
+                label="First Name"
+                name="firstName"
                 value={firstName}
                 onChange={e => handleChange(e)}
                 autoFocus
@@ -113,12 +112,12 @@ const Form = () => {
 
             <Grid item sx={12} sm={6}>
               <TextField
-                variant='standard'
-                margin='normal'
+                variant="standard"
+                margin="normal"
                 fullWidth
-                id='last-name'
-                label='Last Name'
-                name='lastName'
+                id="last-name"
+                label="Last Name"
+                name="lastName"
                 value={lastName}
                 onChange={e => handleChange(e)}
               />
@@ -126,13 +125,13 @@ const Form = () => {
 
             <Grid item xs={12}>
               <TextField
-                variant='standard'
-                margin='normal'
+                variant="standard"
+                margin="normal"
                 fullWidth
-                id='username'
-                label='Username'
-                name='username'
-                autoComplete='username'
+                id="username"
+                label="Username"
+                name="username"
+                autoComplete="username"
                 value={username}
                 onChange={e => handleChange(e)}
               />
@@ -140,13 +139,13 @@ const Form = () => {
 
             <Grid item xs={12}>
               <TextField
-                variant='standard'
-                margin='normal'
+                variant="standard"
+                margin="normal"
                 fullWidth
-                id='email'
-                label='Email'
-                name='email'
-                autoComplete='email'
+                id="email"
+                label="Email"
+                name="email"
+                autoComplete="email"
                 value={email}
                 onChange={e => handleChange(e)}
               />
@@ -154,13 +153,13 @@ const Form = () => {
 
             <Grid item xs={12}>
               <TextField
-                variant='standard'
-                margin='normal'
+                variant="standard"
+                margin="normal"
                 fullWidth
-                name='oldPassword'
-                label='Old Password'
-                type='password'
-                id='oldpassword'
+                name="oldPassword"
+                label="Old Password"
+                type="password"
+                id="oldpassword"
                 value={oldPassword}
                 onChange={e => handleChange(e)}
               />
@@ -168,13 +167,13 @@ const Form = () => {
 
             <Grid item xs={12}>
               <TextField
-                variant='standard'
-                margin='normal'
+                variant="standard"
+                margin="normal"
                 fullWidth
-                name='newPassword'
-                label='New Password'
-                type='password'
-                id='newpassword'
+                name="newPassword"
+                label="New Password"
+                type="password"
+                id="newpassword"
                 value={newPassword}
                 onChange={e => handleChange(e)}
               />
@@ -182,13 +181,13 @@ const Form = () => {
 
             <Grid item xs={12}>
               <TextField
-                variant='standard'
-                margin='normal'
+                variant="standard"
+                margin="normal"
                 fullWidth
-                name='newPassword2'
-                label='Confirm New Password'
-                type='password'
-                id='newpassword2'
+                name="newPassword2"
+                label="Confirm New Password"
+                type="password"
+                id="newpassword2"
                 value={newPassword2}
                 onChange={e => handleChange(e)}
               />
@@ -196,10 +195,10 @@ const Form = () => {
 
             <Grid item xs={12}>
               <Button
-                type='submit'
+                type="submit"
                 fullWidth
-                variant='contained'
-                color='primary'
+                variant="contained"
+                color="primary"
                 className={classes.submit}
               >
                 Update
@@ -214,14 +213,8 @@ const Form = () => {
 
 const Setting = () => {
   return (
-    <div
-      style={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}
-    >
-      <Navbar />
-      <div style={{ flex: 1 }}>
-        <Form />
-      </div>
-      <Footer />
+    <div style={{ flex: 1 }}>
+      <Form />
     </div>
   );
 };

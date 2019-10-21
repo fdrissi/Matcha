@@ -1,23 +1,58 @@
-import { LOGIN_SUCCESS, LOGIN_FAIL } from "../actions/actionTypes";
+import {
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  USER_LOADED,
+  AUTH_ERROR
+} from "../actions/actionTypes";
 
 export const authInitState = {
-  user: {
-    token: localStorage.getItem("token"),
-    isAuthenticated: false,
-    loading: true,
-    user: null
+  isAuthenticated: false,
+  loading: true,
+  userInfo: {
+    email: "",
+    first_name: "",
+    id: "",
+    last_name: "",
+    recovery_key: "",
+    username: "",
+    verification_key: "",
+    verified: ""
   }
 };
 
 export const authReducer = (state, action) => {
   const { type, payload } = action;
   switch (type) {
+    case USER_LOADED:
+      return {
+        ...state,
+        isAuthenticated: true,
+        loading: false,
+        userInfo: payload
+      };
     case LOGIN_SUCCESS:
-      localStorage.setItem("token", payload.token);
-      return { ...state, ...payload, isAuthenticated: true, loading: false };
+      return {
+        ...state,
+        isAuthenticated: true,
+        loading: false
+      };
     case LOGIN_FAIL:
-      localStorage.removeItem("token");
-      return { ...state, toekn: null, isAuthenticated: false, loading: false };
+    case AUTH_ERROR:
+      return {
+        ...state,
+        isAuthenticated: false,
+        loading: true,
+        userInfo: {
+          email: "",
+          first_name: "",
+          id: "",
+          last_name: "",
+          recovery_key: "",
+          username: "",
+          verification_key: "",
+          verified: ""
+        }
+      };
 
     default:
       return state;

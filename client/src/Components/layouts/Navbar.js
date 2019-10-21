@@ -35,20 +35,17 @@ const style = {
 };
 
 const NavBrand = ({ style, children }) => (
-  <Typography variant='h4' className={style}>
-    <Link to='/' style={{ color: "white", textDecoration: "none" }}>
+  <Typography variant="h4" className={style}>
+    <Link to="/" style={{ color: "white", textDecoration: "none" }}>
       {children}
     </Link>
   </Typography>
 );
 
 const NavBtn = ({ text, link }) => (
-  <Button color='inherit'>
-    {" "}
-    <Link to={link} style={{ color: "white", textDecoration: "none" }}>
-      {text}
-    </Link>
-  </Button>
+  <Link to={link} style={{ color: "white", textDecoration: "none" }}>
+    <Button color="inherit">{text}</Button>
+  </Link>
 );
 
 export default function Navbar() {
@@ -56,15 +53,15 @@ export default function Navbar() {
 
   return (
     <>
-      <AppBar position='static' style={style.bar}>
-        <div className='container'>
+      <AppBar position="static" style={style.bar}>
+        <div className="container">
           <Toolbar>
             <NavBrand style={classes.title}>
               <span style={style.brand}>Mat</span>Cha
             </NavBrand>
             <Route>
-              <NavBtn text='Login' link='/Login' />
-              <NavBtn text='Register' link='/register' />
+              <NavBtn text="Login" link="/Login" />
+              <NavBtn text="Register" link="/register" />
             </Route>
           </Toolbar>
         </div>

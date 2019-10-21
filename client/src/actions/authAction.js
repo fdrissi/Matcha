@@ -1,20 +1,27 @@
 import axios from "axios";
-import { LOGIN_SUCCESS, LOGIN_FAIL, SET_ALERT } from "./actionTypes";
+import {
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  USER_LOADED,
+  AUTH_ERROR,
+  SET_ALERT,
+  REMOVE_ALERT
+} from "./actionTypes";
 
-const login = async (email, password, dispatch) => {
-  const config = {
+export const login = async (email, password, remember, dispatch) => {
+  let config = {
     header: {
       "Content-Type": "application/json"
     }
   };
 
   try {
-    const res = await axios.post(
+    let res = await axios.post(
       "/api/users/login",
-      { email, password },
+      { email, password, remember },
       config
     );
-    if (!res.data.success)
+    if (!res.data.success) {
       dispatch({
         type: SET_ALERT,
         payload: {
@@ -22,13 +29,19 @@ const login = async (email, password, dispatch) => {
           msg: res.data.errorMsg
         }
       });
-    else {
-      console.log("logged in success");
+      setTimeout(() => {
+        dispatch({
+          type: REMOVE_ALERT
+        });
+      }, 5000);
+    } else {
+      res = await axios.get("/api/users/current");
+      console.log(res.data);
+      dispatch({
+        type: LOGIN_SUCCESS,
+        payload: res.data.user
+      });
     }
-    // dispatch({
-    //   type: LOGIN_SUCCESS,
-    //   payload: res.data
-    // });
   } catch (error) {
     dispatch({
       type: LOGIN_FAIL
@@ -54,4 +67,24 @@ const register = async (mydata, dispatch) => {
     console.log("1");
   }
 };
-export { login, register };
+ const loadUser = async dispatch => {
+  try {
+    const res = await axios.get("/api/users/current");
+    if (res.data.success) {
+      const payload = res.data.user;
+      dispatch({
+        type: USER_LOADED,
+        payload
+      });
+    } else {
+      dispatch({
+        type: AUTH_ERROR
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: AUTH_ERROR
+    });
+  }
+};
+export { login, register, loadUser };

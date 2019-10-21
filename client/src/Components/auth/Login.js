@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import { login } from "../../actions/authAction";
-import { REMOVE_ALERT } from "../../actions/actionTypes";
 import Navbar from "../layouts/Navbar";
 import Footer from "../layouts/Footer";
 import Avatar from "@material-ui/core/Avatar";
@@ -51,15 +50,17 @@ const useStyles = makeStyles(theme => ({
 
 function SignIn() {
   const classes = useStyles();
+  console.log("login");
 
   const [state, dispatch] = useUserStore();
 
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
+    remember: false
   });
 
-  const { email, password } = formData;
+  const { email, password, remember } = formData;
 
   const handleChange = e =>
     setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
@@ -67,16 +68,10 @@ function SignIn() {
   const submitForm = async form => {
     form.preventDefault();
 
-    login(email, password, dispatch);
+    login(email, password, remember, dispatch);
   };
 
-  useEffect(() => {
-    dispatch({ type: REMOVE_ALERT });
-  }, [email, password]);
-
-  // useEffect(() => {
-  //   console.log(state.auth.user.isAuthenticated);
-  // }, [state.auth.user.isAuthenticated]);
+  if (state.auth.isAuthenticated) return <Redirect to="/setting" />;
 
   return (
     <Container component="main" maxWidth="xs">
@@ -117,7 +112,20 @@ function SignIn() {
           />
 
           <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
+            control={
+              <Checkbox
+                value={remember}
+                color="primary"
+                checked={remember}
+                name="remember"
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    [e.target.name]: e.target.checked
+                  })
+                }
+              />
+            }
             label="Remember me"
           />
           <Button
@@ -145,14 +153,8 @@ function SignIn() {
 
 const Login = () => {
   return (
-    <div
-      style={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}
-    >
-      <Navbar />
-      <div style={{ flex: 1 }}>
-        <SignIn />
-      </div>
-      <Footer />
+    <div style={{ flex: 1 }}>
+      <SignIn />
     </div>
   );
 };
