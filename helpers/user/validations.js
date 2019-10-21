@@ -25,45 +25,52 @@ function isEmpty(obj) {
 
 // For THE REGISTRATION VALIDATION
 function validateInput(data) {
-  console.log(data);
-  let errors = {};
+  let errors = {
+    email: "",
+    userName: "",
+    firstName: "",
+    lastName: "",
+    lastName: "",
+    password: "",
+    confirmPassword: ""
+  };
   // validate email
   if (typeof data.email !== "undefined") {
     if (isEmpty(data.email)) {
-      errors.email = "THIS FIELD IS REQUIRD";
+      errors.email = "this field is requird";
     } else {
       let regex = /\S+@\S+\.\S+/;
-      if (!regex.test(data.email)) errors.email = "ENTER VALID EMAIL";
+      if (!regex.test(data.email)) errors.email = "enter valid email";
     }
   }
   // validate userName
   if (isEmpty(data.userName)) {
-    errors.userName = "THIS FIELD IS REQUIRD";
+    errors.userName = "this field is requird";
   } else {
     let regex = /^[A-Za-z]{3,10}$/;
     if (!regex.test(data.userName))
-      errors.userName = "USER NAME MUST BE BETWEEN 3 AND 10 CHARACTERS";
+      errors.userName = "user name must be between 3 and 10 characters";
   }
   // validate Firstname
   if (isEmpty(data.firstName)) {
-    errors.firstName = "THIS FIELD IS REQUIRD";
+    errors.firstName = "this field is requird";
   }
   // validate lastName
   if (isEmpty(data.lastName)) {
-    errors.lastName = "THIS FIELD IS REQUIRD";
+    errors.lastName = "this field is requird";
   }
   // validate password
   if (isEmpty(data.password)) {
-    errors.password = "THIS FIELD IS REQUIRD";
+    errors.password = "this field is requird";
   } else {
     let regex = /(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=.*[0-9]).{8,20}/i;
     if (!regex.test(data.password))
       errors.password =
-        "Password should be between 8-20 characters in length and should include at least one upper case letter, one number or one special character.";
+        "password should be between 8-20 characters in length and should include at least one upper case letter, one number or one special character.";
   }
   // validate Confirm_password
   if (isEmpty(data.confirmPassword)) {
-    errors.confirmPassword = "THIS FIELD IS REQUIRD";
+    errors.confirmPassword = "this field is requird";
   } else {
     if (data.confirmPassword != data.password)
       errors.confirmPassword = "PASSWORDS DO NOT MATCH";

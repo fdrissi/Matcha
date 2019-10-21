@@ -1,19 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Navbar from "../layouts/Navbar";
-import Footer from "../layouts/Footer";
+import { useUserStore } from "../../Context/appStore";
+import { register } from "../../actions/authAction";
+import { FormHelperText } from "@material-ui/core";
+import { stat } from "fs";
+import Box from "@material-ui/core/Box";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: "#e74c3c"
+    background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
   },
   form: {
     width: "100%", // Fix IE 11 issue.
@@ -37,13 +37,16 @@ const useStyles = makeStyles(theme => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-    backgroundColor: "transparent",
-    backgroundColor: "#e74c3c",
+    background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+
     "&:hover": {
       backgroundColor: "transparent",
-      color: "#e74c3c",
       border: "1px solid #e74c3c"
     }
+  },
+  helperText: {
+    color: "#F32013",
+    fontWeight: "fontWeightBold"
   }
 }));
 
@@ -56,24 +59,20 @@ function SignUp() {
     lastName: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    errors: {}
+    confirmPassword: ""
   });
 
   const [MyErrors, setErrors] = useState({});
 
   const [state, dispatch] = useUserStore();
+  console.log(state.register);
 
   const submitForm = async form => {
-    setMyFormData({
+    dispatch(register => ({
       errors: {}
-    });
+    }));
     form.preventDefault();
-    const [errors] = await register(MyForm);
-    setMyFormData({
-      errors
-    });
-    console.log(MyForm);
+    register(MyForm, dispatch);
     //register(MyForm, dispatch).then(() => {}, ({ res }) => console.log("res"));
   };
 
@@ -88,12 +87,6 @@ function SignUp() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        {state.alert.payload && (
-          <Alert
-            message={state.alert.payload.msg}
-            type={state.alert.payload.type}
-          />
-        )}
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
@@ -104,7 +97,7 @@ function SignUp() {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                errorText={false}
+                error={state.register.errors.userName.length > 0 ? true : false}
                 className={classes.input}
                 variant="outlined"
                 required
@@ -114,12 +107,17 @@ function SignUp() {
                 onChange={handleInputChange}
                 autoFocus
               />
-              <FormHelperText className={classes.helperText}>
-                USER NAME MUST BE BETWEEN 3 AND 10 CHARACTERS
-              </FormHelperText>
+              {state.register.errors.userName.length > 0 && (
+                <FormHelperText className={classes.helperText}>
+                  <sup>*</sup> {state.register.errors.userName}
+                </FormHelperText>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                error={
+                  state.register.errors.firstName.length > 0 ? true : false
+                }
                 name="firstName"
                 variant="outlined"
                 required
@@ -127,9 +125,16 @@ function SignUp() {
                 onChange={handleInputChange}
                 label="First Name"
               />
+              {state.register.errors.firstName.length > 0 && (
+                <FormHelperText className={classes.helperText}>
+                  <sup>*</sup>
+                  {state.register.errors.firstName}
+                </FormHelperText>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
+                error={state.register.errors.lastName.length > 0 ? true : false}
                 variant="outlined"
                 required
                 fullWidth
@@ -138,9 +143,15 @@ function SignUp() {
                 autoComplete="lname"
                 onChange={handleInputChange}
               />
+              {state.register.errors.lastName.length > 0 && (
+                <FormHelperText className={classes.helperText}>
+                  <sup>*</sup> {state.register.errors.lastName}
+                </FormHelperText>
+              )}
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={state.register.errors.email.length > 0 ? true : false}
                 variant="outlined"
                 required
                 fullWidth
@@ -149,9 +160,15 @@ function SignUp() {
                 autoComplete="email"
                 onChange={handleInputChange}
               />
+              {state.register.errors.email.length > 0 && (
+                <FormHelperText className={classes.helperText}>
+                  <sup>*</sup> {state.register.errors.email}
+                </FormHelperText>
+              )}
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={state.register.errors.password.length > 0 ? true : false}
                 variant="outlined"
                 required
                 fullWidth
@@ -160,9 +177,19 @@ function SignUp() {
                 type="password"
                 onChange={handleInputChange}
               />
+              {state.register.errors.password.length > 0 && (
+                <FormHelperText className={classes.helperText}>
+                  <sup>*</sup> {state.register.errors.password}
+                </FormHelperText>
+              )}
             </Grid>
             <Grid item xs={12}>
               <TextField
+                error={
+                  state.register.errors.confirmPassword.length > 0
+                    ? true
+                    : false
+                }
                 variant="outlined"
                 required
                 fullWidth
@@ -171,6 +198,11 @@ function SignUp() {
                 type="password"
                 onChange={handleInputChange}
               />
+              {state.register.errors.confirmPassword.length > 0 && (
+                <FormHelperText className={classes.helperText}>
+                  <sup>*</sup> {state.register.errors.confirmPassword}
+                </FormHelperText>
+              )}
             </Grid>
           </Grid>
           <Button

@@ -5,7 +5,8 @@ const userModel = require("../../models/User");
 const auth = require("../../middleware/auth");
 const {
   validateEmail,
-  validatePassword
+  validatePassword,
+  validateInput
 } = require("../../helpers/user/validations");
 const express = require("express");
 const router = express.Router();
