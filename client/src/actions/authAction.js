@@ -1,7 +1,7 @@
 import axios from "axios";
 import { LOGIN_SUCCESS, LOGIN_FAIL, SET_ALERT } from "./actionTypes";
 
-export const login = async (email, password, dispatch) => {
+const login = async (email, password, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -35,3 +35,23 @@ export const login = async (email, password, dispatch) => {
     });
   }
 };
+
+const register = async (mydata, dispatch) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+
+  try {
+    const res = await axios.post("/api/users/register", mydata, config);
+    if (!res.data.success) {
+      return res.data;
+    } else {
+      console.log("12");
+    }
+  } catch (error) {
+    console.log("1");
+  }
+};
+export { login, register };

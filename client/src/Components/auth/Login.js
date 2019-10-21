@@ -82,12 +82,7 @@ function SignIn() {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        {state.alert.payload && (
-          <Alert
-            message={state.alert.payload.msg}
-            type={state.alert.payload.type}
-          />
-        )}
+      
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
