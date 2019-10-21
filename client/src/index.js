@@ -1,32 +1,38 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Router, Route, Switch } from "react-router-dom";
-import { UserProvider } from "./Context/appStore";
-import history from "./history";
-import PrivateRoute from "./Components/PrivateRoute";
-import Register from "./Components/auth/Register";
-import Login from "./Components/auth/Login";
-import Recovery from "./Components/auth/Recovery";
-import Setting from "./Components/user/Setting";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { UserProvider, useUserStore } from "./Context/appStore";
+import { LoadUserComponent } from "./LoadUser";
+import { loadUser } from "./actions/authAction";
+import Navbar from "./Components/layouts/Navbar";
 import Landing from "./Components/layouts/Landing";
+import Routes from "./Components/routing/Routes";
+import Footer from "./Components/layouts/Footer";
 import "./index.css";
 
 function App() {
+  const [state, dispatch] = useUserStore();
+
   return (
-    <>
-      <Router history={history}>
+    <div
+      style={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}
+    >
+      <LoadUserComponent loadUser={loadUser} dispatch={dispatch} />
+      <Router>
+        <Navbar />
         <Switch>
-          <UserProvider>
-            <Route exact path="/register" component={Register} />
-            <Route exact path="/login" component={Login} />
-            <Route exact path="/recovery" component={Recovery} />
-            <Route exact path="/" component={Landing} />
-            <PrivateRoute to="/setting" component={Setting} isLogged={true} />
-          </UserProvider>
+          <Route exact path="/" component={Landing} />
+          <Route component={Routes} />
         </Switch>
+        <Footer style={{ flex: 1 }} />
       </Router>
-    </>
+    </div>
   );
 }
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(
+  <UserProvider>
+    <App />
+  </UserProvider>,
+  document.getElementById("root")
+);

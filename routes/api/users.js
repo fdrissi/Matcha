@@ -15,7 +15,7 @@ const key = config.get("keyOrSecret");
 // @desc    Login User
 // @access  Public
 router.post("/login", [validateEmail, validatePassword], async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, remember } = req.body;
   const user = await userModel.login(email);
   if (!user) {
     return res.json({ success: false, errorMsg: "Wrong Credentials" });
@@ -28,18 +28,16 @@ router.post("/login", [validateEmail, validatePassword], async (req, res) => {
 
   const payload = {
     user: {
-      id: user.id,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      username: user.username,
-      email: user.email
+      id: user.id
     }
   };
 
-  jwt.sign(payload, key, { expiresIn: 3600 }, (err, token) => {
+  const expiration = remember ? 3600 * 24 * 14 : 3600;
+
+  jwt.sign(payload, key, { expiresIn: expiration }, (err, token) => {
     if (err) throw err;
-    res.cookie("token", token, { httpOnly: true });
-    res.json({ success: true, token });
+    res.cookie("token", token, { httpOnly: true, maxAge: expiration * 1000 }); //one hour or 2 weeks
+    res.json({ success: true });
   });
 });
 
@@ -47,6 +45,20 @@ router.post("/login", [validateEmail, validatePassword], async (req, res) => {
 // @desc    Login User
 // @access  Public
 router.get("/current", auth, async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user.id);
+    delete user.password;
+    res.json({ success: true, user });
+  } catch (error) {
+    console.log(error.message);
+    res.send("Server error");
+  }
+});
+
+// @route   GET api/users/editsetting
+// @desc    Edit user info (name, email, password...)
+// @access  Public
+router.get("/editinfo", auth, async (req, res) => {
   try {
     const user = await userModel.findById(req.user.id);
     delete user.password;

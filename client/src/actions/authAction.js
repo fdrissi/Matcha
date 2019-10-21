@@ -2,11 +2,13 @@ import axios from "axios";
 import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
+  USER_LOADED,
+  AUTH_ERROR,
   SET_ALERT,
   REMOVE_ALERT
 } from "./actionTypes";
 
-export const login = async (email, password, dispatch) => {
+export const login = async (email, password, remember, dispatch) => {
   let config = {
     header: {
       "Content-Type": "application/json"
@@ -14,7 +16,11 @@ export const login = async (email, password, dispatch) => {
   };
 
   try {
-    let res = await axios.post("/api/users/login", { email, password }, config);
+    let res = await axios.post(
+      "/api/users/login",
+      { email, password, remember },
+      config
+    );
     if (!res.data.success) {
       dispatch({
         type: SET_ALERT,
@@ -29,24 +35,37 @@ export const login = async (email, password, dispatch) => {
         });
       }, 5000);
     } else {
-      const token = res.data.token;
-      config = {
-        headers: {
-          "x-auth-token": token
-        }
-      };
-      res = await axios.get("/api/users/current", config);
+      res = await axios.get("/api/users/current");
+      console.log(res.data);
       dispatch({
         type: LOGIN_SUCCESS,
-        payload: {
-          token,
-          user: res.data.user
-        }
+        payload: res.data.user
       });
     }
   } catch (error) {
     dispatch({
       type: LOGIN_FAIL
+    });
+  }
+};
+
+export const loadUser = async dispatch => {
+  try {
+    const res = await axios.get("/api/users/current");
+    if (res.data.success) {
+      const payload = res.data.user;
+      dispatch({
+        type: USER_LOADED,
+        payload
+      });
+    } else {
+      dispatch({
+        type: AUTH_ERROR
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: AUTH_ERROR
     });
   }
 };

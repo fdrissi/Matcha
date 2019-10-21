@@ -1,38 +1,58 @@
-import { LOGIN_SUCCESS, LOGIN_FAIL } from "../actions/actionTypes";
-import axios from "axios";
-
-const loadUser = async () => {
-  const config = {
-    headers: {
-      "x-auth-token": localStorage.getItem("token")
-    }
-  };
-  const res = await axios.get("/api/users/current", config);
-  return res.data.user;
-};
+import {
+  LOGIN_SUCCESS,
+  LOGIN_FAIL,
+  USER_LOADED,
+  AUTH_ERROR
+} from "../actions/actionTypes";
 
 export const authInitState = {
-  token: localStorage.getItem("token"),
   isAuthenticated: false,
   loading: true,
-  userInfo:
-    typeof localStorage.getItem("token") === "undifined" ? {} : loadUser()
+  userInfo: {
+    email: "",
+    first_name: "",
+    id: "",
+    last_name: "",
+    recovery_key: "",
+    username: "",
+    verification_key: "",
+    verified: ""
+  }
 };
 
 export const authReducer = (state, action) => {
   const { type, payload } = action;
   switch (type) {
-    case LOGIN_SUCCESS:
-      localStorage.setItem("token", payload.token);
+    case USER_LOADED:
       return {
         ...state,
         isAuthenticated: true,
         loading: false,
-        userInfo: payload.user
+        userInfo: payload
+      };
+    case LOGIN_SUCCESS:
+      return {
+        ...state,
+        isAuthenticated: true,
+        loading: false
       };
     case LOGIN_FAIL:
-      localStorage.removeItem("token");
-      return { ...state, toekn: null, isAuthenticated: false, loading: false };
+    case AUTH_ERROR:
+      return {
+        ...state,
+        isAuthenticated: false,
+        loading: true,
+        userInfo: {
+          email: "",
+          first_name: "",
+          id: "",
+          last_name: "",
+          recovery_key: "",
+          username: "",
+          verification_key: "",
+          verified: ""
+        }
+      };
 
     default:
       return state;
