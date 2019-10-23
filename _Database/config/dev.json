@@ -1,9 +1,9 @@
 {
   "dev": {
-    "host": "10.12.7.10",
+    "host": "localhost",
     "database": "matcha",
     "user": "root",
-    "password": "159357",
+    "password": "tiger",
     "driver": "mysql",
     "multipleStatments": true
   },

@@ -5,7 +5,8 @@ const userModel = require("../../models/User");
 const auth = require("../../middleware/auth");
 const {
   validateEmail,
-  validatePassword
+  validatePassword,
+  validateInput
 } = require("../../helpers/user/validations");
 const express = require("express");
 const router = express.Router();
@@ -41,6 +42,33 @@ router.post("/login", [validateEmail, validatePassword], async (req, res) => {
   });
 });
 
+// @route   POST api/users/register
+// @desc    Register User
+// @access  Public
+router.post("/register", async (req, res) => {
+  const { errors, isValid } = await validateInput(req.body);
+  if (isValid) {
+    const user = await userModel.register(req.body);
+    if (!user) {
+      return res.json({
+        success: false,
+        errorMsg: "Sorry There is A prb With the database"
+      });
+    } else {
+      res.json({ success: true });
+    }
+  } else {
+    return res.json({ success: false, errors });
+  }
+});
+
+// @route   POST api/users/register
+// @desc    Register User
+// @access  Public
+router.get("/verification/:token", async (req, res) => {
+  console.log(req.params.token);
+});
+
 // @route   GET api/users/login
 // @desc    Login User
 // @access  Public
@@ -64,7 +92,6 @@ router.get("/editinfo", auth, async (req, res) => {
     delete user.password;
     res.json({ success: true, user });
   } catch (error) {
-    console.log(error.message);
     res.send("Server error");
   }
 });

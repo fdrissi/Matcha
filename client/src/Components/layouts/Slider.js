@@ -40,6 +40,7 @@ const useStyles = makeStyles(theme => ({
     display: "block",
     margin: "2% auto 0",
     fontSize: "20px",
+    border: "1px solid #e74c3c",
     textTransform: "capitalize",
     backgroundColor: "#e74c3c",
     "&:hover": {
@@ -54,9 +55,9 @@ const TextOnSlide = ({ classes, animation, children }) => {
   return (
     <Slide direction={animation} in={true} mountOnEnter unmountOnExit>
       <Typography
-        variant='h4'
-        color='textSecondary'
-        align='center'
+        variant="h4"
+        color="textSecondary"
+        align="center"
         className={classes.slideText}
       >
         Are You <span className={classes.redText}>Waiting</span>
@@ -71,10 +72,10 @@ const TextOnSlide = ({ classes, animation, children }) => {
 const FabButton = ({ className, text }) => {
   return (
     <Fab
-      variant='extended'
-      color='primary'
-      aria-label='add'
-      size='large'
+      variant="extended"
+      color="primary"
+      aria-label="add"
+      size="large"
       className={className}
     >
       {text}
@@ -89,9 +90,9 @@ function Slider() {
   return (
     <div className={classes.imgDiv}>
       <img src={image.imgPath} alt={image.label} className={classes.img} />
-      <TextOnSlide classes={classes} animation='up'>
-        <Link to='/register' style={{ textDecoration: "none" }}>
-          <FabButton className={classes.registerButton} text='Registeration' />
+      <TextOnSlide classes={classes} animation="up">
+        <Link to="/register" style={{ textDecoration: "none" }}>
+          <FabButton className={classes.registerButton} text="Registeration" />
         </Link>
       </TextOnSlide>
     </div>

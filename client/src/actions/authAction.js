@@ -5,7 +5,9 @@ import {
   USER_LOADED,
   AUTH_ERROR,
   SET_ALERT,
-  REMOVE_ALERT
+  REMOVE_ALERT,
+  FAILIED_REGISTRATION,
+  SUCCESS_REGISTRATION
 } from "./actionTypes";
 
 export const login = async (email, password, remember, dispatch) => {
@@ -48,6 +50,41 @@ export const login = async (email, password, remember, dispatch) => {
   }
 };
 
+export const register = async (mydata, dispatch) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+
+  try {
+    const res = await axios.post("/api/users/register", mydata, config);
+    if (!res.data.success) {
+      dispatch({
+        type: FAILIED_REGISTRATION,
+        payload: {
+          message: "Register unsuccess",
+          errors: res.data.errors
+        }
+      });
+    } else {
+      dispatch({
+        type: SUCCESS_REGISTRATION,
+        payload: {
+          message: "Register success"
+        }
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: FAILIED_REGISTRATION,
+      payload: {
+        message: "Register unsuccess",
+        errors: {}
+      }
+    });
+  }
+};
 export const loadUser = async dispatch => {
   try {
     const res = await axios.get("/api/users/current");

@@ -2,8 +2,11 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   USER_LOADED,
-  AUTH_ERROR
+  AUTH_ERROR,
+  SUCCESS_REGISTRATION,
+  FAILIED_REGISTRATION
 } from "../actions/actionTypes";
+import { stat } from "fs";
 
 export const authInitState = {
   isAuthenticated: false,
@@ -49,6 +52,39 @@ export const authReducer = (state, action) => {
         }
       };
 
+    default:
+      return state;
+  }
+};
+
+export const registerInitState = {
+  register_message: "",
+  errors: {
+    email: "",
+    userName: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    confirmPassword: ""
+  }
+};
+
+export const registerReducer = (state = registerInitState, action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case SUCCESS_REGISTRATION:
+      return {
+        ...state,
+        register_message: payload.message
+      };
+    case FAILIED_REGISTRATION:
+      return {
+        ...state,
+        register_message: payload.message,
+        errors: payload.errors
+      };
+    case "LeaveErrors":
+      return (state = registerInitState);
     default:
       return state;
   }

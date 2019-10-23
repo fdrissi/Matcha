@@ -74,9 +74,12 @@ const SignIn = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
+<<<<<<< HEAD
         {state.alert.msg && (
           <Alert message={state.alert.msg} type={state.alert.alertType} />
         )}
+=======
+>>>>>>> origin/abelomar
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
