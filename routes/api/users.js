@@ -46,36 +46,27 @@ router.post("/login", [validateEmail, validatePassword], async (req, res) => {
 // @desc    Register User
 // @access  Public
 router.post("/register", async (req, res) => {
-  const {
-    firstName,
-    lastName,
-    userName,
-    email,
-    password,
-    confirmPassword
-  } = req.body;
-  const { errors, isValid } = validateInput(req.body);
-
-  if (!isValid) {
+  const { errors, isValid } = await validateInput(req.body);
+  if (isValid) {
+    const user = await userModel.register(req.body);
+    if (!user) {
+      return res.json({
+        success: false,
+        errorMsg: "Sorry There is A prb With the database"
+      });
+    } else {
+      res.json({ success: true });
+    }
+  } else {
     return res.json({ success: false, errors });
   }
+});
 
-  // const user = await userModel.register({
-  //   firstName,
-  //   lastName,
-  //   userName,
-  //   email,
-  //   password
-  // });
-  // if (!user) {
-  //   return res.json({
-  //     success: false,
-  //     errorMsg: "Sorry There is A prb With the database"
-  //   });
-  // } else {
-  //   console.log("success");
-  //   return res.json({ success: true });
-  // }
+// @route   POST api/users/register
+// @desc    Register User
+// @access  Public
+router.get("/verification/:token", async (req, res) => {
+  console.log(req.params.token);
 });
 
 // @route   GET api/users/login

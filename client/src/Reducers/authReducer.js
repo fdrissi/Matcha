@@ -74,7 +74,7 @@ export const registerInitState = {
   }
 };
 
-export const registerReducer = (state, action) => {
+export const registerReducer = (state = registerInitState, action) => {
   const { type, payload } = action;
   switch (type) {
     case SUCCESS_REGISTRATION:
@@ -88,6 +88,8 @@ export const registerReducer = (state, action) => {
         register_message: payload.message,
         errors: payload.errors
       };
+    case "LeaveErrors":
+      return (state = registerInitState);
     default:
       return state;
   }

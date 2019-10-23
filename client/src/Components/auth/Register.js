@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Avatar from "@material-ui/core/Avatar";
+import { Redirect } from "react-router-dom";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
@@ -62,15 +63,9 @@ function SignUp() {
     confirmPassword: ""
   });
 
-  const [MyErrors, setErrors] = useState({});
-
   const [state, dispatch] = useUserStore();
-  console.log(state.register);
 
   const submitForm = async form => {
-    dispatch(register => ({
-      errors: {}
-    }));
     form.preventDefault();
     register(MyForm, dispatch);
     //register(MyForm, dispatch).then(() => {}, ({ res }) => console.log("res"));
@@ -78,11 +73,22 @@ function SignUp() {
 
   const handleInputChange = event => {
     event.persist();
+
     setMyFormData(MyForm => ({
       ...MyForm,
       [event.target.name]: event.target.value.trim()
     }));
   };
+  useEffect(() => {
+    const payload = {};
+    dispatch({
+      type: "LeaveErrors",
+      payload
+    });
+  }, []);
+  if (state.register.register_message === "Register success") {
+    return <Redirect to="/login" />;
+  }
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
