@@ -52,7 +52,7 @@ async function validateInput(data) {
     }
   }
   // validate userName
-  if (typeof data.email !== "undefined") {
+  if (typeof data.userName !== "undefined") {
     if (checkProperties(data.userName)) {
       errors.userName = "this field is requird";
     } else {
@@ -66,20 +66,20 @@ async function validateInput(data) {
     }
   }
   // validate Firstname
-  if (typeof data.email !== "undefined") {
+  if (typeof data.firstName !== "undefined") {
     if (checkProperties(data.firstName)) {
       errors.firstName = "this field is requird";
     }
   }
 
   // validate lastName
-  if (typeof data.email !== "undefined") {
+  if (typeof data.lastName !== "undefined") {
     if (checkProperties(data.lastName)) {
       errors.lastName = "this field is requird";
     }
   }
   // validate password
-  if (typeof data.email !== "undefined") {
+  if (typeof data.password !== "undefined") {
     if (checkProperties(data.password)) {
       errors.password = "this field is requird";
     } else {
@@ -91,7 +91,7 @@ async function validateInput(data) {
     }
   }
   // validate Confirm_password
-  if (typeof data.email !== "undefined") {
+  if (typeof data.confirmPassword !== "undefined") {
     if (checkProperties(data.confirmPassword)) {
       errors.confirmPassword = "this field is requird";
     } else {
