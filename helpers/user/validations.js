@@ -52,41 +52,52 @@ async function validateInput(data) {
     }
   }
   // validate userName
-  if (checkProperties(data.userName)) {
-    errors.userName = "this field is requird";
-  } else {
-    if (!(await userModel.findByName(data.userName))) {
-      errors.userName = "This User Name is taken by another user";
+  if (typeof data.email !== "undefined") {
+    if (checkProperties(data.userName)) {
+      errors.userName = "this field is requird";
     } else {
-      let regex = /^[A-Za-z]{3,10}$/;
-      if (!regex.test(data.userName))
-        errors.userName = "user name must be between 3 and 10 characters";
+      if (!(await userModel.findByName(data.userName))) {
+        errors.userName = "This User Name is taken by another user";
+      } else {
+        let regex = /^[A-Za-z]{3,10}$/;
+        if (!regex.test(data.userName))
+          errors.userName = "user name must be between 3 and 10 characters";
+      }
     }
   }
   // validate Firstname
-  if (checkProperties(data.firstName)) {
-    errors.firstName = "this field is requird";
+  if (typeof data.email !== "undefined") {
+    if (checkProperties(data.firstName)) {
+      errors.firstName = "this field is requird";
+    }
   }
+
   // validate lastName
-  if (checkProperties(data.lastName)) {
-    errors.lastName = "this field is requird";
+  if (typeof data.email !== "undefined") {
+    if (checkProperties(data.lastName)) {
+      errors.lastName = "this field is requird";
+    }
   }
   // validate password
-  if (checkProperties(data.password)) {
-    errors.password = "this field is requird";
-  } else {
-    // let regex = /(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=.*[0-9]).{8,20}/i;
-    let regex = /(?=.*[a-z]).{3,20}/i;
-    if (!regex.test(data.password))
-      errors.password =
-        "password should be between 8-20 characters in length and should include at least one upper case letter, one number or one special character.";
+  if (typeof data.email !== "undefined") {
+    if (checkProperties(data.password)) {
+      errors.password = "this field is requird";
+    } else {
+      // let regex = /(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=.*[0-9]).{8,20}/i;
+      let regex = /(?=.*[a-z]).{3,20}/i;
+      if (!regex.test(data.password))
+        errors.password =
+          "password should be between 8-20 characters in length and should include at least one upper case letter, one number or one special character.";
+    }
   }
   // validate Confirm_password
-  if (checkProperties(data.confirmPassword)) {
-    errors.confirmPassword = "this field is requird";
-  } else {
-    if (data.confirmPassword != data.password)
-      errors.confirmPassword = "PASSWORDS DO NOT MATCH";
+  if (typeof data.email !== "undefined") {
+    if (checkProperties(data.confirmPassword)) {
+      errors.confirmPassword = "this field is requird";
+    } else {
+      if (data.confirmPassword != data.password)
+        errors.confirmPassword = "PASSWORDS DO NOT MATCH";
+    }
   }
   console.log(errors);
   return {
