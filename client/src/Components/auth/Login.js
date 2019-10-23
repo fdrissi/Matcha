@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import { login } from "../../actions/authAction";
-import Navbar from "../layouts/Navbar";
-import Footer from "../layouts/Footer";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -48,12 +46,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function SignIn() {
+const SignIn = () => {
   const classes = useStyles();
-  console.log("login");
-
   const [state, dispatch] = useUserStore();
-
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -62,7 +57,7 @@ function SignIn() {
 
   const { email, password, remember } = formData;
 
-  const handleChange = e =>
+  const onChange = e =>
     setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
 
   const submitForm = async form => {
@@ -71,17 +66,16 @@ function SignIn() {
     login(email, password, remember, dispatch);
   };
 
-  if (state.auth.isAuthenticated) return <Redirect to="/setting" />;
+  if (state.auth.isAuthenticated) {
+    return <Redirect to="/setting" />;
+  }
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        {state.alert.payload && (
-          <Alert
-            message={state.alert.payload.msg}
-            type={state.alert.payload.type}
-          />
+        {state.alert.msg && (
+          <Alert message={state.alert.msg} type={state.alert.alertType} />
         )}
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
@@ -98,8 +92,9 @@ function SignIn() {
             label="Email Address or Username"
             name="email"
             autoComplete="email"
-            value={email}
-            onChange={e => handleChange(e)}
+            type="text"
+            value={email || ""}
+            onChange={e => onChange(e)}
             autoFocus
           />
 
@@ -111,17 +106,17 @@ function SignIn() {
             label="Password"
             type="password"
             id="password"
-            value={password}
-            onChange={e => handleChange(e)}
+            value={password || ""}
+            onChange={e => onChange(e)}
             autoComplete="current-password"
           />
 
           <FormControlLabel
             control={
               <Checkbox
-                value={remember}
+                value={remember || false}
                 color="primary"
-                checked={remember}
+                checked={remember || false}
                 name="remember"
                 onChange={e =>
                   setFormData({
@@ -154,7 +149,7 @@ function SignIn() {
       </div>
     </Container>
   );
-}
+};
 
 const Login = () => {
   return (
