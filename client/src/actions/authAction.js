@@ -27,7 +27,7 @@ export const login = async (email, password, remember, dispatch) => {
       dispatch({
         type: SET_ALERT,
         payload: {
-          type: "danger",
+          alertType: "danger",
           msg: res.data.errorMsg
         }
       });
@@ -89,10 +89,9 @@ export const loadUser = async dispatch => {
   try {
     const res = await axios.get("/api/users/current");
     if (res.data.success) {
-      const payload = res.data.user;
       dispatch({
         type: USER_LOADED,
-        payload
+        payload: res.data.user
       });
     } else {
       dispatch({

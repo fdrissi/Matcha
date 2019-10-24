@@ -25,18 +25,13 @@ export const authInitState = {
 export const authReducer = (state, action) => {
   const { type, payload } = action;
   switch (type) {
+    case LOGIN_SUCCESS:
     case USER_LOADED:
       return {
         ...state,
         isAuthenticated: true,
         loading: false,
         userInfo: payload
-      };
-    case LOGIN_SUCCESS:
-      return {
-        ...state,
-        isAuthenticated: true,
-        loading: false
       };
     case LOGIN_FAIL:
     case AUTH_ERROR:
