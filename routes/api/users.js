@@ -62,13 +62,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// @route   POST api/users/register
-// @desc    Register User
-// @access  Public
-router.get("/verification/:token", async (req, res) => {
-  console.log(req.params.token);
-});
-
 // @route   GET api/users/login
 // @desc    Login User
 // @access  Public

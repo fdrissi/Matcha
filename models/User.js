@@ -51,14 +51,27 @@ async function findByName(name) {
 
 async function findById(id) {
   let sql = `SELECT * FROM users WHERE id='${id}'`;
-  const [rows, fields] = await pool.query(sql);
+  const [rows] = await pool.query(sql);
   return rows[0];
 }
 
+// check if the user is already activiate his account
+async function checkActivation(token) {
+  let sql =
+    "SELECT verified FROM users WHERE verification_key = ? AND verified = ?";
+  const [result] = await pool.query(sql, [token, 0]);
+  console.log(result);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
 module.exports = {
   login,
   findById,
   register,
   findByEmail,
-  findByName
+  findByName,
+  checkActivation
 };
