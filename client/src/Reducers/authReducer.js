@@ -6,7 +6,6 @@ import {
   SUCCESS_REGISTRATION,
   FAILIED_REGISTRATION
 } from "../actions/actionTypes";
-import { stat } from "fs";
 
 export const authInitState = {
   isAuthenticated: false,

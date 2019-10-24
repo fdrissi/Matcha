@@ -13,9 +13,6 @@ import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
 import { register } from "../../actions/authAction";
 import { FormHelperText } from "@material-ui/core";
-import { stat } from "fs";
-import Box from "@material-ui/core/Box";
-
 const useStyles = makeStyles(theme => ({
   "@global": {
     body: {
@@ -79,6 +76,7 @@ function SignUp() {
       [event.target.name]: event.target.value.trim()
     }));
   };
+
   useEffect(() => {
     const payload = {};
     dispatch({

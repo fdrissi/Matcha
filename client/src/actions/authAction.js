@@ -104,3 +104,16 @@ export const loadUser = async dispatch => {
     });
   }
 };
+
+export const updateUser = async data => {
+  try {
+    const {
+      firstName,
+      lastName,
+      username,
+      email,
+      oldPassword,
+      newPassword
+    } = data;
+  } catch (error) {}
+};
