@@ -29,10 +29,12 @@
     "db-migrate": "^0.11.6",
     "db-migrate-mysql": "^1.1.10",
     "express": "^4.17.1",
-    "express-session": "^1.17.0",
     "history": "^4.10.1",
+    "is-empty": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^1.7.0",
+    "nodemailer": "^6.3.1",
+    "react-history": "^0.18.2",
     "use-combined-reducers": "^1.0.4",
     "uuid": "^3.3.3"
   },

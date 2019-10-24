@@ -2,6 +2,8 @@ const { pool } = require("../config/db");
 const escapeSpecialChars = require("../helpers/escapeSpecialChars");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const empty = require("is-empty");
+const { sendActivation } = require("../helpers/user/emailSender");
 
 async function login(email) {
   email = escapeSpecialChars(email);
@@ -15,14 +17,6 @@ async function register(data) {
     data = escapeSpecialChars(data);
     const token = crypto.randomBytes(64).toString("hex");
     let hash = bcrypt.hashSync(data.password, 10);
-    let payload = {
-      username: data.userName,
-      first_name: data.firstName,
-      last_name: data.lastName,
-      email: data.email,
-      password: hash,
-      verification_key: token
-    };
     let sql =
       "INSERT INTO users (username, first_name, last_name, email, password, verification_key) VALUES (?, ?, ?, ?, ?, ?)";
     const [result] = await pool.query(sql, [
@@ -33,10 +27,26 @@ async function register(data) {
       hash,
       token
     ]);
-    return result.affectedRows;
+    if (result.affectedRows) {
+      sendActivation(data.email, token);
+      return result.affectedRows;
+    }
   } catch (e) {
     console.log("Error caught");
   }
+}
+async function findByEmail(email) {
+  let sql = "SELECT * FROM users WHERE email = ?";
+  const [result] = await pool.query(sql, email);
+  if (empty(result)) return true;
+  else return false;
+}
+
+async function findByName(name) {
+  let sql = "SELECT * FROM users WHERE username = ?";
+  const [result] = await pool.query(sql, name);
+  if (empty(result)) return true;
+  else return false;
 }
 
 async function findById(id) {
@@ -48,5 +58,7 @@ async function findById(id) {
 module.exports = {
   login,
   findById,
-  register
+  register,
+  findByEmail,
+  findByName
 };

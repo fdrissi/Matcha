@@ -11,7 +11,7 @@ import Footer from "./Components/layouts/Footer";
 import "./index.css";
 
 function App() {
-  const [state, dispatch] = useUserStore();
+  const [, dispatch] = useUserStore();
 
   return (
     <div
