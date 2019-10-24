@@ -8,7 +8,6 @@ import Navbar from "./Components/layouts/Navbar";
 import Landing from "./Components/layouts/Landing";
 import Routes from "./Components/routing/Routes";
 import Footer from "./Components/layouts/Footer";
-import "./index.css";
 
 function App() {
   const [, dispatch] = useUserStore();
