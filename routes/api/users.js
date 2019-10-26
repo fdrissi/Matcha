@@ -103,7 +103,7 @@ router.get("/activation", async (req, res) => {
           });
         }
       } else {
-        // maybe the token is not true
+        //the token is not true
         return res.json({
           success: false,
           errorMsg: "Sorry But This is invalide Token you entre"

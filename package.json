@@ -30,7 +30,6 @@
     "db-migrate-mysql": "^1.1.10",
     "express": "^4.17.1",
     "history": "^4.10.1",
-    "http-proxy-middleware": "^0.20.0",
     "is-empty": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^1.7.0",
