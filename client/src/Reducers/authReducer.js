@@ -4,7 +4,8 @@ import {
   USER_LOADED,
   AUTH_ERROR,
   SUCCESS_REGISTRATION,
-  FAILIED_REGISTRATION
+  FAILIED_REGISTRATION,
+  REMOVE_ERRORS
 } from "../actions/actionTypes";
 
 export const authInitState = {
@@ -57,7 +58,7 @@ export const authReducer = (state, action) => {
 };
 
 export const registerInitState = {
-  register_message: "",
+  register_success: "",
   errors: {
     email: "",
     userName: "",
@@ -74,7 +75,7 @@ export const registerReducer = (state = registerInitState, action) => {
     case SUCCESS_REGISTRATION:
       return {
         ...state,
-        register_message: payload.message
+        register_success: "ok"
       };
     case FAILIED_REGISTRATION:
       return {
@@ -82,7 +83,7 @@ export const registerReducer = (state = registerInitState, action) => {
         register_message: payload.message,
         errors: payload.errors
       };
-    case "LeaveErrors":
+    case REMOVE_ERRORS:
       return (state = registerInitState);
     default:
       return state;

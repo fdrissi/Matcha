@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import { login } from "../../actions/authAction";
@@ -65,7 +65,6 @@ const SignIn = () => {
 
     login(email, password, remember, dispatch);
   };
-
   if (state.auth.isAuthenticated) {
     return <Redirect to="/setting" />;
   }
@@ -74,18 +73,9 @@ const SignIn = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-<<<<<<< HEAD
-<<<<<<< HEAD
         {state.alert.msg && (
           <Alert message={state.alert.msg} type={state.alert.alertType} />
         )}
-=======
->>>>>>> origin/abelomar
-=======
-        {state.alert.msg && (
-          <Alert message={state.alert.msg} type={state.alert.alertType} />
-        )}
->>>>>>> 7a9f7f73a880002d136ec0194f37c2f96621d6a9
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
