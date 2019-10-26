@@ -28,7 +28,7 @@ function checkProperties(obj) {
   return true;
 }
 // For THE REGISTRATION VALIDATION
-async function validateInput(data) {
+async function validateInput(req, res, next) {
   let errors = {
     email: "",
     userName: "",
@@ -39,71 +39,69 @@ async function validateInput(data) {
     confirmPassword: ""
   };
   // validate email
-  if (typeof data.email !== "undefined") {
-    if (checkProperties(data.email)) {
+  if (typeof req.body.email !== "undefined") {
+    if (checkProperties(req.body.email)) {
       errors.email = "this field is requird";
     } else {
-      if (!(await userModel.findByEmail(data.email))) {
+      if (await userModel.findByEmail(req.body.email)) {
         errors.email = "This email is taken by another user";
       } else {
         let regex = /\S+@\S+\.\S+/;
-        if (!regex.test(data.email)) errors.email = "enter valid email";
+        if (!regex.test(req.body.email)) errors.email = "enter valid email";
       }
     }
   }
   // validate userName
-  if (typeof data.userName !== "undefined") {
-    if (checkProperties(data.userName)) {
+  if (typeof req.body.userName !== "undefined") {
+    if (checkProperties(req.body.userName)) {
       errors.userName = "this field is requird";
     } else {
-      if (!(await userModel.findByUsername(data.userName))) {
+      if (await userModel.findByUsername(req.body.userName)) {
         errors.userName = "This User Name is taken by another user";
       } else {
         let regex = /^[A-Za-z]{3,10}$/;
-        if (!regex.test(data.userName))
+        if (!regex.test(req.body.userName))
           errors.userName = "user name must be between 3 and 10 characters";
       }
     }
   }
   // validate Firstname
-  if (typeof data.firstName !== "undefined") {
-    if (checkProperties(data.firstName)) {
+  if (typeof req.body.firstName !== "undefined") {
+    if (checkProperties(req.body.firstName)) {
       errors.firstName = "this field is requird";
     }
   }
 
   // validate lastName
-  if (typeof data.lastName !== "undefined") {
-    if (checkProperties(data.lastName)) {
+  if (typeof req.body.lastName !== "undefined") {
+    if (checkProperties(req.body.lastName)) {
       errors.lastName = "this field is requird";
     }
   }
   // validate password
-  if (typeof data.password !== "undefined") {
-    if (checkProperties(data.password)) {
+  if (typeof req.body.password !== "undefined") {
+    if (checkProperties(req.body.password)) {
       errors.password = "this field is requird";
     } else {
       // let regex = /(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=.*[0-9]).{8,20}/i;
       let regex = /(?=.*[a-z]).{3,20}/i;
-      if (!regex.test(data.password))
+      if (!regex.test(req.body.password))
         errors.password =
           "password should be between 8-20 characters in length and should include at least one upper case letter, one number or one special character.";
     }
   }
   // validate Confirm_password
-  if (typeof data.confirmPassword !== "undefined") {
-    if (checkProperties(data.confirmPassword)) {
+  if (typeof req.body.confirmPassword !== "undefined") {
+    if (checkProperties(req.body.confirmPassword)) {
       errors.confirmPassword = "this field is requird";
     } else {
-      if (data.confirmPassword != data.password)
+      if (req.body.confirmPassword != req.body.password)
         errors.confirmPassword = "PASSWORDS DO NOT MATCH";
     }
   }
-  console.log(errors);
-  return {
-    errors,
-    isValid: checkProperties(errors)
-  };
+  if (!checkProperties(errors))
+    return res.json({ success: false, errors, errorMsg: "Register unsuccess" });
+  next();
 }
 module.exports = {
   validateEmail,

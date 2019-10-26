@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import { login } from "../../actions/userAction";
@@ -65,7 +65,6 @@ const SignIn = () => {
 
     login(email, password, remember, dispatch);
   };
-
   if (state.auth.isAuthenticated) {
     return <Redirect to="/setting" />;
   }

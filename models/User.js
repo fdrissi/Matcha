@@ -32,7 +32,7 @@ async function register(data) {
       token
     ]);
     if (result.affectedRows) {
-      sendActivation(data.email, token);
+      sendActivation(data.email, data.userName, token);
       return result.affectedRows;
     }
   } catch (e) {
@@ -42,15 +42,15 @@ async function register(data) {
 async function findByEmail(email) {
   let sql = "SELECT * FROM users WHERE email = ?";
   const [result] = await pool.query(sql, email);
-  if (empty(result)) return true;
-  else return false;
+  if (empty(result)) return false;
+  else return true;
 }
 
 async function findByUsername(name) {
   let sql = "SELECT * FROM users WHERE username = ?";
   const [result] = await pool.query(sql, name);
-  if (empty(result)) return true;
-  else return false;
+  if (empty(result)) return false;
+  else return true;
 }
 
 async function findById(id) {
@@ -59,12 +59,33 @@ async function findById(id) {
   return rows[0];
 }
 
-// check if the user is already activiate his account
-async function checkActivation(token) {
+// check if the user alreay validate his account
+async function checkActivation(userName) {
+  let sql = "SELECT * FROM users WHERE username = ?";
+  const [result] = await pool.query(sql, [userName]);
+  if (!empty(result)) {
+    return result[0];
+  } else {
+    return false;
+  }
+}
+
+// check if token is valide
+async function ActivateUser(userName, token) {
   let sql =
-    "SELECT verified FROM users WHERE verification_key = ? AND verified = ?";
-  const [result] = await pool.query(sql, [token, 0]);
-  console.log(result);
+    "SELECT verified from users WHERE username = ? AND verification_key = ?";
+  const [result] = await pool.query(sql, [userName, token]);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+// set verification to true
+async function updateValidation(userName, token) {
+  let sql =
+    "UPDATE users SET verified = ?, verification_key = ?  WHERE username = ? AND  verification_key = ?";
+  const [result] = await pool.query(sql, [1, 0, userName, token]);
   if (!empty(result)) {
     return true;
   } else {
@@ -77,5 +98,7 @@ module.exports = {
   register,
   findByEmail,
   findByUsername,
-  checkActivation
+  checkActivation,
+  ActivateUser,
+  updateValidation
 };

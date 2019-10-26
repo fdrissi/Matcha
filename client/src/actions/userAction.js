@@ -50,6 +50,33 @@ export const login = async (email, password, remember, dispatch) => {
   }
 };
 
+export const activation = async (username, token, dispatch) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  const res = await axios.get(
+    "/api/users/activation",
+    { params: { userName: username, token: token } },
+    config
+  );
+  console.log(res);
+  if (!res.data.success) {
+    console.log(res.data.errorMsg);
+  } else {
+    console.log(res.data.errorMsg);
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "danger",
+        msg: res.data.errorMsg
+      }
+    });
+    window.location = "/login";
+  }
+};
+
 export const register = async (mydata, dispatch) => {
   const config = {
     header: {
@@ -59,28 +86,44 @@ export const register = async (mydata, dispatch) => {
 
   try {
     const res = await axios.post("/api/users/register", mydata, config);
+    console.log(res);
     if (!res.data.success) {
       dispatch({
         type: FAILIED_REGISTRATION,
         payload: {
-          message: "Register unsuccess",
+          message: res.data.errorMsg,
           errors: res.data.errors
+        }
+      });
+      dispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "danger",
+          msg: res.data.errorMsg
         }
       });
     } else {
       dispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "success",
+          msg: res.data.SuccessMsg
+        }
+      });
+      dispatch({
         type: SUCCESS_REGISTRATION,
         payload: {
-          message: "Register success"
+          email: mydata.email,
+          message: res.data.errorMsg
         }
       });
     }
   } catch (error) {
     dispatch({
-      type: FAILIED_REGISTRATION,
+      type: SET_ALERT,
       payload: {
-        message: "Register unsuccess",
-        errors: {}
+        alertType: "danger",
+        msg: "Register unsuccess"
       }
     });
   }
