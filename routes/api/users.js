@@ -45,20 +45,19 @@ router.post("/login", [validateEmail, validatePassword], async (req, res) => {
 // @route   POST api/users/register
 // @desc    Register User
 // @access  Public
-router.post("/register", async (req, res) => {
-  const { errors, isValid } = await validateInput(req.body);
-  if (isValid) {
-    const user = await userModel.register(req.body);
-    if (!user) {
-      return res.json({
-        success: false,
-        errorMsg: "Sorry There is A prb With the database"
-      });
-    } else {
-      res.json({ success: true });
-    }
+router.post("/register", [validateInput], async (req, res) => {
+  const user = await userModel.register(req.body);
+  if (!user) {
+    return res.json({
+      success: false,
+      errorMsg: "Sorry There is A prb With the database"
+    });
   } else {
-    return res.json({ success: false, errors });
+    res.json({
+      success: true,
+      SuccessMsg: `We'll send an email to ${req.body.email} in 5 minutes. Open it up to activate your account.`,
+      errorMsg: "Register success"
+    });
   }
 });
 
@@ -71,8 +70,49 @@ router.get("/current", auth, async (req, res) => {
     delete user.password;
     res.json({ success: true, user });
   } catch (error) {
-    console.log(error.message);
     res.send("Server error");
+  }
+});
+
+// @route   GET api/users/activation
+// @desc    activation User
+// @access  Public
+router.get("/activation", async (req, res) => {
+  const { userName, token } = req.query;
+  let check = await userModel.checkActivation(userName);
+  if (check) {
+    // valide username
+    if (check.verified) {
+      //already verivied
+      return res.json({
+        success: false,
+        errorMsg: "already verified"
+      });
+    } else {
+      // lets work on validing this username
+      if (await userModel.ActivateUser(userName, token)) {
+        // the token is true
+        if (await userModel.updateValidation(userName, token)) {
+          // everything works fine
+          return res.json({ success: true, errorMsg: "EveryThing Goes Good" });
+        } else {
+          // something goes wrong
+          return res.json({
+            success: false,
+            errorMsg: "Something Goes Wrong Please Let Us Know"
+          });
+        }
+      } else {
+        //the token is not true
+        return res.json({
+          success: false,
+          errorMsg: "Sorry But This is invalide Token you entre"
+        });
+      }
+    }
+  } else {
+    // invalide username
+    return res.json({ success: false, errorMsg: "invalid username" });
   }
 });
 
