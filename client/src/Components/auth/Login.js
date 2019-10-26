@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
-import { login } from "../../actions/authAction";
+import { login } from "../../actions/userAction";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -74,18 +74,9 @@ const SignIn = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-<<<<<<< HEAD
-<<<<<<< HEAD
         {state.alert.msg && (
           <Alert message={state.alert.msg} type={state.alert.alertType} />
         )}
-=======
->>>>>>> origin/abelomar
-=======
-        {state.alert.msg && (
-          <Alert message={state.alert.msg} type={state.alert.alertType} />
-        )}
->>>>>>> 7a9f7f73a880002d136ec0194f37c2f96621d6a9
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>

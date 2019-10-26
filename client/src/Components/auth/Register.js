@@ -11,7 +11,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
-import { register } from "../../actions/authAction";
+import { register } from "../../actions/userAction";
 import { FormHelperText } from "@material-ui/core";
 const useStyles = makeStyles(theme => ({
   "@global": {

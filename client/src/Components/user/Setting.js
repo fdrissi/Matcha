@@ -66,8 +66,12 @@ const Form = () => {
     newPassword2
   } = formData;
 
-  const handleChange = e =>
+  const onChange = e =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = form => {
+    form.preventDefault();
+  };
 
   useEffect(() => {
     setFormData(formData => ({
@@ -91,7 +95,7 @@ const Form = () => {
         <Typography component="h1" variant="h5">
           Update Account Informations
         </Typography>
-        <form className={classes.form}>
+        <form className={classes.form} onSubmit={form => handleSubmit(form)}>
           <Grid container spacing={2}>
             <Grid item sx={12} sm={6}>
               <TextField
@@ -102,7 +106,7 @@ const Form = () => {
                 label="First Name"
                 name="firstName"
                 value={firstName}
-                onChange={e => handleChange(e)}
+                onChange={e => onChange(e)}
                 autoFocus
               />
             </Grid>
@@ -116,7 +120,7 @@ const Form = () => {
                 label="Last Name"
                 name="lastName"
                 value={lastName}
-                onChange={e => handleChange(e)}
+                onChange={e => onChange(e)}
               />
             </Grid>
 
@@ -128,9 +132,11 @@ const Form = () => {
                 id="username"
                 label="Username"
                 name="username"
-                autoComplete="username"
+                autoComplete="username
+                
+                "
                 value={username}
-                onChange={e => handleChange(e)}
+                onChange={e => onChange(e)}
               />
             </Grid>
 
@@ -144,7 +150,7 @@ const Form = () => {
                 name="email"
                 autoComplete="email"
                 value={email}
-                onChange={e => handleChange(e)}
+                onChange={e => onChange(e)}
               />
             </Grid>
 
@@ -158,7 +164,7 @@ const Form = () => {
                 type="password"
                 id="oldpassword"
                 value={oldPassword}
-                onChange={e => handleChange(e)}
+                onChange={e => onChange(e)}
               />
             </Grid>
 
@@ -172,7 +178,7 @@ const Form = () => {
                 type="password"
                 id="newpassword"
                 value={newPassword}
-                onChange={e => handleChange(e)}
+                onChange={e => onChange(e)}
               />
             </Grid>
 
@@ -186,7 +192,7 @@ const Form = () => {
                 type="password"
                 id="newpassword2"
                 value={newPassword2}
-                onChange={e => handleChange(e)}
+                onChange={e => onChange(e)}
               />
             </Grid>
 

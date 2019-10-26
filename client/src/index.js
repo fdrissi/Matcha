@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { UserProvider, useUserStore } from "./Context/appStore";
 import { LoadUserComponent } from "./LoadUser";
-import { loadUser } from "./actions/authAction";
+import { loadUser } from "./actions/userAction";
 import Navbar from "./Components/layouts/Navbar";
 import Landing from "./Components/layouts/Landing";
 import Routes from "./Components/routing/Routes";

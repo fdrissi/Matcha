@@ -8,8 +8,12 @@ const { sendActivation } = require("../helpers/user/emailSender");
 async function login(email) {
   email = escapeSpecialChars(email);
   let sql = `SELECT * FROM users WHERE email='${email}'`;
-  const [rows, fields] = await pool.query(sql);
-  return rows[0];
+  try {
+    const [rows] = await pool.query(sql);
+    return rows[0];
+  } catch (error) {
+    return false;
+  }
 }
 
 async function register(data) {
@@ -42,7 +46,7 @@ async function findByEmail(email) {
   else return false;
 }
 
-async function findByName(name) {
+async function findByUsername(name) {
   let sql = "SELECT * FROM users WHERE username = ?";
   const [result] = await pool.query(sql, name);
   if (empty(result)) return true;
@@ -72,6 +76,6 @@ module.exports = {
   findById,
   register,
   findByEmail,
-  findByName,
+  findByUsername,
   checkActivation
 };

@@ -56,7 +56,7 @@ async function validateInput(data) {
     if (checkProperties(data.userName)) {
       errors.userName = "this field is requird";
     } else {
-      if (!(await userModel.findByName(data.userName))) {
+      if (!(await userModel.findByUsername(data.userName))) {
         errors.userName = "This User Name is taken by another user";
       } else {
         let regex = /^[A-Za-z]{3,10}$/;
