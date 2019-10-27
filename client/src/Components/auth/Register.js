@@ -13,7 +13,7 @@ import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
 import { register } from "../../actions/userAction";
 import { FormHelperText } from "@material-ui/core";
-import Alert from "../layouts/Alert";
+import Alert from "../inc/Alert";
 import { REMOVE_ALERT, REMOVE_ERRORS } from "../../actions/actionTypes";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";

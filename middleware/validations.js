@@ -1,4 +1,4 @@
-const userModel = require("../../models/User");
+const userModel = require("../models/User");
 
 function validatePassword(req, res, next) {
   let regex = /(?=.*[a-z])(?=.*[0-9]).{8,}/i;
@@ -20,6 +20,7 @@ function validateName(req, res, next) {
     return res.json({ success: false, errorMsg: "Enter valid Last Name" });
   next();
 }
+
 // Check it is empty
 function checkProperties(obj) {
   for (var key in obj) {
@@ -27,13 +28,13 @@ function checkProperties(obj) {
   }
   return true;
 }
+
 // For THE REGISTRATION VALIDATION
 async function validateInput(req, res, next) {
   let errors = {
     email: "",
     userName: "",
     firstName: "",
-    lastName: "",
     lastName: "",
     password: "",
     confirmPassword: ""
@@ -59,7 +60,7 @@ async function validateInput(req, res, next) {
       if (await userModel.findByUsername(req.body.userName)) {
         errors.userName = "This User Name is taken by another user";
       } else {
-        let regex = /^[A-Za-z]{3,10}$/;
+        let regex = /^[A-Za-z0-9]{3,10}$/;
         if (!regex.test(req.body.userName))
           errors.userName = "user name must be between 3 and 10 characters";
       }
