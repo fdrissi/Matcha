@@ -49,7 +49,7 @@ const Form = () => {
   const [formData, setFormData] = useState({
     firstName: auth.userInfo.first_name || "",
     lastName: auth.userInfo.laste_name || "",
-    username: auth.userInfo.username || "",
+    userName: auth.userInfo.username || "",
     email: auth.userInfo.email || "",
     oldPassword: "",
     newPassword: "",
@@ -59,7 +59,7 @@ const Form = () => {
   const {
     firstName,
     lastName,
-    username,
+    userName,
     email,
     oldPassword,
     newPassword,
@@ -135,7 +135,7 @@ const Form = () => {
                 autoComplete="username
                 
                 "
-                value={username}
+                value={userName}
                 onChange={e => onChange(e)}
               />
             </Grid>

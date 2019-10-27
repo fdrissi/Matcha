@@ -3,7 +3,7 @@
     "host": "localhost",
     "database": "matcha",
     "user": "root",
-    "password": "tiger",
+    "password": "159357",
     "driver": "mysql",
     "multipleStatments": true
   },

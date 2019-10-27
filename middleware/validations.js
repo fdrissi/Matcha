@@ -1,5 +1,21 @@
 const userModel = require("../models/User");
 
+function validateEmail(req, res, next) {
+  req.body.email = req.body.email.toLowerCase();
+  let regex = /\S+@\S+\.\S+/;
+  if (!regex.test(req.body.email))
+    return res.json({ success: false, errorMsg: "Enter valid email" });
+  next();
+}
+
+function validateUsername(req, res, next) {
+  req.body.email = req.body.email.toLowerCase();
+  let regex = /^[a-z0-9]{3,10}$/;
+  if (!regex.test(req.body.userName))
+    return res.json({ success: false, errorMsg: "Enter valid email" });
+  next();
+}
+
 function validatePassword(req, res, next) {
   let regex = /(?=.*[a-z])(?=.*[0-9]).{8,}/i;
   if (!regex.test(req.body.password))
@@ -7,15 +23,8 @@ function validatePassword(req, res, next) {
   next();
 }
 
-function validateEmail(req, res, next) {
-  let regex = /\S+@\S+\.\S+/;
-  if (!regex.test(req.body.email))
-    return res.json({ success: false, errorMsg: "Enter valid email" });
-  next();
-}
-
 function validateName(req, res, next) {
-  let regex = /^[A-Za-z]{3,}$/;
+  let regex = /^[A-Za-z]{3,20}$/;
   if (!regex.test(req.body.lastName || !regex.test(req.body.firstName)))
     return res.json({ success: false, errorMsg: "Enter valid Last Name" });
   next();
@@ -57,12 +66,11 @@ async function validateInput(req, res, next) {
     if (checkProperties(req.body.userName)) {
       errors.userName = "this field is requird";
     } else {
-
       req.body.userName = req.body.userName.toLowerCase();
       if (await userModel.findByUsername(req.body.userName)) {
         errors.userName = "This User Name is taken by another user";
       } else {
-        let regex = /^[a-zA-Z0-9]{3,10}$/;
+        let regex = /^[a-z0-9]{3,10}$/;
         if (!regex.test(req.body.userName))
           errors.userName =
             "user name must be between 3 and 10 characters without special characters";
@@ -121,5 +129,6 @@ module.exports = {
   validateEmail,
   validateName,
   validatePassword,
+  validateUsername,
   validateInput
 };
