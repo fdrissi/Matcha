@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import { login } from "../../actions/userAction";
+import { REMOVE_ALERT } from "../../actions/actionTypes";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -65,6 +66,15 @@ const SignIn = () => {
 
     login(email, password, remember, dispatch);
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch({
+        type: REMOVE_ALERT
+      });
+    };
+  }, []);
+
   if (state.auth.isAuthenticated) {
     return <Redirect to="/setting" />;
   }
