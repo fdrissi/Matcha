@@ -43,14 +43,14 @@ async function findByEmail(email) {
   let sql = "SELECT * FROM users WHERE email = ?";
   const [result] = await pool.query(sql, email);
   if (empty(result)) return false;
-  else return true;
+  else return result[0];
 }
 
 async function findByUsername(name) {
   let sql = "SELECT * FROM users WHERE username = ?";
   const [result] = await pool.query(sql, name);
   if (empty(result)) return false;
-  else return true;
+  else return result[0];
 }
 
 async function findById(id) {
@@ -61,8 +61,8 @@ async function findById(id) {
 
 // check if the user alreay validate his account
 async function checkActivation(userName) {
-  let sql = "SELECT * FROM users WHERE username = ?";
-  const [result] = await pool.query(sql, [userName]);
+  let sql = "SELECT * FROM users WHERE username = ? OR email = ?";
+  const [result] = await pool.query(sql, [userName, userName]);
   if (!empty(result)) {
     return result[0];
   } else {
@@ -77,6 +77,28 @@ async function ActivateUser(userName, token) {
   const [result] = await pool.query(sql, [userName, token]);
   if (!empty(result)) {
     return true;
+  } else {
+    return false;
+  }
+}
+
+// update the recovery token
+async function setRecovery(email, token) {
+  let sql = "UPDATE users SET recovery_key = ? WHERE email = ?";
+  const [result] = await pool.query(sql, [token, email]);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// check if the user did active his account or not
+async function checkByEamilUsernameValidation(value) {
+  let sql = "select verified from users Where username = ? OR email = ?";
+  const [result] = await pool.query(sql, [value, value]);
+  if (!empty(result)) {
+    return result[0].verified;
   } else {
     return false;
   }
@@ -100,5 +122,7 @@ module.exports = {
   findByUsername,
   checkActivation,
   ActivateUser,
-  updateValidation
+  updateValidation,
+  checkByEamilUsernameValidation,
+  setRecovery
 };

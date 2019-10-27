@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useUserStore } from "../../Context/appStore";
 import { activation } from "../../actions/userAction";
+import { Redirect } from "react-router-dom";
 
 const Activate = props => {
   const [, dispatch] = useUserStore();
@@ -9,6 +10,6 @@ const Activate = props => {
   useEffect(() => {
     activation(username, token, dispatch);
   }, []);
-  return 0;
+  return <Redirect to="/login" />;
 };
 export default Activate;

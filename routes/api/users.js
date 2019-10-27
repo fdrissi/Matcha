@@ -3,6 +3,8 @@ const config = require("config");
 const jwt = require("jsonwebtoken");
 const userModel = require("../../models/User");
 const auth = require("../../middleware/auth");
+const { sendRecovery } = require("../../helpers/user/emailSender");
+
 const {
   validateEmail,
   validatePassword,
@@ -11,6 +13,7 @@ const {
 const express = require("express");
 const router = express.Router();
 const key = config.get("keyOrSecret");
+const crypto = require("crypto");
 
 // @route   POST api/users/login
 // @desc    Login User
@@ -50,14 +53,87 @@ router.post("/register", [validateInput], async (req, res) => {
   if (!user) {
     return res.json({
       success: false,
-      errorMsg: "Sorry There is A prb With the database"
+      errorMsg: "Sorry there is a problem with the database"
     });
   } else {
     res.json({
       success: true,
-      SuccessMsg: `We'll send an email to ${req.body.email} in 5 minutes. Open it up to activate your account.`,
-      errorMsg: "Register success"
+      SuccessMsg: `We'll send an email to ${req.body.email} In 5 minutes. Open it up to activate your account.`,
+      errorMsg: "Register Success"
     });
+  }
+});
+
+// @route Post api/user/recover
+// @desc Recover User
+// @access PUBLIC
+router.post("/recover", async (req, res) => {
+  // first of all we have to check if the input is valide
+  const result = await userModel.findByUsername(req.body.data);
+  const respond = await userModel.checkByEamilUsernameValidation(req.body.data);
+  if (result) {
+    if (respond) {
+      const token = crypto.randomBytes(64).toString("hex");
+      // here we goona seet the token to that user (result = all row of the user get it from the users model)
+      const resultFromSr = userModel.setRecovery(result.email, token);
+      if (resultFromSr) {
+        // here we gonna send the email of the recovery
+        if (sendRecovery(result, token)) {
+          return res.json({
+            success: true,
+            errorMsg:
+              "A message has been sent to you by email with instructions on how to reset your password."
+          });
+        }
+      } else {
+        // something goes worng
+        return res.json({
+          success: false,
+          errorMsg: "Something goes wrong please lets know"
+        });
+      }
+    } else {
+      // the user need to validate his account firest
+      return res.json({
+        success: false,
+        errorMsg: "Please confirme your account first"
+      });
+    }
+  } else {
+    const result = await userModel.findByEmail(req.body.data);
+    if (result) {
+      if (respond) {
+        // let send the user an email to recover his account
+        const token = crypto.randomBytes(64).toString("hex");
+        const resultFromSr = userModel.setRecovery(req.body.data, token);
+        if (resultFromSr) {
+          // here we gonna send the email of the recovery
+          if (sendRecovery(result, token)) {
+            return res.json({
+              success: true,
+              errorMsg:
+                "A message has been sent to you by email with instructions on how to reset your password."
+            });
+          }
+        } else {
+          // something goes worng
+          return res.json({
+            success: false,
+            errorMsg: "Something goes wrong please lets know"
+          });
+        }
+      } else {
+        return res.json({
+          success: false,
+          errorMsg: "Please confirme your account first"
+        });
+      }
+    } else {
+      return res.json({
+        success: false,
+        errorMsg: "Invalid email or username. Please try to resubmit the form."
+      });
+    }
   }
 });
 
@@ -86,7 +162,7 @@ router.get("/activation", async (req, res) => {
       //already verivied
       return res.json({
         success: false,
-        errorMsg: "already verified"
+        errorMsg: "Account Already Verified"
       });
     } else {
       // lets work on validing this username
@@ -94,19 +170,23 @@ router.get("/activation", async (req, res) => {
         // the token is true
         if (await userModel.updateValidation(userName, token)) {
           // everything works fine
-          return res.json({ success: true, errorMsg: "EveryThing Goes Good" });
+          return res.json({
+            success: true,
+            errorMsg:
+              "Your account has been activated successfully. You can now login."
+          });
         } else {
           // something goes wrong
           return res.json({
             success: false,
-            errorMsg: "Something Goes Wrong Please Let Us Know"
+            errorMsg: "Something goes wrong please let us know"
           });
         }
       } else {
         //the token is not true
         return res.json({
           success: false,
-          errorMsg: "Sorry But This is invalide Token you entre"
+          errorMsg: "Sorry but this is invalide token you entre"
         });
       }
     }

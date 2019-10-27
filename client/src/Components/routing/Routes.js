@@ -4,7 +4,8 @@ import { Container } from "@material-ui/core";
 import Login from "../auth/Login";
 import Register from "../auth/Register";
 import Setting from "../user/Setting";
-import activate from "../auth/Activate";
+import Activate from "../auth/Activate";
+import Recover from "../auth/Recover";
 
 const Routes = () => {
   return (
@@ -13,7 +14,8 @@ const Routes = () => {
         <Route exact path="/login" component={Login} />
         <Route exact path="/register/" component={Register} />
         <Route exact path="/setting" component={Setting} />
-        <Route exact path="/activate/:username/:token" component={activate} />
+        <Route exact path="/activate/:username/:token" component={Activate} />
+        <Route exact path="/recover" component={Recover} />
       </Switch>
     </Container>
   );

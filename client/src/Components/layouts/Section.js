@@ -53,10 +53,10 @@ const Widget = ({ classes, img, title, text }) => {
   return (
     <>
       <img src={img.img} alt={img.title} className={classes.image} />
-      <Typography variant='h6' align='center'>
+      <Typography variant="h6" align="center">
         {title}
       </Typography>
-      <Typography variant='subtitle2' align='center'>
+      <Typography variant="subtitle2" align="center">
         {text}
       </Typography>
     </>
@@ -66,12 +66,12 @@ const Widget = ({ classes, img, title, text }) => {
 const Title = () => {
   return (
     <>
-      <Typography variant='h4' align='center'>
+      <Typography variant="h4" align="center">
         Welcome to <span style={{ color: "#e74c3c" }}>Mat</span>Cha
       </Typography>
 
       <Image
-        src='./img/underTitleLine.png'
+        src="./img/underTitleLine.png"
         aspectRatio={50}
         imageStyle={{ width: "10%", marginLeft: "45%" }}
       />

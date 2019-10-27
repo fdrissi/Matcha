@@ -148,7 +148,7 @@ const SignIn = () => {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link to="/recovery">Forgot password?</Link>
+              <Link to="/recover">Forgot password?</Link>
             </Grid>
             <Grid item>
               <Link to="/register">{"Don't have an account? Sign Up"}</Link>
