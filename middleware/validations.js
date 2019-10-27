@@ -20,7 +20,6 @@ function validateName(req, res, next) {
     return res.json({ success: false, errorMsg: "Enter valid Last Name" });
   next();
 }
-
 // Check it is empty
 function checkProperties(obj) {
   for (var key in obj) {
@@ -44,6 +43,7 @@ async function validateInput(req, res, next) {
     if (checkProperties(req.body.email)) {
       errors.email = "this field is requird";
     } else {
+      req.body.email = req.body.email.toLowerCase();
       if (await userModel.findByEmail(req.body.email)) {
         errors.email = "This email is taken by another user";
       } else {
@@ -57,12 +57,15 @@ async function validateInput(req, res, next) {
     if (checkProperties(req.body.userName)) {
       errors.userName = "this field is requird";
     } else {
+
+      req.body.userName = req.body.userName.toLowerCase();
       if (await userModel.findByUsername(req.body.userName)) {
         errors.userName = "This User Name is taken by another user";
       } else {
-        let regex = /^[A-Za-z0-9]{3,10}$/;
+        let regex = /^[a-zA-Z0-9]{3,10}$/;
         if (!regex.test(req.body.userName))
-          errors.userName = "user name must be between 3 and 10 characters";
+          errors.userName =
+            "user name must be between 3 and 10 characters without special characters";
       }
     }
   }
@@ -70,6 +73,11 @@ async function validateInput(req, res, next) {
   if (typeof req.body.firstName !== "undefined") {
     if (checkProperties(req.body.firstName)) {
       errors.firstName = "this field is requird";
+    } else {
+      let regex = /^[A-Za-z]{3,20}$/;
+      if (!regex.test(req.body.firstName))
+        errors.firstName =
+          "name must be between 3 and 20 characters without special characters";
     }
   }
 
@@ -77,6 +85,11 @@ async function validateInput(req, res, next) {
   if (typeof req.body.lastName !== "undefined") {
     if (checkProperties(req.body.lastName)) {
       errors.lastName = "this field is requird";
+    } else {
+      let regex = /^[A-Za-z]{3,20}$/;
+      if (!regex.test(req.body.lastName))
+        errors.lastName =
+          "Last name must be between 3 and 20 characters without special characters";
     }
   }
   // validate password
