@@ -6,16 +6,19 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import { Link } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import AccountCircle from "@material-ui/icons/AccountCircle";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
-import { register } from "../../actions/authAction";
+import { register } from "../../actions/userAction";
 import { FormHelperText } from "@material-ui/core";
 import Alert from "../layouts/Alert";
 import { REMOVE_ALERT, REMOVE_ERRORS } from "../../actions/actionTypes";
-import { stat } from "fs";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import IconButton from "@material-ui/core/IconButton";
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -23,6 +26,7 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: theme.palette.common.white
     }
   },
+
   paper: {
     marginTop: theme.spacing(8),
     display: "flex",
@@ -61,7 +65,9 @@ function SignUp() {
     lastName: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    showPassword: false,
+    showConfPassword: false
   });
 
   const [toLogin, setToHome] = useState(false);
@@ -71,7 +77,15 @@ function SignUp() {
     form.preventDefault();
     register(MyForm, dispatch);
   };
-
+  const handleClickShowPassword = () => {
+    setMyFormData({ ...MyForm, showPassword: !MyForm.showPassword });
+  };
+  const handleClickShowConfPassword = () => {
+    setMyFormData({ ...MyForm, showConfPassword: !MyForm.showConfPassword });
+  };
+  const handleMouseDownPassword = event => {
+    event.preventDefault();
+  };
   const handleInputChange = event => {
     event.persist();
 
@@ -82,10 +96,8 @@ function SignUp() {
   };
   useEffect(() => {
     return () => {
-      const payload = {};
       dispatch({
-        type: REMOVE_ERRORS,
-        payload
+        type: REMOVE_ERRORS
       });
       dispatch({
         type: REMOVE_ALERT
@@ -116,7 +128,7 @@ function SignUp() {
               <Alert message={state.alert.msg} type={state.alert.alertType} />
             )}
             <Avatar className={classes.avatar}>
-              <LockOutlinedIcon />
+              <AccountCircle />
             </Avatar>
             <Typography component="h1" variant="h5">
               Sign up
@@ -210,9 +222,27 @@ function SignUp() {
                     fullWidth
                     name="password"
                     label="Password"
-                    type="password"
+                    type={MyForm.showPassword ? "text" : "password"}
                     autoComplete="new-password"
                     onChange={handleInputChange}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            edge="end"
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {MyForm.showPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
                   />
                   {state.register.errors.password.length > 0 && (
                     <FormHelperText className={classes.helperText}>
@@ -233,8 +263,26 @@ function SignUp() {
                     name="confirmPassword"
                     label="Confirm  Password"
                     autoComplete="new-password"
-                    type="password"
+                    type={MyForm.showConfPassword ? "text" : "password"}
                     onChange={handleInputChange}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            edge="end"
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowConfPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {MyForm.showConfPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
                   />
                   {state.register.errors.confirmPassword.length > 0 && (
                     <FormHelperText className={classes.helperText}>
@@ -252,7 +300,7 @@ function SignUp() {
               >
                 Sign Up
               </Button>
-              <Grid container justify="flex-end">
+              <Grid container justify="center">
                 <Grid item>
                   <Link to="/login">Already have an account? Sign in</Link>
                 </Grid>

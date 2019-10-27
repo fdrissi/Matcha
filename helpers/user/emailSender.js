@@ -11,7 +11,7 @@ const sendActivation = (email, userName, token) => {
   let mailOptions = {
     from: "ayoubebelomari@gmail.com",
     to: email,
-    subject: "Sending Email using Node.js",
+    subject: "Activation Of Your Registration",
     text: `Please Click On This link <a href="http://localhost:3000/activate/${userName}/${token}">Link</a> to activate  your account.`
   };
 
@@ -24,6 +24,24 @@ const sendActivation = (email, userName, token) => {
   });
 };
 
+const sendRecovery = async (info, token) => {
+  let mailOptions = {
+    from: "ayoubebelomari@gmail.com",
+    to: info.email,
+    subject: "Recovery Email",
+    text: `Hi ${info.username} Please Click On This link <a href="http://localhost:3000/activate/${info.username}/${token}">Link</a> So you can update your account password`
+  };
+
+  await transporter.sendMail(mailOptions, function(error) {
+    if (error) {
+      return false;
+    } else {
+      return true;
+    }
+  });
+};
+
 module.exports = {
-  sendActivation
+  sendActivation,
+  sendRecovery
 };

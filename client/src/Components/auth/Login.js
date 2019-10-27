@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
-import { login } from "../../actions/authAction";
+import { login } from "../../actions/userAction";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -138,7 +138,7 @@ const SignIn = () => {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link to="/recovery">Forgot password?</Link>
+              <Link to="/recover">Forgot password?</Link>
             </Grid>
             <Grid item>
               <Link to="/register">{"Don't have an account? Sign Up"}</Link>
