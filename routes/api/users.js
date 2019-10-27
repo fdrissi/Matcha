@@ -3,13 +3,13 @@ const config = require("config");
 const jwt = require("jsonwebtoken");
 const userModel = require("../../models/User");
 const auth = require("../../middleware/auth");
-const { sendRecovery } = require("../../helpers/user/emailSender");
+const { sendRecovery } = require("../../helpers/emailSender");
 
 const {
   validateEmail,
   validatePassword,
   validateInput
-} = require("../../helpers/user/validations");
+} = require("../../middleware/validations");
 const express = require("express");
 const router = express.Router();
 const key = config.get("keyOrSecret");
