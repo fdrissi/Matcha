@@ -178,7 +178,7 @@ export const loadUser = async dispatch => {
   }
 };
 
-export const updateUser = async data => {
+export const updateUser = async (formData, user, dispatch) => {
   try {
     const {
       firstName,
@@ -187,6 +187,8 @@ export const updateUser = async data => {
       email,
       oldPassword,
       newPassword
-    } = data;
+    } = formData;
+    if (user.first_name !== firstName) {
+    }
   } catch (error) {}
 };

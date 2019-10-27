@@ -8,8 +8,12 @@ const { sendActivation } = require("../helpers/emailSender");
 async function login(email) {
   email = escapeSpecialChars(email);
   let sql = `SELECT * FROM users WHERE email='${email}'`;
-  const [rows, fields] = await pool.query(sql);
-  return rows[0];
+  try {
+    const [rows] = await pool.query(sql);
+    return rows[0];
+  } catch (error) {
+    return false;
+  }
 }
 
 async function register(data) {
@@ -110,6 +114,57 @@ async function updateValidation(userName, token) {
     return false;
   }
 }
+
+async function updateFirstName(firstName, id) {
+  let sql = "UPDATE users SET first_name = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [firstName, id]);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+async function updateLastName(lastName, id) {
+  let sql = "UPDATE users SET last_name = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [lastName, id]);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+async function updateUsername(username, id) {
+  let sql = "UPDATE users SET username = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [username, id]);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+async function updateEmail(email, id) {
+  let sql = "UPDATE users SET email = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [email, id]);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+async function updatePassword(password, id) {
+  let sql = "UPDATE users SET password = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [password, id]);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 module.exports = {
   login,
   findById,
@@ -120,5 +175,10 @@ module.exports = {
   ActivateUser,
   updateValidation,
   checkByEamilUsernameValidation,
-  setRecovery
+  setRecovery,
+  updateFirstName,
+  updateLastName,
+  updateUsername,
+  updateEmail,
+  updatePassword
 };

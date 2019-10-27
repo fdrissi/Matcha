@@ -199,10 +199,30 @@ router.get("/activation", async (req, res) => {
 // @route   GET api/users/editsetting
 // @desc    Edit user info (name, email, password...)
 // @access  Public
-router.get("/editinfo", auth, async (req, res) => {
+router.get("/updateUser", [auth, validateInput], async (req, res) => {
+  const {
+    firstName,
+    lastName,
+    username,
+    email,
+    oldPassword,
+    newPassword
+  } = req.data;
+  const errors = {
+    email: "",
+    userName: "",
+    firstName: "",
+    lastName: "",
+    lastName: "",
+    password: "",
+    confirmPassword: ""
+  };
   try {
     const user = await userModel.findById(req.user.id);
-    delete user.password;
+    if (user.email !== email && !userModel.findByEmail(email)) {
+      errors.email = "Email already exists";
+    } else if (user.email !== email && !userModel.findByEmail(email)) {
+    }
     res.json({ success: true, user });
   } catch (error) {
     res.send("Server error");

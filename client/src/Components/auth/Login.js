@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import { login } from "../../actions/userAction";
+import { REMOVE_ALERT } from "../../actions/actionTypes";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -13,7 +14,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Alert from "../layouts/Alert";
+import Alert from "../inc/Alert";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -65,6 +66,15 @@ const SignIn = () => {
 
     login(email, password, remember, dispatch);
   };
+
+  useEffect(() => {
+    return () => {
+      dispatch({
+        type: REMOVE_ALERT
+      });
+    };
+  }, []);
+
   if (state.auth.isAuthenticated) {
     return <Redirect to="/setting" />;
   }

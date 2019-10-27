@@ -27,13 +27,13 @@ function checkProperties(obj) {
   }
   return true;
 }
+
 // For THE REGISTRATION VALIDATION
 async function validateInput(req, res, next) {
   let errors = {
     email: "",
     userName: "",
     firstName: "",
-    lastName: "",
     lastName: "",
     password: "",
     confirmPassword: ""
@@ -57,6 +57,7 @@ async function validateInput(req, res, next) {
     if (checkProperties(req.body.userName)) {
       errors.userName = "this field is requird";
     } else {
+
       req.body.userName = req.body.userName.toLowerCase();
       if (await userModel.findByUsername(req.body.userName)) {
         errors.userName = "This User Name is taken by another user";

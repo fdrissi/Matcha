@@ -10,7 +10,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
-import Alert from "../layouts/Alert";
+import Alert from "../inc/Alert";
 import { recover } from "../../actions/userAction";
 import { REMOVE_ALERT } from "../../actions/actionTypes";
 
