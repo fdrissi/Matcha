@@ -50,6 +50,33 @@ export const login = async (email, password, remember, dispatch) => {
   }
 };
 
+export const recover = async (data, dispatch) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  const res = await axios.post("api/users/recover", { data }, config);
+  console.log(res);
+  if (!res.data.success) {
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "danger",
+        msg: res.data.errorMsg
+      }
+    });
+  } else {
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "success",
+        msg: res.data.errorMsg
+      }
+    });
+  }
+};
+
 export const activation = async (username, token, dispatch) => {
   const config = {
     header: {
@@ -61,11 +88,7 @@ export const activation = async (username, token, dispatch) => {
     { params: { userName: username, token: token } },
     config
   );
-  console.log(res);
   if (!res.data.success) {
-    console.log(res.data.errorMsg);
-  } else {
-    console.log(res.data.errorMsg);
     dispatch({
       type: SET_ALERT,
       payload: {
@@ -73,7 +96,14 @@ export const activation = async (username, token, dispatch) => {
         msg: res.data.errorMsg
       }
     });
-    window.location = "/login";
+  } else {
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "success",
+        msg: res.data.errorMsg
+      }
+    });
   }
 };
 
