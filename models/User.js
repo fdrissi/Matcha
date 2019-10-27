@@ -3,7 +3,7 @@ const escapeSpecialChars = require("../helpers/escapeSpecialChars");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const empty = require("is-empty");
-const { sendActivation } = require("../helpers/user/emailSender");
+const { sendActivation } = require("../helpers/emailSender");
 
 async function login(email) {
   email = escapeSpecialChars(email);
