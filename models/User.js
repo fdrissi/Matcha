@@ -103,6 +103,16 @@ async function checkByEamilUsernameValidation(value) {
     return false;
   }
 }
+
+async function findByToken(token) {
+  let sql = "SELECT * FROM users WHERE recovery_key = ?";
+  const [result] = await pool.query(sql, [token]);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
 // set verification to true
 async function updateValidation(userName, token) {
   let sql =
@@ -180,5 +190,6 @@ module.exports = {
   updateLastName,
   updateUsername,
   updateEmail,
-  updatePassword
+  updatePassword,
+  findByToken
 };
