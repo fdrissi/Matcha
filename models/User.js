@@ -39,18 +39,17 @@ async function register(data) {
     console.log("Error caught");
   }
 }
+
 async function findByEmail(email) {
   let sql = "SELECT * FROM users WHERE email = ?";
-  const [result] = await pool.query(sql, email);
-  if (empty(result)) return false;
-  else return result[0];
+  const [rows] = await pool.query(sql, email);
+  return rows[0];
 }
 
 async function findByUsername(name) {
   let sql = "SELECT * FROM users WHERE username = ?";
-  const [result] = await pool.query(sql, name);
-  if (empty(result)) return false;
-  else return result[0];
+  const [rows] = await pool.query(sql, [name]);
+  return rows[0];
 }
 
 async function findById(id) {
@@ -103,6 +102,7 @@ async function checkByEamilUsernameValidation(value) {
     return false;
   }
 }
+
 // set verification to true
 async function updateValidation(userName, token) {
   let sql =
@@ -146,6 +146,7 @@ async function updateUsername(username, id) {
 }
 
 async function updateEmail(email, id) {
+  console.log(email);
   let sql = "UPDATE users SET email = ? WHERE id = ?";
   const [result] = await pool.query(sql, [email, id]);
   if (!empty(result)) {

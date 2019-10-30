@@ -7,7 +7,9 @@ import {
   SET_ALERT,
   REMOVE_ALERT,
   FAILIED_REGISTRATION,
-  SUCCESS_REGISTRATION
+  SUCCESS_REGISTRATION,
+  SUCCESS_UPDATE_USER,
+  FAILIED_UPDATE_USER
 } from "./actionTypes";
 
 export const login = async (email, password, remember, dispatch) => {
@@ -178,17 +180,39 @@ export const loadUser = async dispatch => {
   }
 };
 
-export const updateUser = async (formData, user, dispatch) => {
+export const updateUser = async (formData, dispatch) => {
+  let config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
   try {
-    const {
-      firstName,
-      lastName,
-      username,
-      email,
-      oldPassword,
-      newPassword
-    } = formData;
-    if (user.first_name !== firstName) {
+    const res = await axios.post("/api/users/updateUser", formData, config);
+    if (res.data.success) {
+      dispatch({
+        type: SUCCESS_UPDATE_USER
+      });
+      dispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "success",
+          msg: res.data.errorMsg
+        }
+      });
+    } else {
+      dispatch({
+        type: FAILIED_UPDATE_USER,
+        payload: {
+          errors: res.data.errors
+        }
+      });
+      dispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "danger",
+          msg: res.data.errorMsg
+        }
+      });
     }
   } catch (error) {}
 };

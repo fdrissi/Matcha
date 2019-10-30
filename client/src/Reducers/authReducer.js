@@ -5,7 +5,10 @@ import {
   AUTH_ERROR,
   SUCCESS_REGISTRATION,
   FAILIED_REGISTRATION,
-  REMOVE_ERRORS
+  REMOVE_ERRORS,
+  SUCCESS_UPDATE_USER,
+  FAILIED_UPDATE_USER,
+  CLEAR_ERRORS
 } from "../actions/actionTypes";
 
 export const authInitState = {
@@ -85,6 +88,50 @@ export const registerReducer = (state = registerInitState, action) => {
       };
     case REMOVE_ERRORS:
       return (state = registerInitState);
+    default:
+      return state;
+  }
+};
+
+export const updateInitState = {
+  update_success: false,
+  errors: {
+    email: "",
+    userName: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    newPassword: ""
+  }
+};
+
+export const updateUserReducer = (state = updateInitState, action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case SUCCESS_UPDATE_USER:
+      return {
+        ...state,
+        update_success: true
+      };
+    case FAILIED_UPDATE_USER:
+      return {
+        ...state,
+        update_success: false,
+        errors: payload.errors
+      };
+    case CLEAR_ERRORS:
+      return {
+        ...state,
+        update_success: false,
+        errors: {
+          email: "",
+          userName: "",
+          firstName: "",
+          lastName: "",
+          password: "",
+          newPassword: ""
+        }
+      };
     default:
       return state;
   }

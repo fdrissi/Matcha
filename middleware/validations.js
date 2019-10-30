@@ -2,31 +2,89 @@ const userModel = require("../models/User");
 
 function validateEmail(req, res, next) {
   req.body.email = req.body.email.toLowerCase();
+  const errors = {
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: "",
+    oldPassword: "",
+    newPassword: ""
+  };
   let regex = /\S+@\S+\.\S+/;
-  if (!regex.test(req.body.email))
-    return res.json({ success: false, errorMsg: "Enter valid email" });
+  if (!regex.test(req.body.email)) {
+    errors.email = "Enter valid Email";
+    return res.json({
+      success: false,
+      errorMsg: "Failed process due to errors",
+      errors
+    });
+  }
   next();
 }
 
 function validateUsername(req, res, next) {
-  req.body.email = req.body.email.toLowerCase();
+  req.body.userName = req.body.userName.toLowerCase();
+  const errors = {
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: "",
+    oldPassword: "",
+    newPassword: ""
+  };
   let regex = /^[a-z0-9]{3,10}$/;
-  if (!regex.test(req.body.userName))
-    return res.json({ success: false, errorMsg: "Enter valid email" });
+  if (!regex.test(req.body.userName)) {
+    errors.userName = "Enter valid Username";
+    return res.json({
+      success: false,
+      errorMsg: "Failed process due to errors",
+      errors
+    });
+  }
   next();
 }
 
 function validatePassword(req, res, next) {
-  let regex = /(?=.*[a-z])(?=.*[0-9]).{8,}/i;
-  if (!regex.test(req.body.password))
-    return res.json({ success: false, errorMsg: "Enter valid password" });
+  let regex = /(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/i;
+  const errors = {
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: "",
+    oldPassword: "",
+    newPassword: ""
+  };
+  if (!regex.test(req.body.newPassword) && req.body.newPassword != "") {
+    errors.newPassword = "Enter valid Password";
+    return res.json({
+      success: false,
+      errorMsg: "Failed process due to errors",
+      errors
+    });
+  }
   next();
 }
 
 function validateName(req, res, next) {
   let regex = /^[A-Za-z]{3,20}$/;
-  if (!regex.test(req.body.lastName || !regex.test(req.body.firstName)))
-    return res.json({ success: false, errorMsg: "Enter valid Last Name" });
+  const errors = {
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: "",
+    oldPassword: "",
+    newPassword: ""
+  };
+  if (!regex.test(req.body.lastName || !regex.test(req.body.firstName))) {
+    !regex.test(req.body.lastName)
+      ? (errors.lastName = "Enter valid Last Name")
+      : (errors.firstName = "Enter valid First Name");
+    return res.json({
+      success: false,
+      errorMsg: "Failed process due to errors",
+      errors
+    });
+  }
   next();
 }
 // Check it is empty
