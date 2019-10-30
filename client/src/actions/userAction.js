@@ -7,7 +7,9 @@ import {
   SET_ALERT,
   REMOVE_ALERT,
   FAILIED_REGISTRATION,
-  SUCCESS_REGISTRATION
+  SUCCESS_REGISTRATION,
+  SUCCES_TOKEN,
+  WRONG_TOKEN
 } from "./actionTypes";
 
 export const login = async (email, password, remember, dispatch) => {
@@ -51,6 +53,7 @@ export const login = async (email, password, remember, dispatch) => {
 };
 
 export const recover = async (data, dispatch) => {
+  console.log(data);
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -67,6 +70,55 @@ export const recover = async (data, dispatch) => {
       }
     });
   } else {
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "success",
+        msg: res.data.errorMsg
+      }
+    });
+  }
+};
+
+export const passwordEdit = async (
+  password,
+  confirmPassword,
+  token,
+  dispatch
+) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  const res = await axios.post(
+    "/api/users/passedit",
+    { password, confirmPassword, token },
+    config
+  );
+  if (!res.data.success) {
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "danger",
+        msg: "Error"
+      }
+    });
+    dispatch({
+      type: FAILIED_REGISTRATION,
+      payload: {
+        message: "FAILIED_UPDAITING",
+        errors: res.data.errors
+      }
+    });
+  } else {
+    dispatch({
+      type: SUCCES_TOKEN,
+      payload: {
+        message: res.data.updated,
+        valide: res.data.valide
+      }
+    });
     dispatch({
       type: SET_ALERT,
       payload: {
@@ -102,6 +154,49 @@ export const activation = async (username, token, dispatch) => {
       payload: {
         alertType: "success",
         msg: res.data.errorMsg
+      }
+    });
+    dispatch({
+      type: SUCCES_TOKEN,
+      payload: {
+        message: res.data.errorMsg,
+        valide: res.data.valide
+      }
+    });
+  }
+};
+export const checktoken = async (token, dispatch) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  const res = await axios.get(
+    "/api/users/checktoken",
+    { params: { token: token } },
+    config
+  );
+  if (!res.data.success) {
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "danger",
+        msg: res.data.errorMsg
+      }
+    });
+    dispatch({
+      type: WRONG_TOKEN,
+      payload: {
+        message: res.data.errorMsg,
+        valide: res.data.valide
+      }
+    });
+  } else {
+    dispatch({
+      type: SUCCES_TOKEN,
+      payload: {
+        message: res.data.errorMsg,
+        valide: res.data.valide
       }
     });
   }

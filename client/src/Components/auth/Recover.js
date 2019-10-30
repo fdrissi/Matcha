@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -10,9 +10,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
+import { FormHelperText } from "@material-ui/core";
 import Alert from "../inc/Alert";
 import { recover } from "../../actions/userAction";
-import { REMOVE_ALERT } from "../../actions/actionTypes";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -43,6 +43,10 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: "transparent",
       border: "1px solid #e74c3c"
     }
+  },
+  helperText: {
+    color: "#F32013",
+    fontWeight: "fontWeightBold"
   }
 }));
 
@@ -59,6 +63,7 @@ function Recover() {
     form.preventDefault();
     recover(MyForm.data, dispatch);
   };
+  console.log(state);
   const handleInputChange = event => {
     event.persist();
     setMyFormData(MyForm => ({
@@ -66,13 +71,6 @@ function Recover() {
       data: event.target.value.trim()
     }));
   };
-  useEffect(() => {
-    return () => {
-      dispatch({
-        type: REMOVE_ALERT
-      });
-    };
-  }, []);
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />

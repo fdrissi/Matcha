@@ -1,2 +1,6 @@
 .DS_Store
 node_modules/
+dev.json
+prod.json
+default.json
+.gitignore

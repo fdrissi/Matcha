@@ -5,8 +5,11 @@ import {
   AUTH_ERROR,
   SUCCESS_REGISTRATION,
   FAILIED_REGISTRATION,
-  REMOVE_ERRORS
+  REMOVE_ERRORS,
+  SUCCES_TOKEN,
+  WRONG_TOKEN
 } from "../actions/actionTypes";
+import { stat } from "fs";
 
 export const authInitState = {
   isAuthenticated: false,
@@ -85,6 +88,33 @@ export const registerReducer = (state = registerInitState, action) => {
       };
     case REMOVE_ERRORS:
       return (state = registerInitState);
+    default:
+      return state;
+  }
+};
+
+export const tokenvalidationInitState = {
+  token_valide_message: "",
+  token_valide: "this is me before",
+  is_loading: true
+};
+export const passeditReducer = (state = tokenvalidationInitState, action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case SUCCES_TOKEN:
+      return {
+        ...state,
+        token_valide_message: payload.message,
+        token_valide: payload.valide,
+        is_loading: false
+      };
+    case WRONG_TOKEN:
+      return {
+        ...state,
+        token_valide_message: payload.message,
+        token_valide: payload.valide,
+        is_loading: false
+      };
     default:
       return state;
   }

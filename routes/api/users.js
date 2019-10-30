@@ -137,6 +137,51 @@ router.post("/recover", async (req, res) => {
   }
 });
 
+// @route POST /api/users/passedit
+// @desc Recover USER
+// @access public
+router.post("/passedit", [validateInput], async (req, res) => {
+  // first of all we have to make sure that we already have that token
+  const { token, password } = req.body;
+  const user = await userModel.findUserByRecovery(token);
+  if (user) {
+    let hash = bcrypt.hashSync(password, 10);
+    const update = await userModel.updatePassword(hash, user.id);
+    if (update) {
+      res.json({
+        success: true,
+        errorMsg: "Your password has ben updated",
+        updated: "done",
+        valide: true
+      });
+    } else {
+      res.json({
+        success: false,
+        errorMsg: "Something goes wrong please lets know"
+      });
+    }
+  } else {
+    return res.json({
+      success: false,
+      errorMsg: "The reset token you have provided is not valid."
+    });
+  }
+});
+router.get("/checktoken", async (req, res) => {
+  let { token } = req.query;
+  // lets make sure its a valide token
+  const user = await userModel.findByToken(token);
+  if (user) {
+    res.json({ success: true, errorMsg: "YES", valide: true });
+  } else {
+    res.json({
+      success: false,
+      errorMsg: "The reset token you have provided is not valid",
+      valide: false
+    });
+  }
+});
+
 // @route   GET api/users/login
 // @desc    Login User
 // @access  Public
