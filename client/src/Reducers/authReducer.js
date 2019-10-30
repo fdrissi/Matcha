@@ -95,7 +95,7 @@ export const registerReducer = (state = registerInitState, action) => {
 
 export const tokenvalidationInitState = {
   token_valide_message: "",
-  token_valide: "",
+  token_valide: "this is me before",
   is_loading: true
 };
 export const passeditReducer = (state = tokenvalidationInitState, action) => {

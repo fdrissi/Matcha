@@ -82,6 +82,16 @@ async function ActivateUser(userName, token) {
   }
 }
 
+async function findUserByRecovery(token) {
+  let sql = "SELECT * FROM users WHERE recovery_key = ?";
+  const [result] = await pool.query(sql, [token]);
+  if (!empty(result)) {
+    return result[0];
+  } else {
+    return false;
+  }
+}
+
 // update the recovery token
 async function setRecovery(email, token) {
   let sql = "UPDATE users SET recovery_key = ? WHERE email = ?";
@@ -191,5 +201,6 @@ module.exports = {
   updateUsername,
   updateEmail,
   updatePassword,
-  findByToken
+  findByToken,
+  findUserByRecovery
 };

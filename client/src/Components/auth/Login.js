@@ -55,7 +55,6 @@ const SignIn = () => {
     password: "",
     remember: false
   });
-
   const { email, password, remember } = formData;
 
   const onChange = e =>
@@ -66,6 +65,7 @@ const SignIn = () => {
 
     login(email, password, remember, dispatch);
   };
+  console.log(state);
 
   useEffect(() => {
     return () => {

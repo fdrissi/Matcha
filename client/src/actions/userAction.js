@@ -96,6 +96,37 @@ export const passwordEdit = async (
     { password, confirmPassword, token },
     config
   );
+  if (!res.data.success) {
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "danger",
+        msg: "Error"
+      }
+    });
+    dispatch({
+      type: FAILIED_REGISTRATION,
+      payload: {
+        message: "FAILIED_UPDAITING",
+        errors: res.data.errors
+      }
+    });
+  } else {
+    dispatch({
+      type: SUCCES_TOKEN,
+      payload: {
+        message: res.data.updated,
+        valide: res.data.valide
+      }
+    });
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "success",
+        msg: res.data.errorMsg
+      }
+    });
+  }
 };
 
 export const activation = async (username, token, dispatch) => {
@@ -123,6 +154,13 @@ export const activation = async (username, token, dispatch) => {
       payload: {
         alertType: "success",
         msg: res.data.errorMsg
+      }
+    });
+    dispatch({
+      type: SUCCES_TOKEN,
+      payload: {
+        message: res.data.errorMsg,
+        valide: res.data.valide
       }
     });
   }

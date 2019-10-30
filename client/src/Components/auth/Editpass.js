@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -7,17 +7,13 @@ import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import Box from "@material-ui/core/Box";
 import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
 import Alert from "../inc/Alert";
 import { passwordEdit, checktoken } from "../../actions/userAction";
-import { REMOVE_ALERT } from "../../actions/actionTypes";
+import { REMOVE_ALERT, REMOVE_ERRORS } from "../../actions/actionTypes";
 import { FormHelperText } from "@material-ui/core";
-import CircularProgress from "@material-ui/core/CircularProgress";
 import { Redirect } from "react-router-dom";
-
-import { stat } from "fs";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -51,6 +47,10 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: "transparent",
       border: "1px solid #e74c3c"
     }
+  },
+  helperText: {
+    color: "#F32013",
+    fontWeight: "fontWeightBold"
   }
 }));
 
@@ -62,12 +62,20 @@ const Editpass = params => {
   });
 
   const [state, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
+
+  const { is_loading, token_valide, token_valide_message } = state.token;
 
   const submitForm = async form => {
     form.preventDefault();
     let token = params.params.token;
 
-    passwordEdit(MyForm.password, MyForm.confirmPassword, token, dispatch);
+    await passwordEdit(
+      MyForm.password,
+      MyForm.confirmPassword,
+      token,
+      dispatch
+    );
   };
   const handleInputChange = event => {
     event.persist();
@@ -78,84 +86,94 @@ const Editpass = params => {
   };
   useEffect(() => {
     let token = params.params.token;
-    checktoken(token, dispatch);
-  }, []);
-  const { is_loading, token_valide } = state.token;
+    checktoken(token, stableDispatch);
+  }, [params.params.token, stableDispatch]);
+  useEffect(() => {
+    return () => {
+      if (state.alert.msg === "Error") {
+        stableDispatch({
+          type: REMOVE_ALERT
+        });
+      }
+    };
+  }, [state.alert.msg, stableDispatch]);
+
   if (is_loading) {
     return null;
   } else {
-    if (!token_valide) return <Redirect to="/register" />;
-    else console.log(state);
-    return (
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <div className={classes.paper}>
-          {state.alert.msg && (
-            <Alert message={state.alert.msg} type={state.alert.alertType} />
-          )}
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography variant="h5">Change your password</Typography>
+    if (!token_valide || token_valide_message === "done") {
+      return <Redirect to="/login" />;
+    } else
+      return (
+        <Container component="main" maxWidth="xs">
+          <CssBaseline />
+          <div className={classes.paper}>
+            {state.alert.msg && (
+              <Alert message={state.alert.msg} type={state.alert.alertType} />
+            )}
+            <Avatar className={classes.avatar}>
+              <LockOutlinedIcon />
+            </Avatar>
+            <Typography variant="h5">Change your password</Typography>
 
-          <form className={classes.form} onSubmit={form => submitForm(form)}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  error={
-                    state.register.errors.password.length > 0 ? true : false
-                  }
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  autoComplete="new-password"
-                  onChange={handleInputChange}
-                />
-                {state.register.errors.password.length > 0 && (
-                  <FormHelperText className={classes.helperText}>
-                    <sup>*</sup> {state.data.errors.password}
-                  </FormHelperText>
-                )}
+            <form className={classes.form} onSubmit={form => submitForm(form)}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    error={
+                      state.register.errors.password.length > 0 ? true : false
+                    }
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    autoComplete="new-password"
+                    onChange={handleInputChange}
+                  />
+                  {state.register.errors.password.length > 0 && (
+                    <FormHelperText className={classes.helperText}>
+                      <sup>*</sup> {state.register.errors.password}
+                    </FormHelperText>
+                  )}
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    error={
+                      state.register.errors.confirmPassword.length > 0
+                        ? true
+                        : false
+                    }
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="confirmPassword"
+                    label="Confirm  Password"
+                    autoComplete="new-password"
+                    type="password"
+                    onChange={handleInputChange}
+                  />
+                  {state.register.errors.confirmPassword.length > 0 && (
+                    <FormHelperText className={classes.helperText}>
+                      <sup>*</sup> {state.register.errors.confirmPassword}
+                    </FormHelperText>
+                  )}
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  error={
-                    state.register.errors.confirmPassword.length > 0
-                      ? true
-                      : false
-                  }
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="confirmPassword"
-                  label="Confirm  Password"
-                  autoComplete="new-password"
-                  type="password"
-                  onChange={handleInputChange}
-                />
-                {state.register.errors.confirmPassword.length > 0 && (
-                  <FormHelperText className={classes.helperText}>
-                    <sup>*</sup> {state.register.errors.confirmPassword}
-                  </FormHelperText>
-                )}
-              </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
-              SEND
-            </Button>
-          </form>
-        </div>
-      </Container>
-    );
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                SEND
+              </Button>
+            </form>
+          </div>
+        </Container>
+      );
   }
 };
 const passedit = props => {
