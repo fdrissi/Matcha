@@ -6,11 +6,13 @@ import {
   SUCCESS_REGISTRATION,
   FAILIED_REGISTRATION,
   REMOVE_ERRORS,
+  SUCCESS_UPDATE_USER,
+  FAILIED_UPDATE_USER,
+  CLEAR_ERRORS,
   SUCCES_TOKEN,
   WRONG_TOKEN,
   REMOVE_SPECIFIC_ERROR
 } from "../actions/actionTypes";
-import { stat } from "fs";
 
 export const authInitState = {
   isAuthenticated: false,
@@ -92,6 +94,42 @@ export const registerReducer = (state = registerInitState, action) => {
       return (state = registerInitState);
     case REMOVE_SPECIFIC_ERROR:
       return { ...state, errors: { ...state.errors, [payload.name]: "" } };
+    default:
+      return state;
+  }
+};
+
+export const updateInitState = {
+  update_success: false,
+  errors: {
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: "",
+    newPassword: "",
+    password: "",
+    confirmPassword: ""
+  }
+};
+
+export const updateUserReducer = (state = updateInitState, action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case SUCCESS_UPDATE_USER:
+      return {
+        ...state,
+        update_success: true
+      };
+    case FAILIED_UPDATE_USER:
+      return {
+        ...state,
+        update_success: false,
+        errors: payload.errors
+      };
+    case REMOVE_SPECIFIC_ERROR:
+      return { ...state, errors: { ...state.errors, [payload.name]: "" } };
+    case CLEAR_ERRORS:
+      return (state = updateInitState);
     default:
       return state;
   }

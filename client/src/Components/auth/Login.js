@@ -65,7 +65,6 @@ const SignIn = () => {
 
     login(email, password, remember, dispatch);
   };
-  console.log(state);
 
   useEffect(() => {
     return () => {

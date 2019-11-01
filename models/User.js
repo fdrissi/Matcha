@@ -37,21 +37,20 @@ async function register(data) {
       return result.affectedRows;
     }
   } catch (e) {
-    console.log("Error caught");
+    console.log(e);
   }
 }
+
 async function findByEmail(email) {
   let sql = "SELECT * FROM users WHERE email = ?";
-  const [result] = await pool.query(sql, email);
-  if (empty(result)) return false;
-  else return result[0];
+  const [rows] = await pool.query(sql, email);
+  return rows[0];
 }
 
 async function findByUsername(name) {
   let sql = "SELECT * FROM users WHERE username = ?";
-  const [result] = await pool.query(sql, name);
-  if (empty(result)) return false;
-  else return result[0];
+  const [rows] = await pool.query(sql, [name]);
+  return rows[0];
 }
 
 async function findById(id) {

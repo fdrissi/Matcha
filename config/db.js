@@ -15,13 +15,6 @@ const connection = mysql.createPool({
 
 const pool = connection.promise();
 
-// const connectDb = () => {
-//   connection.connect(err => {
-//     if (err) console.log(err);
-//     else console.log("Database connected");
-//   });
-// };
-
 module.exports = {
   pool
 };
