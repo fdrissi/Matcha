@@ -8,7 +8,9 @@ import {
   REMOVE_ERRORS,
   SUCCESS_UPDATE_USER,
   FAILIED_UPDATE_USER,
-  CLEAR_ERRORS
+  CLEAR_ERRORS,
+  SUCCES_TOKEN,
+  WRONG_TOKEN
 } from "../actions/actionTypes";
 
 export const authInitState = {
@@ -96,12 +98,13 @@ export const registerReducer = (state = registerInitState, action) => {
 export const updateInitState = {
   update_success: false,
   errors: {
-    email: "",
-    userName: "",
     firstName: "",
     lastName: "",
+    userName: "",
+    email: "",
+    newPassword: "",
     password: "",
-    newPassword: ""
+    confirmPassword: ""
   }
 };
 
@@ -120,17 +123,33 @@ export const updateUserReducer = (state = updateInitState, action) => {
         errors: payload.errors
       };
     case CLEAR_ERRORS:
+      return (state = updateInitState);
+    default:
+      return state;
+  }
+};
+
+export const tokenvalidationInitState = {
+  token_valide_message: "",
+  token_valide: "this is me before",
+  is_loading: true
+};
+export const passeditReducer = (state = tokenvalidationInitState, action) => {
+  const { type, payload } = action;
+  switch (type) {
+    case SUCCES_TOKEN:
       return {
         ...state,
-        update_success: false,
-        errors: {
-          email: "",
-          userName: "",
-          firstName: "",
-          lastName: "",
-          password: "",
-          newPassword: ""
-        }
+        token_valide_message: payload.message,
+        token_valide: payload.valide,
+        is_loading: false
+      };
+    case WRONG_TOKEN:
+      return {
+        ...state,
+        token_valide_message: payload.message,
+        token_valide: payload.valide,
+        is_loading: false
       };
     default:
       return state;

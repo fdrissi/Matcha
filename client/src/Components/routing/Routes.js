@@ -6,6 +6,7 @@ import Register from "../auth/Register";
 import Setting from "../user/Setting";
 import Activate from "../auth/Activate";
 import Recover from "../auth/Recover";
+import Editpass from "../auth/Editpass";
 
 const Routes = () => {
   return (
@@ -16,6 +17,7 @@ const Routes = () => {
         <Route exact path="/setting" component={Setting} />
         <Route exact path="/activate/:username/:token" component={Activate} />
         <Route exact path="/recover" component={Recover} />
+        <Route exact path="/editpass/:token/" component={Editpass} />
       </Switch>
     </Container>
   );

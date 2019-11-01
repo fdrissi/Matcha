@@ -1,15 +1,16 @@
 const userModel = require("../models/User");
 
 function validateEmail(req, res, next) {
-  req.body.email = req.body.email.toLowerCase();
   const errors = {
     firstName: "",
     lastName: "",
     userName: "",
     email: "",
-    oldPassword: "",
-    newPassword: ""
+    newPassword: "",
+    password: "",
+    confirmPassword: ""
   };
+  req.body.email = req.body.email.toLowerCase();
   let regex = /\S+@\S+\.\S+/;
   if (!regex.test(req.body.email)) {
     errors.email = "Enter valid Email";
@@ -23,15 +24,16 @@ function validateEmail(req, res, next) {
 }
 
 function validateUsername(req, res, next) {
-  req.body.userName = req.body.userName.toLowerCase();
   const errors = {
     firstName: "",
     lastName: "",
     userName: "",
     email: "",
-    oldPassword: "",
-    newPassword: ""
+    newPassword: "",
+    password: "",
+    confirmPassword: ""
   };
+  req.body.userName = req.body.userName.toLowerCase();
   let regex = /^[a-z0-9]{3,10}$/;
   if (!regex.test(req.body.userName)) {
     errors.userName = "Enter valid Username";
@@ -45,16 +47,17 @@ function validateUsername(req, res, next) {
 }
 
 function validatePassword(req, res, next) {
-  let regex = /(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/i;
   const errors = {
     firstName: "",
     lastName: "",
     userName: "",
     email: "",
-    oldPassword: "",
-    newPassword: ""
+    newPassword: "",
+    password: "",
+    confirmPassword: ""
   };
-  if (!regex.test(req.body.newPassword) && req.body.newPassword != "") {
+  let regex = /(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/i;
+  if (!regex.test(req.body.newPassword) && req.body.newPassword !== "") {
     errors.newPassword = "Enter valid Password";
     return res.json({
       success: false,
@@ -66,16 +69,17 @@ function validatePassword(req, res, next) {
 }
 
 function validateName(req, res, next) {
-  let regex = /^[A-Za-z]{3,20}$/;
   const errors = {
     firstName: "",
     lastName: "",
     userName: "",
     email: "",
-    oldPassword: "",
-    newPassword: ""
+    newPassword: "",
+    password: "",
+    confirmPassword: ""
   };
-  if (!regex.test(req.body.lastName || !regex.test(req.body.firstName))) {
+  let regex = /^[A-Za-z]{3,20}$/;
+  if (!regex.test(req.body.lastName) || !regex.test(req.body.firstName)) {
     !regex.test(req.body.lastName)
       ? (errors.lastName = "Enter valid Last Name")
       : (errors.firstName = "Enter valid First Name");
@@ -87,6 +91,11 @@ function validateName(req, res, next) {
   }
   next();
 }
+
+function validator(req, res, next) {
+  next();
+}
+
 // Check it is empty
 function checkProperties(obj) {
   for (var key in obj) {
@@ -97,11 +106,12 @@ function checkProperties(obj) {
 
 // For THE REGISTRATION VALIDATION
 async function validateInput(req, res, next) {
-  let errors = {
-    email: "",
-    userName: "",
+  const errors = {
     firstName: "",
     lastName: "",
+    userName: "",
+    email: "",
+    newPassword: "",
     password: "",
     confirmPassword: ""
   };
@@ -183,6 +193,7 @@ async function validateInput(req, res, next) {
     return res.json({ success: false, errors, errorMsg: "Register unsuccess" });
   next();
 }
+
 module.exports = {
   validateEmail,
   validateName,

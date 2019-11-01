@@ -55,7 +55,6 @@ const SignIn = () => {
     password: "",
     remember: false
   });
-
   const { email, password, remember } = formData;
 
   const onChange = e =>

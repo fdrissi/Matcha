@@ -36,7 +36,7 @@ async function register(data) {
       return result.affectedRows;
     }
   } catch (e) {
-    console.log("Error caught");
+    console.log(e);
   }
 }
 
@@ -81,6 +81,16 @@ async function ActivateUser(userName, token) {
   }
 }
 
+async function findUserByRecovery(token) {
+  let sql = "SELECT * FROM users WHERE recovery_key = ?";
+  const [result] = await pool.query(sql, [token]);
+  if (!empty(result)) {
+    return result[0];
+  } else {
+    return false;
+  }
+}
+
 // update the recovery token
 async function setRecovery(email, token) {
   let sql = "UPDATE users SET recovery_key = ? WHERE email = ?";
@@ -103,6 +113,15 @@ async function checkByEamilUsernameValidation(value) {
   }
 }
 
+async function findByToken(token) {
+  let sql = "SELECT * FROM users WHERE recovery_key = ?";
+  const [result] = await pool.query(sql, [token]);
+  if (!empty(result)) {
+    return true;
+  } else {
+    return false;
+  }
+}
 // set verification to true
 async function updateValidation(userName, token) {
   let sql =
@@ -146,7 +165,6 @@ async function updateUsername(username, id) {
 }
 
 async function updateEmail(email, id) {
-  console.log(email);
   let sql = "UPDATE users SET email = ? WHERE id = ?";
   const [result] = await pool.query(sql, [email, id]);
   if (!empty(result)) {
@@ -181,5 +199,7 @@ module.exports = {
   updateLastName,
   updateUsername,
   updateEmail,
-  updatePassword
+  updatePassword,
+  findByToken,
+  findUserByRecovery
 };

@@ -9,7 +9,8 @@ const escapeHtmlChars = unsafe => {
 
 module.exports = escapeSpecialChars = param => {
   for (let property in param) {
-    param[property] = escapeHtmlChars(param[property]);
+    param[property] =
+      typeof param[property] == "string" && escapeHtmlChars(param[property]);
   }
   return param;
 };
