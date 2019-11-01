@@ -68,9 +68,10 @@ router.post("/register", [validateInput], async (req, res) => {
 // @desc Recover User
 // @access PUBLIC
 router.post("/recover", async (req, res) => {
+  const { data } = req.body;
   // first of all we have to check if the input is valide
-  const result = await userModel.findByUsername(req.body.data);
-  const respond = await userModel.checkByEamilUsernameValidation(req.body.data);
+  const result = await userModel.findByUsername(data);
+  const respond = await userModel.checkByEamilUsernameValidation(data);
   if (result) {
     if (respond) {
       const token = crypto.randomBytes(64).toString("hex");
@@ -100,12 +101,12 @@ router.post("/recover", async (req, res) => {
       });
     }
   } else {
-    const result = await userModel.findByEmail(req.body.data);
+    const result = await userModel.findByEmail(data);
     if (result) {
       if (respond) {
         // let send the user an email to recover his account
         const token = crypto.randomBytes(64).toString("hex");
-        const resultFromSr = userModel.setRecovery(req.body.data, token);
+        const resultFromSr = userModel.setRecovery(data, token);
         if (resultFromSr) {
           // here we gonna send the email of the recovery
           if (sendRecovery(result, token)) {
@@ -148,12 +149,20 @@ router.post("/passedit", [validateInput], async (req, res) => {
     let hash = bcrypt.hashSync(password, 10);
     const update = await userModel.updatePassword(hash, user.id);
     if (update) {
-      res.json({
-        success: true,
-        errorMsg: "Your password has ben updated",
-        updated: "done",
-        valide: true
-      });
+      // now lets remove that token
+      const removeIt = await userModel.setRecovery(user.email, "");
+      if (removeIt)
+        res.json({
+          success: true,
+          errorMsg: "Your password has ben updated",
+          updated: "done",
+          valide: true
+        });
+      else
+        res.json({
+          success: false,
+          errorMsg: "Problem With Removing The Token"
+        });
     } else {
       res.json({
         success: false,

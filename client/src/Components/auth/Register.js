@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import { Redirect } from "react-router-dom";
 import Button from "@material-ui/core/Button";
@@ -14,7 +14,11 @@ import { useUserStore } from "../../Context/appStore";
 import { register } from "../../actions/userAction";
 import { FormHelperText } from "@material-ui/core";
 import Alert from "../inc/Alert";
-import { REMOVE_ALERT, REMOVE_ERRORS } from "../../actions/actionTypes";
+import {
+  REMOVE_ALERT,
+  REMOVE_ERRORS,
+  REMOVE_SPECIFIC_ERROR
+} from "../../actions/actionTypes";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import Visibility from "@material-ui/icons/Visibility";
@@ -72,6 +76,7 @@ function SignUp() {
 
   const [toLogin, setToHome] = useState(false);
   const [state, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
 
   const submitForm = async form => {
     form.preventDefault();
@@ -88,23 +93,41 @@ function SignUp() {
   };
   const handleInputChange = event => {
     event.persist();
-
+    dispatch({
+      type: REMOVE_SPECIFIC_ERROR,
+      payload: {
+        name: event.target.name
+      }
+    });
     setMyFormData(MyForm => ({
       ...MyForm,
       [event.target.name]: event.target.value.trim()
     }));
   };
+  const handlePasswordChange = event => {
+    event.persist();
+    dispatch({
+      type: REMOVE_SPECIFIC_ERROR,
+      payload: {
+        name: event.target.name
+      }
+    });
+    setMyFormData(MyForm => ({
+      ...MyForm,
+      [event.target.name]: event.target.value
+    }));
+  };
   useEffect(() => {
     return () => {
-      dispatch({
+      stableDispatch({
         type: REMOVE_ERRORS
       });
-      dispatch({
+      stableDispatch({
         type: REMOVE_ALERT
       });
     };
-  }, []);
-  if (state.register.register_success === "ok") {
+  }, [stableDispatch]);
+  if (state.register.register_success) {
     let time = setTimeout(() => test(time), 5000);
     const payload = {};
     dispatch({
@@ -116,6 +139,8 @@ function SignUp() {
     setToHome(true);
     clearTimeout(timer);
   };
+  const { firstName, lastName, userName, email } = MyForm;
+
   return (
     <>
       {toLogin ? (
@@ -147,6 +172,7 @@ function SignUp() {
                     label="Usear Name"
                     name="userName"
                     onChange={handleInputChange}
+                    value={userName}
                     autoFocus
                   />
                   {state.register.errors.userName.length > 0 && (
@@ -165,6 +191,7 @@ function SignUp() {
                     required
                     fullWidth
                     onChange={handleInputChange}
+                    value={firstName}
                     label="First Name"
                   />
                   {state.register.errors.firstName.length > 0 && (
@@ -186,6 +213,7 @@ function SignUp() {
                     name="lastName"
                     autoComplete="lname"
                     onChange={handleInputChange}
+                    value={lastName}
                   />
                   {state.register.errors.lastName.length > 0 && (
                     <FormHelperText className={classes.helperText}>
@@ -205,6 +233,7 @@ function SignUp() {
                     name="email"
                     autoComplete="email"
                     onChange={handleInputChange}
+                    value={email}
                   />
                   {state.register.errors.email.length > 0 && (
                     <FormHelperText className={classes.helperText}>
@@ -224,7 +253,7 @@ function SignUp() {
                     label="Password"
                     type={MyForm.showPassword ? "text" : "password"}
                     autoComplete="new-password"
-                    onChange={handleInputChange}
+                    onChange={handlePasswordChange}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
@@ -264,7 +293,7 @@ function SignUp() {
                     label="Confirm  Password"
                     autoComplete="new-password"
                     type={MyForm.showConfPassword ? "text" : "password"}
-                    onChange={handleInputChange}
+                    onChange={handlePasswordChange}
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">

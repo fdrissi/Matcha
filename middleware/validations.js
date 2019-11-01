@@ -40,10 +40,10 @@ async function validateInput(req, res, next) {
   };
   // validate email
   if (typeof req.body.email !== "undefined") {
-    if (checkProperties(req.body.email)) {
+    if (checkProperties(req.body.email.trim())) {
       errors.email = "this field is requird";
     } else {
-      req.body.email = req.body.email.toLowerCase();
+      req.body.email = req.body.email.toLowerCase().trim();
       if (await userModel.findByEmail(req.body.email)) {
         errors.email = "This email is taken by another user";
       } else {
@@ -54,11 +54,10 @@ async function validateInput(req, res, next) {
   }
   // validate userName
   if (typeof req.body.userName !== "undefined") {
-    if (checkProperties(req.body.userName)) {
+    if (checkProperties(req.body.userName.trim())) {
       errors.userName = "this field is requird";
     } else {
-
-      req.body.userName = req.body.userName.toLowerCase();
+      req.body.userName = req.body.userName.toLowerCase().trim();
       if (await userModel.findByUsername(req.body.userName)) {
         errors.userName = "This User Name is taken by another user";
       } else {
@@ -71,9 +70,10 @@ async function validateInput(req, res, next) {
   }
   // validate Firstname
   if (typeof req.body.firstName !== "undefined") {
-    if (checkProperties(req.body.firstName)) {
+    if (checkProperties(req.body.firstName.trim())) {
       errors.firstName = "this field is requird";
     } else {
+      req.body.firstName = req.body.firstName.trim();
       let regex = /^[A-Za-z]{3,20}$/;
       if (!regex.test(req.body.firstName))
         errors.firstName =
@@ -83,9 +83,10 @@ async function validateInput(req, res, next) {
 
   // validate lastName
   if (typeof req.body.lastName !== "undefined") {
-    if (checkProperties(req.body.lastName)) {
+    if (checkProperties(req.body.lastName.trim())) {
       errors.lastName = "this field is requird";
     } else {
+      req.body.lastName = req.body.lastName.trim();
       let regex = /^[A-Za-z]{3,20}$/;
       if (!regex.test(req.body.lastName))
         errors.lastName =

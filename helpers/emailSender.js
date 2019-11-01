@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const sendActivation = (email, userName, token) => {
+const sendActivation = async (email, userName, token) => {
   let mailOptions = {
     from: "ayoubebelomari@gmail.com",
     to: email,
@@ -15,7 +15,7 @@ const sendActivation = (email, userName, token) => {
     text: `Please Click On This link <a href="http://localhost:3000/activate/${userName}/${token}">Link</a> to activate  your account.`
   };
 
-  transporter.sendMail(mailOptions, function(error, info) {
+  await transporter.sendMail(mailOptions, function(error, info) {
     if (error) {
       console.log(error);
     } else {
@@ -29,7 +29,7 @@ const sendRecovery = async (info, token) => {
     from: "ayoubebelomari@gmail.com",
     to: info.email,
     subject: "Recovery Email",
-    text: `Hi ${info.username} Please Click On This link <a href="http://localhost:3000/activate/${info.username}/${token}">Link</a> So you can update your account password`
+    text: `Hi ${info.username} Please Click On This link <a href="http://localhost:3000/editpass/${token}">Link</a> So you can update your account password`
   };
 
   await transporter.sendMail(mailOptions, function(error) {
