@@ -10,7 +10,8 @@ import {
   FAILIED_UPDATE_USER,
   CLEAR_ERRORS,
   SUCCES_TOKEN,
-  WRONG_TOKEN
+  WRONG_TOKEN,
+  REMOVE_SPECIFIC_ERROR
 } from "../actions/actionTypes";
 
 export const authInitState = {
@@ -63,7 +64,7 @@ export const authReducer = (state, action) => {
 };
 
 export const registerInitState = {
-  register_success: "",
+  register_success: false,
   errors: {
     email: "",
     userName: "",
@@ -80,16 +81,19 @@ export const registerReducer = (state = registerInitState, action) => {
     case SUCCESS_REGISTRATION:
       return {
         ...state,
-        register_success: "ok"
+        register_success: true
       };
     case FAILIED_REGISTRATION:
       return {
         ...state,
         register_message: payload.message,
+        register_success: false,
         errors: payload.errors
       };
     case REMOVE_ERRORS:
       return (state = registerInitState);
+    case REMOVE_SPECIFIC_ERROR:
+      return { ...state, errors: { ...state.errors, [payload.name]: "" } };
     default:
       return state;
   }
@@ -131,7 +135,7 @@ export const updateUserReducer = (state = updateInitState, action) => {
 
 export const tokenvalidationInitState = {
   token_valide_message: "",
-  token_valide: "this is me before",
+  token_valide: false,
   is_loading: true
 };
 export const passeditReducer = (state = tokenvalidationInitState, action) => {

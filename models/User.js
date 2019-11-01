@@ -31,6 +31,7 @@ async function register(data) {
       hash,
       token
     ]);
+    console.log(data);
     if (result.affectedRows) {
       sendActivation(data.email, data.userName, token);
       return result.affectedRows;
@@ -126,7 +127,7 @@ async function findByToken(token) {
 async function updateValidation(userName, token) {
   let sql =
     "UPDATE users SET verified = ?, verification_key = ?  WHERE username = ? AND  verification_key = ?";
-  const [result] = await pool.query(sql, [1, 0, userName, token]);
+  const [result] = await pool.query(sql, [1, "", userName, token]);
   if (!empty(result)) {
     return true;
   } else {

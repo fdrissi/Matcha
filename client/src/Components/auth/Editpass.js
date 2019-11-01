@@ -11,9 +11,17 @@ import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
 import Alert from "../inc/Alert";
 import { passwordEdit, checktoken } from "../../actions/userAction";
-import { REMOVE_ALERT, REMOVE_ERRORS } from "../../actions/actionTypes";
+import {
+  REMOVE_ALERT,
+  REMOVE_ERRORS,
+  REMOVE_SPECIFIC_ERROR
+} from "../../actions/actionTypes";
 import { FormHelperText } from "@material-ui/core";
 import { Redirect } from "react-router-dom";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import IconButton from "@material-ui/core/IconButton";
+import Visibility from "@material-ui/icons/Visibility";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -58,8 +66,19 @@ const Editpass = params => {
   const classes = useStyles();
   const [MyForm, setMyFormData] = useState({
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    showPassword: false,
+    showConfPassword: false
   });
+  const handleClickShowPassword = () => {
+    setMyFormData({ ...MyForm, showPassword: !MyForm.showPassword });
+  };
+  const handleClickShowConfPassword = () => {
+    setMyFormData({ ...MyForm, showConfPassword: !MyForm.showConfPassword });
+  };
+  const handleMouseDownPassword = event => {
+    event.preventDefault();
+  };
 
   const [state, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
@@ -79,24 +98,34 @@ const Editpass = params => {
   };
   const handleInputChange = event => {
     event.persist();
+    dispatch({
+      type: REMOVE_SPECIFIC_ERROR,
+      payload: {
+        name: event.target.name
+      }
+    });
     setMyFormData(MyForm => ({
       ...MyForm,
-      [event.target.name]: event.target.value.trim()
+      [event.target.name]: event.target.value
     }));
   };
+
   useEffect(() => {
     let token = params.params.token;
     checktoken(token, stableDispatch);
   }, [params.params.token, stableDispatch]);
   useEffect(() => {
     return () => {
-      if (state.alert.msg === "Error") {
+      if (!state.register.register_success && token_valide) {
         stableDispatch({
           type: REMOVE_ALERT
         });
+        stableDispatch({
+          type: REMOVE_ERRORS
+        });
       }
     };
-  }, [state.alert.msg, stableDispatch]);
+  }, [state.register.register_success, token_valide, stableDispatch]);
 
   if (is_loading) {
     return null;
@@ -128,9 +157,27 @@ const Editpass = params => {
                     fullWidth
                     name="password"
                     label="Password"
-                    type="password"
+                    type={MyForm.showPassword ? "text" : "password"}
                     autoComplete="new-password"
                     onChange={handleInputChange}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            edge="end"
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {MyForm.showPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
                   />
                   {state.register.errors.password.length > 0 && (
                     <FormHelperText className={classes.helperText}>
@@ -151,8 +198,26 @@ const Editpass = params => {
                     name="confirmPassword"
                     label="Confirm  Password"
                     autoComplete="new-password"
-                    type="password"
+                    type={MyForm.showConfPassword ? "text" : "password"}
                     onChange={handleInputChange}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            edge="end"
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowConfPassword}
+                            onMouseDown={handleMouseDownPassword}
+                          >
+                            {MyForm.showConfPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
                   />
                   {state.register.errors.confirmPassword.length > 0 && (
                     <FormHelperText className={classes.helperText}>
