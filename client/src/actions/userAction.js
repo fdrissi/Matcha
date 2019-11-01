@@ -208,10 +208,8 @@ export const register = async (mydata, dispatch) => {
       "Content-Type": "application/json"
     }
   };
-
   try {
     const res = await axios.post("/api/users/register", mydata, config);
-    console.log(res);
     if (!res.data.success) {
       dispatch({
         type: FAILIED_REGISTRATION,

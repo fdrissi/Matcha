@@ -6,9 +6,10 @@ function escapeHtmlChars(unsafe) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-module.exports = escapeSpecialChars = quiz => {
-  for (let property in quiz) {
-    quiz[property] = escapeHtmlChars(quiz[property]);
+module.exports = escapeSpecialChars = param => {
+  for (let property in param) {
+    param[property] =
+      typeof param[property] === "string" && escapeHtmlChars(param[property]);
   }
-  return quiz;
+  return param;
 };
