@@ -17,7 +17,11 @@ import Draggable from "react-draggable";
 import Paper from "@material-ui/core/Paper";
 import { updateUser, loadUser } from "../../actions/userAction";
 import Alert from "../inc/Alert";
-import { CLEAR_ERRORS, REMOVE_ALERT } from "../../actions/actionTypes";
+import {
+  CLEAR_ERRORS,
+  REMOVE_ALERT,
+  REMOVE_SPECIFIC_ERROR
+} from "../../actions/actionTypes";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -55,13 +59,13 @@ const Form = () => {
   const classes = useStyles();
 
   const [formData, setFormData] = useState({
-    firstName: auth.userInfo.first_name || "",
-    lastName: auth.userInfo.laste_name || "",
-    userName: auth.userInfo.username || "",
-    email: auth.userInfo.email || "",
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: "",
     oldPassword: "",
     newPassword: "",
-    newPassword2: "",
+    confirmPassword: "",
     open: false
   });
 
@@ -72,7 +76,7 @@ const Form = () => {
     email,
     oldPassword,
     newPassword,
-    newPassword2,
+    confirmPassword,
     open
   } = formData;
 
@@ -83,7 +87,10 @@ const Form = () => {
   const onChange = e => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     dispatch({
-      type: CLEAR_ERRORS
+      type: REMOVE_SPECIFIC_ERROR,
+      payload: {
+        name: e.target.name
+      }
     });
     dispatch({
       type: REMOVE_ALERT
@@ -98,20 +105,22 @@ const Form = () => {
   };
 
   useEffect(() => {
-    setFormData(formData => ({
-      ...formData,
-      firstName: auth.userInfo.first_name || "",
-      lastName: auth.userInfo.last_name || "",
-      userName: auth.userInfo.username || "",
-      email: auth.userInfo.email || ""
-    }));
+    if (!firstName && !lastName && !userName && !email) {
+      setFormData(formData => ({
+        ...formData,
+        firstName: auth.userInfo.first_name || "",
+        lastName: auth.userInfo.last_name || "",
+        userName: auth.userInfo.username || "",
+        email: auth.userInfo.email || ""
+      }));
+    }
   }, [auth]);
 
   useEffect(() => {
     setFormData(formData => ({
       ...formData,
       newPassword: "",
-      newPassword2: "",
+      confirmPassword: "",
       oldPassword: ""
     }));
     loadUser(dispatch);
@@ -153,7 +162,7 @@ const Form = () => {
               id="first-name"
               label="First Name"
               name="firstName"
-              value={firstName}
+              value={!firstName ? auth.userInfo.first_name || "" : firstName}
               onChange={e => onChange(e)}
               autoFocus
             />
@@ -169,7 +178,7 @@ const Form = () => {
               id="last-name"
               label="Last Name"
               name="lastName"
-              value={lastName}
+              value={!lastName ? auth.userInfo.last_name || "" : lastName}
               onChange={e => onChange(e)}
             />
           </Grid>
@@ -185,7 +194,7 @@ const Form = () => {
               label="Username"
               name="userName"
               autoComplete="username"
-              value={userName}
+              value={!userName ? auth.userInfo.userName || "" : userName}
               onChange={e => onChange(e)}
             />
           </Grid>
@@ -201,7 +210,7 @@ const Form = () => {
               label="Email"
               name="email"
               autoComplete="email"
-              value={email}
+              value={!email ? auth.userInfo.email || "" : email}
               onChange={e => onChange(e)}
             />
           </Grid>
@@ -224,16 +233,16 @@ const Form = () => {
 
           <Grid item xs={12}>
             <TextField
-              error={updateUserInfo.errors.newPassword ? true : false}
-              helperText={updateUserInfo.errors.newPassword}
+              error={updateUserInfo.errors.confirmPassword ? true : false}
+              helperText={updateUserInfo.errors.confirmPassword}
               variant="standard"
               margin="normal"
               fullWidth
-              name="newPassword2"
+              name="confirmPassword"
               label="Confirm New Password"
               type="password"
-              id="newpassword2"
-              value={newPassword2}
+              id="confirmPassword"
+              value={confirmPassword}
               onChange={e => onChange(e)}
             />
           </Grid>

@@ -1,74 +1,65 @@
 const userModel = require("../models/User");
+const escapeSpecialChars = require("../helpers/escapeSpecialChars");
+const bcrypt = require("bcryptjs");
 
-function validateEmail(req, res, next) {
-  const errors = {
-    firstName: "",
-    lastName: "",
-    userName: "",
-    email: "",
-    newPassword: "",
-    password: "",
-    confirmPassword: ""
-  };
-  req.body.email = req.body.email.toLowerCase();
-  let regex = /\S+@\S+\.\S+/;
-  if (!regex.test(req.body.email)) {
-    errors.email = "Enter valid Email";
-    return res.json({
-      success: false,
-      errorMsg: "Failed process due to errors",
-      errors
-    });
+async function validateEmail(req) {
+  req.body.email = req.body.email.toLowerCase().trim();
+  const user = await userModel.findById(req.user.id);
+  if (user.email !== req.body.email) {
+    if (await userModel.findByEmail(req.body.email))
+      return "Email already exists";
+    else {
+      let regex = /\S+@\S+\.\S+/;
+      if (!regex.test(req.body.email)) return "Enter valid Email";
+    }
   }
-  next();
+  return "";
 }
 
-function validateUsername(req, res, next) {
-  const errors = {
-    firstName: "",
-    lastName: "",
-    userName: "",
-    email: "",
-    newPassword: "",
-    password: "",
-    confirmPassword: ""
-  };
-  req.body.userName = req.body.userName.toLowerCase();
-  let regex = /^[a-z0-9]{3,10}$/;
-  if (!regex.test(req.body.userName)) {
-    errors.userName = "Enter valid Username";
-    return res.json({
-      success: false,
-      errorMsg: "Failed process due to errors",
-      errors
-    });
+async function validateUsername(req) {
+  req.body.userName = req.body.userName.toLowerCase().trim();
+  const user = await userModel.findById(req.user.id);
+  if (user.username !== req.body.userName) {
+    if (await userModel.findByUsername(req.body.userName))
+      return "Username already exists";
+    else {
+      let regex = /^[a-z0-9]{3,10}$/;
+      if (!regex.test(req.body.userName)) return "Enter valid Username";
+    }
   }
-  next();
+  return "";
 }
 
-function validatePassword(req, res, next) {
-  const errors = {
-    firstName: "",
-    lastName: "",
-    userName: "",
-    email: "",
-    newPassword: "",
-    password: "",
-    confirmPassword: ""
-  };
+function validatePassword(req) {
   let regex = /(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/i;
-  if (!regex.test(req.body.newPassword) && req.body.newPassword !== "") {
-    errors.newPassword = "Enter valid Password";
-    return res.json({
-      success: false,
-      errorMsg: "Failed process due to errors",
-      errors
-    });
+  if (req.body.newPassword !== "") {
+    if (!regex.test(req.body.newPassword)) {
+      return ["Enter valid Password", "Enter valid Password"];
+    } else if (req.body.newPassword !== req.body.confirmPassword)
+      return ["", "Password not matche"];
   }
-  next();
+  return ["", ""];
 }
 
-function validateName(req, res, next) {
+function validateFirstName(req) {
+  req.body.firstName = req.body.firstName.trim();
+  let firstName = "";
+  let regex = /^[A-Za-z]{3,20}$/;
+  firstName = !regex.test(req.body.firstName) ? "Enter valid First Name" : "";
+  return firstName;
+}
+
+function validateLastName(req) {
+  req.body.lastName = req.body.lastName.trim();
+  let lastName = "";
+  let regex = /^[A-Za-z]{3,20}$/;
+  lastName = !regex.test(req.body.lastName) ? "Enter valid Last Name" : "";
+  return lastName;
+}
+
+async function validator(req, res, next) {
+  req.body = escapeSpecialChars(req.body);
+
   const errors = {
     firstName: "",
     lastName: "",
@@ -78,21 +69,44 @@ function validateName(req, res, next) {
     password: "",
     confirmPassword: ""
   };
-  let regex = /^[A-Za-z]{3,20}$/;
-  if (!regex.test(req.body.lastName) || !regex.test(req.body.firstName)) {
-    !regex.test(req.body.lastName)
-      ? (errors.lastName = "Enter valid Last Name")
-      : (errors.firstName = "Enter valid First Name");
+
+  const user = await userModel.findById(req.user.id);
+  const isMatched = bcrypt.compareSync(req.body.oldPassword, user.password);
+  if (!isMatched)
     return res.json({
       success: false,
-      errorMsg: "Failed process due to errors",
+      errorMsg: "Invalid user password",
       errors
     });
-  }
-  next();
-}
 
-function validator(req, res, next) {
+  if (typeof req.body.firstName !== "undefined") {
+    errors.firstName = validateFirstName(req);
+  }
+
+  if (typeof req.body.lastName !== "undefined") {
+    errors.lastName = validateLastName(req);
+  }
+
+  if (typeof req.body.userName !== "undefined") {
+    errors.userName = await validateUsername(req);
+  }
+
+  if (typeof req.body.email !== "undefined") {
+    errors.email = await validateEmail(req);
+  }
+
+  if (typeof req.body.newPassword !== "undefined") {
+    const [newPassword, confirmPassword] = validatePassword(req);
+    errors.newPassword = newPassword;
+    errors.confirmPassword = confirmPassword;
+  }
+
+  if (!checkProperties(errors))
+    return res.json({
+      success: false,
+      errors,
+      errorMsg: "Update User Info Unsuccess"
+    });
   next();
 }
 
@@ -198,8 +212,10 @@ async function validateInput(req, res, next) {
 
 module.exports = {
   validateEmail,
-  validateName,
+  validateFirstName,
+  validateLastName,
   validatePassword,
   validateUsername,
+  validator,
   validateInput
 };

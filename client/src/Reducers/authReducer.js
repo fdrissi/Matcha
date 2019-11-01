@@ -126,6 +126,8 @@ export const updateUserReducer = (state = updateInitState, action) => {
         update_success: false,
         errors: payload.errors
       };
+    case REMOVE_SPECIFIC_ERROR:
+      return { ...state, errors: { ...state.errors, [payload.name]: "" } };
     case CLEAR_ERRORS:
       return (state = updateInitState);
     default:
