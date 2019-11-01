@@ -125,7 +125,6 @@ async function validateInput(req, res, next) {
     lastName: "",
     userName: "",
     email: "",
-    newPassword: "",
     password: "",
     confirmPassword: ""
   };
