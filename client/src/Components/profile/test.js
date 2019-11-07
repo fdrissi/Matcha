@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes, { array } from "prop-types";
 import SwipeableViews from "react-swipeable-views";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -24,6 +24,8 @@ import PhotoCamera from "@material-ui/icons/PhotoCamera";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { IconButton } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
+import { useUserStore } from "../../Context/appStore";
+
 const axios = require("axios");
 
 function TabPanel(props) {
@@ -70,6 +72,14 @@ const useStyles = makeStyles(theme => ({
   tab: {
     marginTop: theme.spacing(4)
   },
+  button: {
+    "&:hover": {
+      backgroundColor: "transparent"
+    }
+  },
+  submit: {
+    background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
+  },
   avatar: {
     margin: theme.spacing(1),
     background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
@@ -83,12 +93,7 @@ const useStyles = makeStyles(theme => ({
   Typography: {
     padding: theme.spacing(3, 0, 0, 0)
   },
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-    display: "flex",
-    height: 224
-  },
+
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`
   },
@@ -203,6 +208,16 @@ export default function FullWidthTabs() {
   const classes = useStyles();
   const theme = useTheme();
   const [index, setIndex] = useState(0);
+  const isFirstRun = useRef(true);
+  const [myPhoto, setPhoto] = useState({
+    id: "",
+    file: "",
+    profile_Image: "place-holder.png",
+    first_Image: "place-holder.png",
+    second_Image: "place-holder.png",
+    third_Image: "place-holder.png",
+    fourth_Image: "place-holder.png"
+  });
   const [mydata, setData] = useState({
     gender: "male",
     day: "",
@@ -210,12 +225,10 @@ export default function FullWidthTabs() {
     year: "",
     phoneNumber: "",
     tags: [],
-    relationship: "",
-    imagePreview: ""
+    relationship: ""
   });
 
   const handleChange = event => {
-    console.log(event.target.value);
     setData({
       ...mydata,
       [event.target.name]: event.target.value
@@ -225,7 +238,7 @@ export default function FullWidthTabs() {
   const submitForm = form => {
     form.preventDefault();
     const formData = new FormData();
-    formData.append("image", mydata.file);
+    formData.append("image", myPhoto.file);
     // for (var pair of formData.entries()) {
     //   console.log(pair[1]);
     // }
@@ -248,10 +261,8 @@ export default function FullWidthTabs() {
 
   function handleInputUpdate(event, values) {
     if (values.includes(undefined)) {
-      console.log("pop");
       values.pop();
     }
-    console.log(values[values.length - 1].tags);
     if (!mydata.tags.includes(values[values.length - 1].tags))
       setData({
         ...mydata,
@@ -267,23 +278,38 @@ export default function FullWidthTabs() {
       phoneNumber: value
     });
   };
+  const [state, dispatch] = useUserStore();
 
   const onImageChange = event => {
+    event.persist();
     if (event.target.files && event.target.files[0]) {
-      let reader = new FileReader();
-      let file = event.target.files[0];
-      reader.onloadend = () => {
-        setData({
-          ...mydata,
-          imagePreview: reader.result,
-          file: file
-        });
-      };
-      reader.readAsDataURL(file);
+      let filee = event.target.files[0];
+      setPhoto({
+        ...myPhoto,
+        file: filee,
+        id: event.target.name
+      });
     }
   };
-  console.log(mydata);
-
+  useEffect(() => {
+    if (!isFirstRun.current) {
+      const formData = new FormData();
+      formData.append("myImage", myPhoto.file);
+      const config = {
+        headers: {
+          "content-type": "multipart/form-data"
+        }
+      };
+      axios
+        .post(`api/profile/upload/${myPhoto.id}`, formData, config)
+        .then(response => {
+          alert("The file is successfully uploaded");
+        })
+        .catch(error => {});
+    }
+    isFirstRun.current = false;
+  }, [myPhoto.file]);
+  console.log(state);
   return (
     <Container component="main" maxWidth="md">
       <div className={classes.paper}>
@@ -358,21 +384,15 @@ export default function FullWidthTabs() {
                     onChange={handleChange}
                   >
                     <FormControlLabel
-                      value="female"
-                      control={<Radio color="secondary" />}
-                      label="👩Female"
-                      labelPlacement="start"
-                    />
-                    <FormControlLabel
                       value="male"
                       control={<Radio color="secondary" />}
                       label="👨Male"
                       labelPlacement="start"
                     />
                     <FormControlLabel
-                      value="bisexual"
+                      value="female"
                       control={<Radio color="secondary" />}
-                      label="🏳️‍🌈Bisexual"
+                      label="👩Female"
                       labelPlacement="start"
                     />
                   </RadioGroup>
@@ -426,13 +446,7 @@ export default function FullWidthTabs() {
                   Birthday:
                 </Typography>
               </Grid>
-              <Grid
-                item
-                xs={12}
-                container
-                direction="row"
-                justify="space-between"
-              >
+              <Grid item xs={12} container direction="row" justify="center">
                 <Grid item xs={2}>
                   <TextField
                     name="day"
@@ -527,34 +541,200 @@ export default function FullWidthTabs() {
           <TabPanel value={index} index={1} dir={theme.direction}>
             {/* Next Tab */}
             <form onSubmit={form => submitForm(form)}>
-              <input
-                accept="image/*"
-                onChange={onImageChange}
-                className={classes.inputImage}
-                id="contained-button-file"
-                multiple
-                name="image"
-                type="file"
-              />
-              <label htmlFor="contained-button-file">
-                <IconButton component="span">
-                  <Avatar
-                    src={mydata.imagePreview}
-                    style={{
-                      margin: "10px",
-                      width: "200px",
-                      height: "200px"
-                    }}
+              <Grid xs={12} container item justify="center">
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  profile Photo:
+                </Typography>
+              </Grid>
+              <Divider className={classes.divider} />
+
+              {/* Profile Gride */}
+              <Grid container item justify="center" xs={12}>
+                <input
+                  accept="image/*"
+                  onChange={onImageChange}
+                  className={classes.inputImage}
+                  id="profileImage-button-file"
+                  multiple
+                  name="profile_Image"
+                  type="file"
+                />
+                <label htmlFor="profileImage-button-file">
+                  <IconButton component="span">
+                    <Avatar
+                      src={`./uploads/${myPhoto.profile_Image}`}
+                      style={{
+                        margin: "10px",
+                        width: "200px",
+                        height: "200px"
+                      }}
+                    />
+                  </IconButton>
+                </label>
+              </Grid>
+              <Divider className={classes.divider} />
+
+              {/* first Container Grid */}
+              <Grid container direction="row" justify="center">
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    maxWidth: "200px"
+                  }}
+                >
+                  <input
+                    accept="image/*"
+                    onChange={onImageChange}
+                    className={classes.inputImage}
+                    id="firstImage-button-file"
+                    multiple
+                    name="first_Image"
+                    type="file"
                   />
-                </IconButton>
-              </label>
-              <Button
-                type="submit"
-                variant="outlined"
-                className={classes.button}
-              >
-                Default
-              </Button>
+                  <label htmlFor="firstImage-button-file">
+                    <IconButton
+                      className={classes.button}
+                      component="span"
+                      aria-label="Delete"
+                    >
+                      <Avatar
+                        variant="square"
+                        src={`./uploads/${myPhoto.first_Image}`}
+                        style={{
+                          borderRadius: 0,
+                          width: "100%",
+                          height: "auto"
+                        }}
+                      />
+                    </IconButton>
+                  </label>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    maxWidth: "200px"
+                  }}
+                >
+                  <input
+                    accept="image/*"
+                    onChange={onImageChange}
+                    className={classes.inputImage}
+                    id="secondImage-button-file"
+                    multiple
+                    name="second_Image"
+                    type="file"
+                  />
+                  <label htmlFor="secondImage-button-file">
+                    <IconButton
+                      className={classes.button}
+                      component="span"
+                      aria-label="Delete"
+                    >
+                      <Avatar
+                        variant="square"
+                        src={`./uploads/${myPhoto.second_Image}`}
+                        style={{
+                          borderRadius: 0,
+                          width: "100%",
+                          height: "auto"
+                        }}
+                      />
+                    </IconButton>
+                  </label>
+                </Grid>
+              </Grid>
+              {/* Second Container */}
+              <Grid container direction="row" justify="center">
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    maxWidth: "200px"
+                  }}
+                >
+                  <input
+                    accept="image/*"
+                    onChange={onImageChange}
+                    className={classes.inputImage}
+                    id="thirdImage-button-file"
+                    multiple
+                    name="third_Image"
+                    type="file"
+                  />
+                  <label htmlFor="thirdImage-button-file">
+                    <IconButton
+                      className={classes.button}
+                      component="span"
+                      aria-label="Delete"
+                    >
+                      <Avatar
+                        variant="square"
+                        src={`./uploads/${myPhoto.third_Image}`}
+                        style={{
+                          borderRadius: 0,
+                          width: "100%",
+                          height: "auto"
+                        }}
+                      />
+                    </IconButton>
+                  </label>
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    maxWidth: "200px"
+                  }}
+                >
+                  <input
+                    accept="image/*"
+                    onChange={onImageChange}
+                    className={classes.inputImage}
+                    id="fourthImage-button-file"
+                    multiple
+                    name="fourth_Image"
+                    type="file"
+                  />
+                  <label htmlFor="fourthImage-button-file">
+                    <IconButton
+                      className={classes.button}
+                      component="span"
+                      aria-label="Delete"
+                    >
+                      <Avatar
+                        variant="square"
+                        key="1"
+                        src={`./uploads/${myPhoto.fourth_Image}`}
+                        style={{
+                          borderRadius: 0,
+                          width: "100%",
+                          height: "auto"
+                        }}
+                      />
+                    </IconButton>
+                  </label>
+                </Grid>
+              </Grid>
+              <Grid xs={12} container justify="center" item>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  Save Changes
+                </Button>
+              </Grid>
             </form>
           </TabPanel>
         </SwipeableViews>

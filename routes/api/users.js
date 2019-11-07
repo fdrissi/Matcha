@@ -18,7 +18,7 @@ const crypto = require("crypto");
 // @route   POST api/users/login
 // @desc    Login User
 // @access  Public
-router.post("/login", [validateEmail, validatePassword], async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password, remember } = req.body;
   const user = await userModel.login(email);
   if (!user) {
