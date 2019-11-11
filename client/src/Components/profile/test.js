@@ -25,6 +25,7 @@ import Autocomplete from "@material-ui/lab/Autocomplete";
 import { IconButton } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import { useUserStore } from "../../Context/appStore";
+import { setImage } from "../../actions/profileAction";
 
 const axios = require("axios");
 
@@ -209,6 +210,7 @@ export default function FullWidthTabs() {
   const theme = useTheme();
   const [index, setIndex] = useState(0);
   const isFirstRun = useRef(true);
+  const [state, dispatch] = useUserStore();
   const [myPhoto, setPhoto] = useState({
     id: "",
     file: "",
@@ -235,25 +237,7 @@ export default function FullWidthTabs() {
     });
   };
 
-  const submitForm = form => {
-    form.preventDefault();
-    const formData = new FormData();
-    formData.append("image", myPhoto.file);
-    // for (var pair of formData.entries()) {
-    //   console.log(pair[1]);
-    // }
-    const config = {
-      headers: {
-        "content-type": "multipart/form-data"
-      }
-    };
-    axios
-      .post("api/profile/upload", formData, config)
-      .then(response => {
-        alert("The file is successfully uploaded");
-      })
-      .catch(error => {});
-  };
+  const submitForm = form => {};
 
   const handleIndexChange = (event, newValue) => {
     setIndex(newValue);
@@ -278,7 +262,6 @@ export default function FullWidthTabs() {
       phoneNumber: value
     });
   };
-  const [state, dispatch] = useUserStore();
 
   const onImageChange = event => {
     event.persist();
@@ -291,25 +274,17 @@ export default function FullWidthTabs() {
       });
     }
   };
+
+  useEffect(() => {}, []);
+
   useEffect(() => {
     if (!isFirstRun.current) {
       const formData = new FormData();
       formData.append("myImage", myPhoto.file);
-      const config = {
-        headers: {
-          "content-type": "multipart/form-data"
-        }
-      };
-      axios
-        .post(`api/profile/upload/${myPhoto.id}`, formData, config)
-        .then(response => {
-          alert("The file is successfully uploaded");
-        })
-        .catch(error => {});
+      setImage(formData, myPhoto.id, dispatch);
     }
     isFirstRun.current = false;
   }, [myPhoto.file]);
-  console.log(state);
   return (
     <Container component="main" maxWidth="md">
       <div className={classes.paper}>
@@ -540,202 +515,190 @@ export default function FullWidthTabs() {
           </TabPanel>
           <TabPanel value={index} index={1} dir={theme.direction}>
             {/* Next Tab */}
-            <form onSubmit={form => submitForm(form)}>
-              <Grid xs={12} container item justify="center">
-                <Typography
-                  variant="overline"
-                  gutterBottom
-                  className={classes.Typography}
-                >
-                  profile Photo:
-                </Typography>
-              </Grid>
-              <Divider className={classes.divider} />
+            <Grid xs={12} container item justify="center">
+              <Typography
+                variant="overline"
+                gutterBottom
+                className={classes.Typography}
+              >
+                profile Photo:
+              </Typography>
+            </Grid>
+            <Divider className={classes.divider} />
 
-              {/* Profile Gride */}
-              <Grid container item justify="center" xs={12}>
+            {/* Profile Gride */}
+            <Grid container item justify="center" xs={12}>
+              <input
+                accept="image/*"
+                onChange={onImageChange}
+                className={classes.inputImage}
+                id="profileImage-button-file"
+                multiple
+                name="profile_Image"
+                type="file"
+              />
+              <label htmlFor="profileImage-button-file">
+                <IconButton component="span">
+                  <Avatar
+                    src={`./uploads/${state.photo.profile_Image}`}
+                    style={{
+                      margin: "10px",
+                      width: "200px",
+                      height: "200px"
+                    }}
+                  />
+                </IconButton>
+              </label>
+            </Grid>
+            <Divider className={classes.divider} />
+
+            {/* first Container Grid */}
+            <Grid container direction="row" justify="center">
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                style={{
+                  maxWidth: "200px"
+                }}
+              >
                 <input
                   accept="image/*"
                   onChange={onImageChange}
                   className={classes.inputImage}
-                  id="profileImage-button-file"
+                  id="firstImage-button-file"
                   multiple
-                  name="profile_Image"
+                  name="first_Image"
                   type="file"
                 />
-                <label htmlFor="profileImage-button-file">
-                  <IconButton component="span">
+                <label htmlFor="firstImage-button-file">
+                  <IconButton
+                    className={classes.button}
+                    component="span"
+                    aria-label="Delete"
+                  >
                     <Avatar
-                      src={`./uploads/${myPhoto.profile_Image}`}
+                      variant="square"
+                      src={`./uploads/${state.photo.first_Image}`}
                       style={{
-                        margin: "10px",
-                        width: "200px",
-                        height: "200px"
+                        borderRadius: 0,
+                        width: "100%",
+                        height: "auto"
                       }}
                     />
                   </IconButton>
                 </label>
               </Grid>
-              <Divider className={classes.divider} />
-
-              {/* first Container Grid */}
-              <Grid container direction="row" justify="center">
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  style={{
-                    maxWidth: "200px"
-                  }}
-                >
-                  <input
-                    accept="image/*"
-                    onChange={onImageChange}
-                    className={classes.inputImage}
-                    id="firstImage-button-file"
-                    multiple
-                    name="first_Image"
-                    type="file"
-                  />
-                  <label htmlFor="firstImage-button-file">
-                    <IconButton
-                      className={classes.button}
-                      component="span"
-                      aria-label="Delete"
-                    >
-                      <Avatar
-                        variant="square"
-                        src={`./uploads/${myPhoto.first_Image}`}
-                        style={{
-                          borderRadius: 0,
-                          width: "100%",
-                          height: "auto"
-                        }}
-                      />
-                    </IconButton>
-                  </label>
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  style={{
-                    maxWidth: "200px"
-                  }}
-                >
-                  <input
-                    accept="image/*"
-                    onChange={onImageChange}
-                    className={classes.inputImage}
-                    id="secondImage-button-file"
-                    multiple
-                    name="second_Image"
-                    type="file"
-                  />
-                  <label htmlFor="secondImage-button-file">
-                    <IconButton
-                      className={classes.button}
-                      component="span"
-                      aria-label="Delete"
-                    >
-                      <Avatar
-                        variant="square"
-                        src={`./uploads/${myPhoto.second_Image}`}
-                        style={{
-                          borderRadius: 0,
-                          width: "100%",
-                          height: "auto"
-                        }}
-                      />
-                    </IconButton>
-                  </label>
-                </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                style={{
+                  maxWidth: "200px"
+                }}
+              >
+                <input
+                  accept="image/*"
+                  onChange={onImageChange}
+                  className={classes.inputImage}
+                  id="secondImage-button-file"
+                  multiple
+                  name="second_Image"
+                  type="file"
+                />
+                <label htmlFor="secondImage-button-file">
+                  <IconButton
+                    className={classes.button}
+                    component="span"
+                    aria-label="Delete"
+                  >
+                    <Avatar
+                      variant="square"
+                      src={`./uploads/${state.photo.second_Image}`}
+                      style={{
+                        borderRadius: 0,
+                        width: "100%",
+                        height: "auto"
+                      }}
+                    />
+                  </IconButton>
+                </label>
               </Grid>
-              {/* Second Container */}
-              <Grid container direction="row" justify="center">
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  style={{
-                    maxWidth: "200px"
-                  }}
-                >
-                  <input
-                    accept="image/*"
-                    onChange={onImageChange}
-                    className={classes.inputImage}
-                    id="thirdImage-button-file"
-                    multiple
-                    name="third_Image"
-                    type="file"
-                  />
-                  <label htmlFor="thirdImage-button-file">
-                    <IconButton
-                      className={classes.button}
-                      component="span"
-                      aria-label="Delete"
-                    >
-                      <Avatar
-                        variant="square"
-                        src={`./uploads/${myPhoto.third_Image}`}
-                        style={{
-                          borderRadius: 0,
-                          width: "100%",
-                          height: "auto"
-                        }}
-                      />
-                    </IconButton>
-                  </label>
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  style={{
-                    maxWidth: "200px"
-                  }}
-                >
-                  <input
-                    accept="image/*"
-                    onChange={onImageChange}
-                    className={classes.inputImage}
-                    id="fourthImage-button-file"
-                    multiple
-                    name="fourth_Image"
-                    type="file"
-                  />
-                  <label htmlFor="fourthImage-button-file">
-                    <IconButton
-                      className={classes.button}
-                      component="span"
-                      aria-label="Delete"
-                    >
-                      <Avatar
-                        variant="square"
-                        key="1"
-                        src={`./uploads/${myPhoto.fourth_Image}`}
-                        style={{
-                          borderRadius: 0,
-                          width: "100%",
-                          height: "auto"
-                        }}
-                      />
-                    </IconButton>
-                  </label>
-                </Grid>
+            </Grid>
+            {/* Second Container */}
+            <Grid container direction="row" justify="center">
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                style={{
+                  maxWidth: "200px"
+                }}
+              >
+                <input
+                  accept="image/*"
+                  onChange={onImageChange}
+                  className={classes.inputImage}
+                  id="thirdImage-button-file"
+                  multiple
+                  name="third_Image"
+                  type="file"
+                />
+                <label htmlFor="thirdImage-button-file">
+                  <IconButton
+                    className={classes.button}
+                    component="span"
+                    aria-label="Delete"
+                  >
+                    <Avatar
+                      variant="square"
+                      src={`./uploads/${state.photo.third_Image}`}
+                      style={{
+                        borderRadius: 0,
+                        width: "100%",
+                        height: "auto"
+                      }}
+                    />
+                  </IconButton>
+                </label>
               </Grid>
-              <Grid xs={12} container justify="center" item>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                >
-                  Save Changes
-                </Button>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                style={{
+                  maxWidth: "200px"
+                }}
+              >
+                <input
+                  accept="image/*"
+                  onChange={onImageChange}
+                  className={classes.inputImage}
+                  id="fourthImage-button-file"
+                  multiple
+                  name="fourth_Image"
+                  type="file"
+                />
+                <label htmlFor="fourthImage-button-file">
+                  <IconButton
+                    className={classes.button}
+                    component="span"
+                    aria-label="Delete"
+                  >
+                    <Avatar
+                      variant="square"
+                      key="1"
+                      src={`./uploads/${state.photo.fourth_Image}`}
+                      style={{
+                        borderRadius: 0,
+                        width: "100%",
+                        height: "auto"
+                      }}
+                    />
+                  </IconButton>
+                </label>
               </Grid>
-            </form>
+            </Grid>
           </TabPanel>
         </SwipeableViews>
       </div>

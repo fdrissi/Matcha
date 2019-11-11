@@ -10,7 +10,6 @@ import {
   WRONG_TOKEN,
   REMOVE_SPECIFIC_ERROR
 } from "../actions/actionTypes";
-import { stat } from "fs";
 
 export const authInitState = {
   isAuthenticated: false,

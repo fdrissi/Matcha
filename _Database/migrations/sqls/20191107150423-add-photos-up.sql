@@ -2,9 +2,7 @@
 CREATE TABLE photos
 (
     id int PRIMARY Key AUTO_INCREMENT,
-    `profile` varchar
-(255) NOT NULL DEFAULT 'photo_holder.png',
-    profile_Image varchar
+    `profile_Image` varchar
 (255) NOT NULL DEFAULT 'photo_holder.png',
     first_Image varchar
 (255) NOT NULL DEFAULT 'photo_holder.png',

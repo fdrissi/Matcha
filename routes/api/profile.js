@@ -4,34 +4,60 @@ const multer = require("multer");
 const path = require("path");
 const auth = require("../../middleware/auth");
 const photoModel = require("../../models/Photo");
+const fs = require("file-system");
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: "./client/public/uploads/",
-    filename: function(req, file, cb) {
-      cb(null, "IMAGE-" + Date.now() + path.extname(file.originalname));
-    }
-  }),
-  limits: { fileSize: 1000000 }
-}).single("myImage");
-
-router.post("/upload/:row", auth, async (req, res) => {
-  const id = req.user.id;
-  const { row } = req.params;
-  await upload(async (req, res, err) => {
-    console.log("Request ---", req.body);
-    console.log("Request file ---", req.file); //Here you get file.
-    /*Now do where ever you want to do*/
-    // if (!err) return res.send(200).end();
-    if (!err) {
-      // lets now work on our database
-      const check = await photoModel.SetImage(id, row);
-      if (check) console.log(check);
-      else {
-        console.log(check);
+var storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    const { id } = req.user;
+    const { row } = req.params;
+    const dir = `./client/public/uploads/${id}/`;
+    fs.exists(dir, exists => {
+      if (!exists) {
+        return fs.mkdir(dir, error => cb(error, dir));
       }
+      return cb(null, dir);
+    });
+  },
+  filename: function(req, file, callback) {
+    const { row } = req.params;
+    console.log(row);
+    if (row === "profile_Image")
+      return callback(null, "profile" + path.extname(file.originalname));
+    else
+      return callback(
+        null,
+        "IMAGE-" + Date.now() + path.extname(file.originalname)
+      );
+  }
+});
+
+// @route   Post api/profle/upload
+// @desc    upload user images
+// @access  Private
+var upload = multer({ storage: storage });
+router.post("/upload/:row", [auth, upload.single("myImage")], (req, res) => {
+  const file = req.file;
+  const { row } = req.params;
+  const id = req.user.id;
+  console.log(file);
+  if (!file) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    return error;
+  } else {
+    const check = photoModel.SetImage(id, row, file.filename);
+    if (check) {
+      return res.json({
+        success: true,
+        errorMsg: "Your image hass been uploaded"
+      });
+    } else {
+      return res.json({
+        success: false,
+        errorMsg: "There an error on upload image api"
+      });
     }
-  });
+  }
 });
 
 module.exports = router;
