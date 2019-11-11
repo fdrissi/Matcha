@@ -62,7 +62,6 @@ function Recover() {
     form.preventDefault();
     recover(MyForm.data, dispatch);
   };
-  console.log(state);
   const handleInputChange = event => {
     event.persist();
     setMyFormData(MyForm => ({
