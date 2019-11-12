@@ -12,7 +12,7 @@ const slides = [
   }
 ];
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   root: {
     maxWidth: "100%",
     maxHeight: "50%"
@@ -69,7 +69,7 @@ const TextOnSlide = ({ classes, animation, children }) => {
   );
 };
 
-const FabButton = ({ className, text }) => {
+export const FabButton = ({ className, text }) => {
   return (
     <Fab
       variant="extended"
@@ -83,7 +83,7 @@ const FabButton = ({ className, text }) => {
   );
 };
 
-function Slider() {
+export const Slider = () => {
   const classes = useStyles();
   const image = slides[Math.floor(Math.random() * slides.length)];
 
@@ -97,6 +97,4 @@ function Slider() {
       </TextOnSlide>
     </div>
   );
-}
-
-export default Slider;
+};
