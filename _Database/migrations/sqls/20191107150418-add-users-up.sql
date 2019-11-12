@@ -1,7 +1,6 @@
 /* Replace with your SQL commands */
 
-/* Tables */
-
+/* TABLE users */
 CREATE TABLE users (
     id int PRIMARY KEY AUTO_INCREMENT,
     username varchar
@@ -17,7 +16,6 @@ CREATE TABLE users (
     verification_key varchar
 (255) NOT NULL,
     recovery_key varchar
-(255) NOT NULL,
+(255) DEFAULT NULL,
     verified boolean DEFAULT FALSE
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
-
