@@ -13,7 +13,6 @@ import {
   tokenvalidationInitState
 } from "../Reducers/authReducer";
 import { photoReducer, photoInitState } from "../Reducers/profileReducer";
-import { registerReducer, registerInitState } from "../Reducers/authReducer";
 
 export const appStore = React.createContext();
 
@@ -23,7 +22,7 @@ export const UserProvider = ({ children }) => {
     auth: useReducer(authReducer, authInitState),
     register: useReducer(registerReducer, registerInitState),
     token: useReducer(passeditReducer, tokenvalidationInitState),
-    photo: useReducer(photoReducer, photoInitState)
+    photo: useReducer(photoReducer, photoInitState),
     updateUserInfo: useReducer(updateUserReducer, updateInitState),
     token: useReducer(passeditReducer, tokenvalidationInitState)
   });
