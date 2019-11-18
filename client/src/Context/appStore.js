@@ -2,8 +2,13 @@ import React, { useContext } from "react";
 import { useReducer } from "react";
 import useCombinedReducers from "use-combined-reducers";
 import { alertReducer, alertInitState } from "../Reducers/alertReducer";
-import { authReducer, authInitState } from "../Reducers/authReducer";
 import {
+  authReducer,
+  authInitState,
+  registerReducer,
+  registerInitState,
+  updateUserReducer,
+  updateInitState,
   passeditReducer,
   tokenvalidationInitState
 } from "../Reducers/authReducer";
@@ -19,6 +24,8 @@ export const UserProvider = ({ children }) => {
     register: useReducer(registerReducer, registerInitState),
     token: useReducer(passeditReducer, tokenvalidationInitState),
     photo: useReducer(photoReducer, photoInitState)
+    updateUserInfo: useReducer(updateUserReducer, updateInitState),
+    token: useReducer(passeditReducer, tokenvalidationInitState)
   });
   return (
     <appStore.Provider value={globalReducers}>{children}</appStore.Provider>
