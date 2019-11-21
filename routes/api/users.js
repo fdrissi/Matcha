@@ -44,17 +44,27 @@ router.post("/login", async (req, res) => {
 // @desc    Register User
 // @access  Public
 router.post("/register", [validateInput], async (req, res) => {
+  const errors = {
+    firstName: "",
+    lastName: "",
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  };
   const user = await userModel.register(req.body);
   if (!user) {
     return res.json({
       success: false,
-      errorMsg: "Sorry there is a problem with the database"
+      errorMsg: "Sorry there is a problem with the database",
+      errors
     });
   } else {
     res.json({
       success: true,
       SuccessMsg: `We'll send an email to ${req.body.email} In 5 minutes. Open it up to activate your account.`,
-      errorMsg: "Register Success"
+      errorMsg: "Register Success",
+      errors
     });
   }
 });
