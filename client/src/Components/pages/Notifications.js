@@ -38,7 +38,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-function NotificationsList() {
+export const NotificationsList = () => {
   const classes = useStyles();
 
   return (
@@ -67,7 +67,7 @@ function NotificationsList() {
       <Divider variant="inset" component="li" />
     </List>
   );
-}
+};
 
 const Icon = () => {
   const classes = useStyles();

@@ -114,7 +114,7 @@ const ProfileImage = () => {
     <>
       <Avatar
         alt="Profile"
-        src="./img/profile.png"
+        src="/img/profiletest.png"
         className={classes.avatar}
       />
     </>
@@ -123,7 +123,7 @@ const ProfileImage = () => {
 
 const options = ["Block", "Report"];
 
-const ITEM_HEIGHT = 20;
+const ITEM_HEIGHT = 48;
 
 const LongMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -157,7 +157,8 @@ const LongMenu = () => {
         PaperProps={{
           style: {
             maxHeight: ITEM_HEIGHT * 4.5,
-            width: 200
+            width: 80,
+            marginTop: "50px"
           }
         }}
       >
@@ -201,7 +202,7 @@ const UserAllInfoContainer = ({ children }) => {
   return <div className={classes.Userallinfocontainer}>{children}</div>;
 };
 
-export const Cover = ({ children, img = null }) => {
+export const Cover = ({ children, img = "/img/banner-brwose.jpg" }) => {
   const classes = useStyles();
   return (
     <div className={classes.cover} style={{ backgroundImage: `url(${img})` }}>
@@ -341,7 +342,7 @@ const Gallery = ({ images }) => {
     <div style={{ margin: "0 auto 5%", width: "100%" }}>
       <h3>Photo</h3>
       <img
-        src={"img/widget-title-border.png"}
+        src={"/img/widget-title-border.png"}
         alt="wrap"
         style={{ display: "block", marginBottom: "5%" }}
       />
@@ -409,7 +410,7 @@ export const Profile = () => {
             />
           </Grid>
           <Grid item lg={4} xs={12}>
-            <Gallery images={imgs} style={{ zIndex: "1" }} />
+            <Gallery images={imgs} />
           </Grid>
         </Grid>
       </Container>

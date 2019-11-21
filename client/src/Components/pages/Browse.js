@@ -297,7 +297,7 @@ const Sort = () => {
 const Header = () => {
   const classes = useStyles();
   return (
-    <Cover img={"./img/banner-brwose.jpg"}>
+    <Cover img={"/img/banner-brwose.jpg"}>
       <Container>
         <div>
           <img src="./img/t-left-img.png" alt="left" />
