@@ -11,7 +11,6 @@ import { Notifications } from "../pages/Notifications";
 import Browse from "../pages/Browse";
 import Chat from "../pages/Chat";
 import Edit_Profile from "../profile/Edit_Profile";
-import TESTJS from "../profile/test";
 
 const Routes = () => {
   return (
@@ -28,7 +27,6 @@ const Routes = () => {
         <Route exact path="/chat" component={Chat} />
         <Route exact path="/notifications" component={Notifications} />
         <Route exact path="/edit-profile" component={Edit_Profile} />
-        <Route exact path="/test" component={TESTJS} />
       </Switch>
     </div>
   );

@@ -12,7 +12,7 @@ import {
   passeditReducer,
   tokenvalidationInitState
 } from "../Reducers/authReducer";
-import { photoReducer, photoInitState } from "../Reducers/profileReducer";
+import { profileReducer, profileInitState } from "../Reducers/profileReducer";
 
 export const appStore = React.createContext();
 
@@ -21,9 +21,9 @@ export const UserProvider = ({ children }) => {
     alert: useReducer(alertReducer, alertInitState),
     auth: useReducer(authReducer, authInitState),
     register: useReducer(registerReducer, registerInitState),
-    token: useReducer(passeditReducer, tokenvalidationInitState),
-    photo: useReducer(photoReducer, photoInitState),
-    updateUserInfo: useReducer(updateUserReducer, updateInitState)
+    profile: useReducer(profileReducer, profileInitState),
+    updateUserInfo: useReducer(updateUserReducer, updateInitState),
+    token: useReducer(passeditReducer, tokenvalidationInitState)
   });
   return (
     <appStore.Provider value={globalReducers}>{children}</appStore.Provider>

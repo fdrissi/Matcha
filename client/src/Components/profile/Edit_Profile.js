@@ -1,80 +1,130 @@
-import React, { useState } from "react";
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import Grid from "@material-ui/core/Grid";
-import AccountCircle from "@material-ui/icons/AccountCircle";
+import {
+  setUserImages,
+  getUserImages,
+  removeUserImage,
+  setUserCover,
+  getUserInfo,
+  updateUserInfo,
+  getpreedefined
+} from "../../actions/profileAction";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import PropTypes from "prop-types";
+import SwipeableViews from "react-swipeable-views";
+import { REMOVE_ALERT } from "../../actions/actionTypes";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
 import Box from "@material-ui/core/Box";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import AccountCircle from "@material-ui/icons/AccountCircle";
+import Avatar from "@material-ui/core/Avatar";
+import Divider from "@material-ui/core/Divider";
 import Container from "@material-ui/core/Container";
-import { useUserStore } from "../../Context/appStore";
-import Alert from "../inc/Alert";
-import { recover } from "../../actions/userAction";
-import { positions } from "@material-ui/system";
+import Grid from "@material-ui/core/Grid";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
-import FormLabel from "@material-ui/core/FormLabel";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/dist/style.css";
-import Divider from "@material-ui/core/Divider";
+import TextField from "@material-ui/core/TextField";
+import AccountBox from "@material-ui/icons/AccountBox";
+import PhotoCamera from "@material-ui/icons/PhotoCamera";
 import { IconButton } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import { useUserStore } from "../../Context/appStore";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import ClearIcon from "@material-ui/icons/Clear";
+import ChipInput from "material-ui-chip-input";
+import GoogleApiWrapper from "../inc/MapContainer";
+
+import DeleteIcon from "@material-ui/icons/Delete";
+import Alert from "../inc/Alert";
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      <Box p={3}>{children}</Box>
+    </Typography>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired
+};
+
+function a11yProps(index) {
+  return {
+    id: `full-width-tab-${index}`,
+    "aria-controls": `full-width-tabpanel-${index}`
+  };
+}
 
 const useStyles = makeStyles(theme => ({
-  "@global": {
-    body: {
-      backgroundColor: theme.palette.common.white
-    }
+  root: {
+    backgroundColor: theme.palette.background.paper,
+    width: 800
   },
-
   paper: {
     marginTop: theme.spacing(8),
     display: "flex",
     flexDirection: "column",
+    textAlign: "center",
     alignItems: "center"
+  },
+  tab: {
+    marginTop: theme.spacing(4)
+  },
+  button: {
+    "&:hover": {
+      backgroundColor: "transparent"
+    }
+  },
+  buttonMark: {
+    color: "#5cb85c",
+    border: "1px solid #5cb85c"
+  },
+  buttonUnMark: {
+    color: "gray",
+    border: "1px solid gray"
+  },
+  submit: {
+    background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
   },
   avatar: {
     margin: theme.spacing(1),
     background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
   },
-  form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(1)
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-    background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
-
-    "&:hover": {
-      backgroundColor: "transparent",
-      border: "1px solid #e74c3c"
-    }
-  },
-  helperText: {
-    color: "#F32013",
-    fontWeight: "fontWeightBold"
-  },
-  divider: {
-    margin: theme.spacing(2, 0)
-  },
   IconButton: {
-    margin: theme.spacing.unit
+    margin: theme.spacing(1)
   },
   inputImage: {
     display: "none"
+  },
+  Typography: {
+    padding: theme.spacing(3, 0, 0, 0)
+  },
+
+  tabs: {
+    borderRight: `1px solid ${theme.palette.divider}`
+  },
+  divider: {
+    margin: theme.spacing(4, 0)
   }
 }));
 
-function Edit_Profile() {
-  const classes = useStyles();
-
-  const [MyForm, setMyFormData] = useState({
-    files: []
-  });
+function EditProfile() {
   const months = [
     {
       value: "1",
@@ -125,42 +175,155 @@ function Edit_Profile() {
       label: "December"
     }
   ];
-  const [values, setValues] = React.useState({
-    name: "Cat in the Hat",
-    age: "",
-    multiline: "Controlled",
-    currency: "EUR"
+
+  const relationship_status = [
+    {
+      value: "Single",
+      label: "Single"
+    },
+    {
+      value: "In a relationship",
+      label: "In a relationship"
+    },
+    {
+      value: "Engaged",
+      label: "Engaged"
+    },
+    {
+      value: "Married",
+      label: "Married"
+    }
+  ];
+  const classes = useStyles();
+  const theme = useTheme();
+  const [index, setIndex] = useState(0);
+  const [user_cities, setcities] = useState([]);
+  const isFirstRun = useRef(true);
+  const [isLoading, setisLoading] = useState(true);
+  const [{ alert, profile, auth }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
+
+  const [myPhoto, setPhoto] = useState({
+    id: "",
+    file: "",
+    profile_Image: "",
+    first_Image: "",
+    second_Image: "",
+    third_Image: "",
+    fourth_Image: ""
+  });
+  const [mydata, setData] = useState({
+    user_gender: "",
+    user_relationship: "",
+    user_birth_day: "",
+    user_birth_month: "",
+    user_gender_interest: "",
+    user_birth_year: "",
+    user_tags: [],
+    user_city: "",
+    user_current_occupancy: ""
   });
 
-  const [state, dispatch] = useUserStore();
+  const handleChange = event => {
+    setData({
+      ...mydata,
+      [event.target.name]: event.target.value
+    });
+  };
 
-  const submitForm = async form => {
+  const submitForm = form => {
     form.preventDefault();
-    //recover(MyForm.data, dispatch);
+    async function update() {
+      await updateUserInfo(mydata, stableDispatch);
+    }
+    update();
   };
 
-  const [value, setValue] = React.useState("female");
+  const handleIndexChange = (event, newValue) => {
+    setIndex(newValue);
+  };
 
-  const handleChange = name => event => {
-    setValues({ ...values, [name]: event.target.value });
+  const handleChangeIndex = index => {
+    setIndex(index);
   };
-  const handleOnChange = value => {
-    this.setState({ phone: value });
-  };
-  const handleInputChange = event => {
+
+  const onImageChange = event => {
     event.persist();
-    setMyFormData(MyForm => ({
-      ...MyForm,
-      data: event.target.value.trim()
+    if (event.target.files && event.target.files[0]) {
+      let filee = event.target.files[0];
+      setPhoto({
+        ...myPhoto,
+        file: filee,
+        id: event.target.name
+      });
+      event.target.value = null;
+    }
+  };
+
+  const handleCoverSet = filed => {
+    setUserCover(filed, dispatch);
+  };
+  const handleClick = (photo, filed) => {
+    removeUserImage(photo, filed, dispatch);
+  };
+
+  const handleAddChip = chip => {
+    setData(previousData => ({
+      ...previousData,
+      user_tags: previousData.user_tags.concat(chip)
     }));
   };
+
+  const handleDeleteChip = (chip, index) => {
+    if (index > -1) {
+      const res = mydata.user_tags;
+      res.splice(index, 1);
+      setData(previousData => ({
+        ...previousData,
+        user_tags: res
+      }));
+    }
+  };
+
+  if (alert.msg != "")
+    setTimeout(() => {
+      stableDispatch({
+        type: REMOVE_ALERT
+      });
+    }, 2000);
+
+  useEffect(() => {
+    async function getUser() {
+      await getUserImages(stableDispatch);
+      await getUserInfo(stableDispatch);
+      const cities = await getpreedefined();
+      setcities(cities);
+      console.log("1", cities);
+      setisLoading(false);
+    }
+    stableDispatch({
+      type: REMOVE_ALERT
+    });
+    getUser();
+  }, [stableDispatch]);
+  console.log(isLoading);
+  useEffect(() => {
+    setData(profile.info);
+  }, [profile.info]);
+
+  useEffect(() => {
+    if (!isFirstRun.current) {
+      const formData = new FormData();
+      formData.append("myImage", myPhoto.file);
+      setUserImages(formData, myPhoto.id, stableDispatch);
+    }
+    isFirstRun.current = false;
+  }, [myPhoto.file, myPhoto.id, stableDispatch]);
+  if (isLoading) return null;
   return (
     <Container component="main" maxWidth="md">
-      <CssBaseline />
       <div className={classes.paper}>
-        {state.alert.msg && (
-          <Alert message={state.alert.msg} type={state.alert.alertType} />
-        )}
+        <CssBaseline />
         <Avatar className={classes.avatar}>
           <AccountCircle />
         </Avatar>
@@ -168,115 +331,101 @@ function Edit_Profile() {
         <Box textAlign="center">
           Tempor ad excepteur irure officia in labore velit.
         </Box>
-        <input
-          accept="image/*"
-          className={classes.inputImage}
-          id="contained-button-file"
-          multiple
-          type="file"
-        />
-        <label htmlFor="contained-button-file">
-          <IconButton>
-            <Avatar
-              src="https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png"
-              style={{
-                margin: "10px",
-                width: "200px",
-                height: "200px"
-              }}
-            />
-          </IconButton>
-        </label>
         <Divider className={classes.divider} />
-        <Divider className={classes.divider} />
-        <Grid container item xs={12} direction="row" justify="space-between">
-          <Grid item xs={4}>
-            <TextField
-              className={classes.input}
-              variant="outlined"
-              disabled
-              label="Usear Name"
-              name="userName"
-              fullWidth
-              onChange={handleInputChange}
+
+        <AppBar position="static" color="default">
+          <Tabs
+            value={index}
+            onChange={handleIndexChange}
+            indicatorColor="secondary"
+            textColor="secondary"
+            variant="fullWidth"
+            aria-label="full width tabs example"
+          >
+            <Tab icon={<AccountBox />} label="Profile Info" {...a11yProps(0)} />
+            <Tab
+              icon={<PhotoCamera />}
+              label="Profile Photos"
+              {...a11yProps(1)}
             />
-          </Grid>
-          <Grid item xs={4}>
-            <TextField
-              error={state.register.errors.firstName.length > 0 ? true : false}
-              name="firstName"
-              variant="outlined"
-              disabled
-              fullWidth
-              onChange={handleInputChange}
-              label="First Name"
-            />
-          </Grid>
-        </Grid>
-        {/* next gride  */}
-        <form
-          className={classes.form}
-          onSubmit={form => submitForm(form)}
-          border={1}
+          </Tabs>
+        </AppBar>
+        <SwipeableViews
+          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+          index={index}
+          onChangeIndex={handleChangeIndex}
         >
-          <Divider className={classes.divider} />
-          <Grid xs={12} container justify="center">
-            <Typography variant="subtitle1" gutterBottom>
-              Your Gender:
-            </Typography>
-          </Grid>
-          <Grid item xs={12} container justify="center">
-            <FormControl component="fieldset" className={classes.formControl}>
-              <RadioGroup
-                row
-                aria-label="gender"
-                name="gender1"
-                value={value}
-                onChange={handleChange}
-              >
-                <FormControlLabel
-                  value="female"
-                  control={<Radio />}
-                  label="👩Female"
-                />
-                <FormControlLabel
-                  value="male"
-                  control={<Radio />}
-                  label="👨Male"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Grid>
-          {/*next Gride*/}
-          <Divider className={classes.divider} />
-          <Grid xs={12} container justify="center">
-            <Typography variant="subtitle1" gutterBottom>
-              Birthday
-            </Typography>
-          </Grid>
-          <Grid item xs={12} container direction="row" justify="space-between">
-            <Grid item xs={2}>
-              <TextField
-                error={
-                  state.register.errors.firstName.length > 0 ? true : false
-                }
-                name="day"
-                variant="outlined"
-                fullWidth
-                onChange={handleInputChange}
-                label="Day"
-              />
-            </Grid>
-            <Grid item xs={3}>
+          <TabPanel
+            value={index}
+            index={0}
+            dir={theme.direction}
+            className={classes.tab}
+          >
+            {alert.msg && <Alert message={alert.msg} type={alert.alertType} />}
+
+            {/* NEXT GRIDE */}
+            <form
+              className={classes.form}
+              onSubmit={form => submitForm(form)}
+              border={1}
+            >
+              <Grid xs={12} container item justify="center">
+                <Typography variant="subtitle1" gutterBottom>
+                  Gender & RELATIONSHIP:
+                </Typography>
+              </Grid>
+              <Grid xs={12} container item justify="center">
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  Gender:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} container justify="center">
+                <FormControl component="fieldset">
+                  <RadioGroup
+                    row
+                    aria-label="gender"
+                    name="user_gender"
+                    value={mydata.user_gender}
+                    onChange={handleChange}
+                  >
+                    <FormControlLabel
+                      value="Male"
+                      control={<Radio color="secondary" />}
+                      label="👨Male"
+                      labelPlacement="start"
+                    />
+                    <FormControlLabel
+                      value="Female"
+                      control={<Radio color="secondary" />}
+                      label="👩Female"
+                      labelPlacement="start"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              {/* Next Gride */}
+              <Grid xs={12} container item justify="center">
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  RELATIONSHIP:
+                </Typography>
+              </Grid>
               <TextField
                 className={classes.input}
                 select
                 variant="outlined"
-                label="Month"
-                value={values.currency}
-                name="userName"
+                label="Your Relationship status"
+                value={mydata.user_relationship}
+                name="user_relationship"
                 fullWidth
-                onChange={handleChange("currency")}
+                onChange={handleChange}
                 SelectProps={{
                   native: true,
                   MenuProps: {
@@ -284,78 +433,621 @@ function Edit_Profile() {
                   }
                 }}
               >
-                {months.map(option => (
+                {relationship_status.map(option => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
                 ))}
               </TextField>
-            </Grid>
-            <Grid item xs={5}>
-              <TextField
-                error={
-                  state.register.errors.firstName.length > 0 ? true : false
-                }
-                name="firstName"
-                variant="outlined"
-                fullWidth
-                onChange={handleInputChange}
-                label="YYYY"
-              />
-            </Grid>
-          </Grid>
-          <Divider className={classes.divider} />
-          <Grid xs={12} container justify="center">
-            <Typography variant="subtitle1" gutterBottom>
-              Phone Number
-            </Typography>
-          </Grid>
-          <Grid container container justify="center">
-            <Grid>
-              <PhoneInput
-                defaultCountry={"ma"}
-                value=""
-                onChange={handleOnChange}
-              />
-            </Grid>
-          </Grid>
-          <Divider className={classes.divider} />
-
-          <Grid container item xs={12} direction="row" justify="space-between">
-            <Grid item xs={4}>
+              {/* Next Gride */}
+              <Divider className={classes.divider} />
+              <Grid xs={12} container item justify="center" pt={2}>
+                <Typography variant="subtitle1" pt={3}>
+                  Details About You:
+                </Typography>
+              </Grid>
+              <Grid xs={12} container item justify="center">
+                <Typography variant="overline" className={classes.Typography}>
+                  Interests:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} container justify="center">
+                <FormControl error component="fieldset">
+                  <RadioGroup
+                    row
+                    aria-label="gender"
+                    name="user_gender_interest"
+                    value={mydata.user_gender_interest}
+                    onChange={handleChange}
+                  >
+                    <FormControlLabel
+                      value="Male"
+                      control={<Radio color="secondary" />}
+                      label="👨Male"
+                      labelPlacement="start"
+                    />
+                    <FormControlLabel
+                      value="Female"
+                      control={<Radio color="secondary" />}
+                      label="👩Female"
+                      labelPlacement="start"
+                    />
+                    <FormControlLabel
+                      value="bisexual"
+                      control={<Radio color="secondary" />}
+                      label="🏳️‍🌈Bisexual"
+                      labelPlacement="start"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              {/* Next Gride */}
+              <Grid xs={12} container item justify="center">
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  Current Occupancy:
+                </Typography>
+              </Grid>
               <TextField
                 className={classes.input}
+                select
                 variant="outlined"
-                required
-                fullWidth
-                label="Usear Name"
-                name="userName"
-                onChange={handleInputChange}
-                autoFocus
-              />
-            </Grid>
-            <Grid item xs={4}>
+                label="Your City"
+                value={""}
+                name="user_city"
+                size="medium"
+                onChange={handleChange}
+                SelectProps={{
+                  native: true,
+                  MenuProps: {
+                    className: classes.menu
+                  }
+                }}
+              >
+                {[
+                  { id: 0, value: "Student" },
+                  { id: 1, value: "Employer" },
+                  { id: 2, value: "None" }
+                ].map(option => (
+                  <option key={option.id} value={option.value}>
+                    {option.value}
+                  </option>
+                ))}
+              </TextField>
+
+              {/* Next Gride */}
+              <Grid xs={12} container item justify="center">
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  City:
+                </Typography>
+              </Grid>
               <TextField
-                error={
-                  state.register.errors.firstName.length > 0 ? true : false
-                }
-                name="firstName"
+                className={classes.input}
+                select
                 variant="outlined"
-                required
-                onChange={handleInputChange}
-                label="First Name"
+                label="Your City"
+                value={""}
+                name="user_city"
+                size="medium"
+                onChange={handleChange}
+                SelectProps={{
+                  native: true,
+                  MenuProps: {
+                    className: classes.menu
+                  }
+                }}
+              >
+                {user_cities.map(option => (
+                  <option key={option.id} value={option.value}>
+                    {option.value}
+                  </option>
+                ))}
+              </TextField>
+
+              {/* Next Gride */}
+              <Grid xs={12} container item justify="center">
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  Birthday:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} container direction="row" justify="center">
+                <Grid item xs={2}>
+                  <TextField
+                    name="user_birth_day"
+                    variant="outlined"
+                    fullWidth
+                    value={mydata.user_birth_day}
+                    onChange={handleChange}
+                    label="Day"
+                  />
+                </Grid>
+                <Grid item xs={3}>
+                  <TextField
+                    className={classes.input}
+                    select
+                    variant="outlined"
+                    label="Month"
+                    value={mydata.user_birth_month}
+                    name="user_birth_month"
+                    fullWidth
+                    onChange={handleChange}
+                    SelectProps={{
+                      native: true,
+                      MenuProps: {
+                        className: classes.menu
+                      }
+                    }}
+                  >
+                    {months.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs={5}>
+                  <TextField
+                    name="user_birth_year"
+                    variant="outlined"
+                    value={mydata.user_birth_year}
+                    fullWidth
+                    onChange={handleChange}
+                    label="YYYY"
+                  />
+                </Grid>
+              </Grid>
+              {/* Next Gride */}
+              {/* Next Gride */}
+              <Grid xs={12} container item justify="center">
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  biography:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} container direction="row" justify="center">
+                <Grid item xs={12}>
+                  <TextField
+                    id="outlined-multiline-static"
+                    label="Multiline"
+                    multiline
+                    rows="4"
+                    fullWidth
+                    defaultValue="Default Value"
+                    className={classes.textField}
+                    margin="normal"
+                    variant="outlined"
+                  />
+                </Grid>
+              </Grid>
+              {/* Next Gride */}
+              <Grid xs={12} container item justify="center">
+                <Typography variant="subtitle1" gutterBottom>
+                  Tags:
+                </Typography>
+              </Grid>
+              <ChipInput
+                value={mydata.user_tags}
+                onAdd={chip => handleAddChip(chip)}
+                onDelete={(chip, index) => handleDeleteChip(chip, index)}
               />
+              {/* Next Gride */}
+              {/* {next Gride } */}
+              <Grid xs={12} container item justify="center">
+                <Grid
+                  item
+                  xs={12}
+                  style={{ position: "relative", height: "30vh" }}
+                >
+                  <GoogleApiWrapper onMarkerClick />
+                </Grid>
+              </Grid>
+              <Divider className={classes.divider} />
+              <Button
+                type="submit"
+                size="medium"
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Save
+              </Button>
+            </form>
+          </TabPanel>
+          <TabPanel value={index} index={1} dir={theme.direction}>
+            {/* Next Tab */}
+            {alert.msg && <Alert message={alert.msg} type={alert.alertType} />}
+            <Grid
+              container
+              direction="row"
+              justify="space-between"
+              alignItems="center"
+            >
+              <Grid xs={12} item>
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  profile Photo:
+                </Typography>
+              </Grid>
+              <Divider className={classes.divider} />
+
+              {/* Profile Gride */}
+              <Grid item xs={12}>
+                <input
+                  accept="image/*"
+                  onChange={onImageChange}
+                  className={classes.inputImage}
+                  id="profileImage-button-file"
+                  multiple
+                  name="profile_Image"
+                  type="file"
+                />
+                <label htmlFor="profileImage-button-file">
+                  <IconButton component="span">
+                    <Avatar
+                      src={
+                        `./uploads/${profile.photo.profile_Image}?` + Date.now()
+                      }
+                      style={{
+                        margin: "10px",
+                        width: "200px",
+                        height: "200px"
+                      }}
+                    />
+                  </IconButton>
+                </label>
+                {profile.photo.profile_Image !== "photo_holder.png" && (
+                  <Grid xs={12} container item justify="center">
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="secondary"
+                      startIcon={<DeleteIcon />}
+                      onClick={() =>
+                        handleClick(
+                          profile.photo.profile_Image,
+                          "profile_Image"
+                        )
+                      }
+                    >
+                      Remove
+                    </Button>
+                  </Grid>
+                )}
+              </Grid>
+              <Divider className={classes.divider} />
+
+              {/* first Container Grid */}
+              <Grid container direction="row" justify="space-around">
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    maxWidth: "200px"
+                  }}
+                >
+                  <input
+                    accept="image/*"
+                    onChange={onImageChange}
+                    className={classes.inputImage}
+                    id="firstImage-button-file"
+                    multiple
+                    name="first_Image"
+                    type="file"
+                  />
+                  <label htmlFor="firstImage-button-file">
+                    <IconButton
+                      className={classes.button}
+                      component="span"
+                      aria-label="Delete"
+                    >
+                      <Avatar
+                        variant="square"
+                        src={`./uploads/${profile.photo.first_Image}`}
+                        style={{
+                          borderRadius: 0,
+                          width: "100%",
+                          height: "200px"
+                        }}
+                      />
+                    </IconButton>
+                  </label>
+                  {profile.photo.first_Image !== "photo_holder.png" && (
+                    <Grid container>
+                      <Grid item xs={6}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<DeleteIcon />}
+                          onClick={() =>
+                            handleClick(
+                              profile.photo.first_Image,
+                              "first_Image"
+                            )
+                          }
+                        >
+                          Remove
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          className={
+                            profile.photo.first_Image ===
+                            profile.photo.cover_Image
+                              ? classes.buttonMark
+                              : classes.buttonUnMark
+                          }
+                          size="small"
+                          variant="outlined"
+                          startIcon={
+                            profile.photo.first_Image ===
+                            profile.photo.cover_Image ? (
+                              <CheckCircleIcon />
+                            ) : (
+                              <ClearIcon />
+                            )
+                          }
+                          onClick={() => handleCoverSet("first_Image")}
+                        >
+                          Cover
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  )}
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  style={{
+                    maxWidth: "200px"
+                  }}
+                >
+                  <input
+                    accept="image/*"
+                    onChange={onImageChange}
+                    className={classes.inputImage}
+                    id="secondImage-button-file"
+                    multiple
+                    name="second_Image"
+                    type="file"
+                  />
+                  <label htmlFor="secondImage-button-file">
+                    <IconButton
+                      className={classes.button}
+                      component="span"
+                      aria-label="Delete"
+                    >
+                      <Avatar
+                        variant="square"
+                        src={`./uploads/${profile.photo.second_Image}`}
+                        style={{
+                          borderRadius: 0,
+                          width: "100%",
+                          height: "200px"
+                        }}
+                      />
+                    </IconButton>
+                  </label>
+                  {profile.photo.second_Image !== "photo_holder.png" && (
+                    <Grid container>
+                      <Grid item xs={6}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<DeleteIcon />}
+                          onClick={() =>
+                            handleClick(
+                              profile.photo.second_Image,
+                              "second_Image"
+                            )
+                          }
+                        >
+                          Remove
+                        </Button>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Button
+                          className={
+                            profile.photo.second_Image ===
+                            profile.photo.cover_Image
+                              ? classes.buttonMark
+                              : classes.buttonUnMark
+                          }
+                          size="small"
+                          variant="outlined"
+                          startIcon={
+                            profile.photo.second_Image ===
+                            profile.photo.cover_Image ? (
+                              <CheckCircleIcon />
+                            ) : (
+                              <ClearIcon />
+                            )
+                          }
+                          onClick={() => handleCoverSet("second_Image")}
+                        >
+                          Cover
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  )}
+                </Grid>
+              </Grid>
             </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            className={classes.submit}
-          >
-            Save Changes
-          </Button>
-        </form>
+            {/* Second Container */}
+            <Grid container direction="row" justify="space-around">
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                style={{
+                  maxWidth: "200px"
+                }}
+              >
+                <input
+                  accept="image/*"
+                  onChange={onImageChange}
+                  className={classes.inputImage}
+                  id="thirdImage-button-file"
+                  multiple
+                  name="third_Image"
+                  type="file"
+                />
+                <label htmlFor="thirdImage-button-file">
+                  <IconButton
+                    className={classes.button}
+                    component="span"
+                    aria-label="Delete"
+                  >
+                    <Avatar
+                      variant="square"
+                      src={`./uploads/${profile.photo.third_Image}`}
+                      style={{
+                        borderRadius: 0,
+                        width: "100%",
+                        height: "200px"
+                      }}
+                    />
+                  </IconButton>
+                </label>
+                {profile.photo.third_Image !== "photo_holder.png" && (
+                  <Grid container>
+                    <Grid item xs={6}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<DeleteIcon />}
+                        onClick={() =>
+                          handleClick(profile.photo.third_Image, "third_Image")
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Button
+                        className={
+                          profile.photo.third_Image ===
+                          profile.photo.cover_Image
+                            ? classes.buttonMark
+                            : classes.buttonUnMark
+                        }
+                        size="small"
+                        variant="outlined"
+                        startIcon={
+                          profile.photo.third_Image ===
+                          profile.photo.cover_Image ? (
+                            <CheckCircleIcon />
+                          ) : (
+                            <ClearIcon />
+                          )
+                        }
+                        onClick={() => handleCoverSet("third_Image")}
+                      >
+                        Cover
+                      </Button>
+                    </Grid>
+                  </Grid>
+                )}
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                style={{
+                  maxWidth: "200px"
+                }}
+              >
+                <input
+                  accept="image/*"
+                  onChange={onImageChange}
+                  className={classes.inputImage}
+                  id="fourthImage-button-file"
+                  multiple
+                  name="fourth_Image"
+                  type="file"
+                />
+                <label htmlFor="fourthImage-button-file">
+                  <IconButton
+                    className={classes.button}
+                    component="span"
+                    aria-label="Delete"
+                  >
+                    <Avatar
+                      variant="square"
+                      key="1"
+                      src={`./uploads/${profile.photo.fourth_Image}`}
+                      style={{
+                        borderRadius: 0,
+                        width: "100%",
+                        height: "200px"
+                      }}
+                    />
+                  </IconButton>
+                </label>
+                {profile.photo.fourth_Image !== "photo_holder.png" && (
+                  <Grid container>
+                    <Grid item xs={6}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<DeleteIcon />}
+                        onClick={() =>
+                          handleClick(
+                            profile.photo.fourth_Image,
+                            "fourth_Image"
+                          )
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Button
+                        className={
+                          profile.photo.fourth_Image ===
+                          profile.photo.cover_Image
+                            ? classes.buttonMark
+                            : classes.buttonUnMark
+                        }
+                        size="small"
+                        variant="outlined"
+                        startIcon={
+                          profile.photo.fourth_Image ===
+                          profile.photo.cover_Image ? (
+                            <CheckCircleIcon />
+                          ) : (
+                            <ClearIcon />
+                          )
+                        }
+                        onClick={() => handleCoverSet("fourth_Image")}
+                      >
+                        Cover
+                      </Button>
+                    </Grid>
+                  </Grid>
+                )}
+              </Grid>
+            </Grid>
+          </TabPanel>
+        </SwipeableViews>
       </div>
     </Container>
   );
@@ -363,7 +1055,7 @@ function Edit_Profile() {
 const editProfile = () => {
   return (
     <div style={{ flex: 1 }}>
-      <Edit_Profile />
+      <EditProfile />
     </div>
   );
 };
