@@ -233,7 +233,8 @@ router.get("/getUserInfo", [auth], async (req, res) => {
     user_birth_month: month,
     user_gender_interest: result.user_gender_interest,
     user_birth_year: year,
-    user_city: ""
+    user_city: "",
+    user_biography: "",
   };
   return res.json({
     success: true,
