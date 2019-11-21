@@ -1,12 +1,12 @@
 /* Replace with your SQL commands */
-CREATE TRIGGER AfterRegisterphotos
+CREATE TRIGGER AfterRegisterInfo
 after
 INSERT ON
 users
 FOR
 EACH
 ROW
-INSERT INTO photos
+INSERT INTO user_info
     (id)
 VALUES
     (new.id)
