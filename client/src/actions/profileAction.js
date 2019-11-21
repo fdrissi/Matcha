@@ -1,13 +1,12 @@
 import axios from "axios";
-import { PHOTO_SUCCESS, SET_ALERT } from "./actionTypes";
+import { PHOTO_SUCCESS, SET_ALERT, INFO_SUCCESS } from "./actionTypes";
 
-export const setImage = async (formData, row, dispatch) => {
+export const setUserImages = async (formData, row, dispatch) => {
   const config = {
     header: {
-      "content-type": "multipart/form-data"
+      "Content-Type": "multipart/form-data"
     }
   };
-  console.log("test");
   try {
     const res = await axios.post(`api/profile/upload/${row}`, formData, config);
     if (res.data.success) {
@@ -36,7 +35,7 @@ export const setImage = async (formData, row, dispatch) => {
   }
 };
 
-export const setCover = async (filed, dispatch) => {
+export const setUserCover = async (filed, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -48,6 +47,10 @@ export const setCover = async (filed, dispatch) => {
       config
     });
     if (res.data.success) {
+      dispatch({
+        type: PHOTO_SUCCESS,
+        payload: res.data.result
+      });
       dispatch({
         type: SET_ALERT,
         payload: {
@@ -67,7 +70,7 @@ export const setCover = async (filed, dispatch) => {
   } catch (error) {}
 };
 
-export const getImage = async dispatch => {
+export const getUserImages = async dispatch => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -87,10 +90,10 @@ export const getImage = async dispatch => {
   }
 };
 
-export const removeImage = async (photo, filed, dispatch) => {
+export const removeUserImage = async (photo, filed, dispatch) => {
   const config = {
     header: {
-      "Conetne-Type": "application/json"
+      "Content-Type": "application/json"
     }
   };
   try {
@@ -121,4 +124,52 @@ export const removeImage = async (photo, filed, dispatch) => {
       });
     }
   } catch (error) {}
+};
+
+export const getUserInfo = async dispatch => {
+  try {
+    const res = await axios.get("api/profile/getUserInfo");
+    if (res.data.success) {
+      dispatch({
+        type: INFO_SUCCESS,
+        payload: res.data.info
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateUserInfo = async (mydata, dispatch) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    const res = await axios.post(
+      "api/profile/updateUserInfo",
+      {
+        data: mydata
+      },
+      config
+    );
+    if (res.data.success) {
+    } else {
+      dispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "danger",
+          msg: res.data.errorMsg
+        }
+      });
+    }
+  } catch (error) {}
+};
+
+export const getpreedefined = async () => {
+  const res = await axios.get("api/profile/getpreedefined");
+  if (res.data.success) {
+    return res.data.cities;
+  }
 };

@@ -13,7 +13,7 @@ CREATE TABLE photos
     fourth_Image varchar
 (255) NOT NULL DEFAULT 'photo_holder.png',
     cover_Image varchar
-(255) NOT NULL DEFAULT 'profile_holder.png',
+(255) NOT NULL DEFAULT 'cover_holder.png',
     `counter` int
 (11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

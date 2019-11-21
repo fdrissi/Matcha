@@ -1,3 +1,12 @@
+import {
+  setUserImages,
+  getUserImages,
+  removeUserImage,
+  setUserCover,
+  getUserInfo,
+  updateUserInfo,
+  getpreedefined
+} from "../../actions/profileAction";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
 import SwipeableViews from "react-swipeable-views";
@@ -19,22 +28,18 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import TextField from "@material-ui/core/TextField";
-import PhoneInput from "react-phone-input-2";
 import AccountBox from "@material-ui/icons/AccountBox";
 import PhotoCamera from "@material-ui/icons/PhotoCamera";
-import Autocomplete from "@material-ui/lab/Autocomplete";
 import { IconButton } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import { useUserStore } from "../../Context/appStore";
-import {
-  setImage,
-  getImage,
-  removeImage,
-  setCover
-} from "../../actions/profileAction";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import ClearIcon from "@material-ui/icons/Clear";
+import ChipInput from "material-ui-chip-input";
+import GoogleApiWrapper from "../inc/MapContainer";
+
 import DeleteIcon from "@material-ui/icons/Delete";
 import Alert from "../inc/Alert";
-import AspectRatioIcon from "@material-ui/icons/AspectRatio";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -86,6 +91,14 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: "transparent"
     }
   },
+  buttonMark: {
+    color: "#5cb85c",
+    border: "1px solid #5cb85c"
+  },
+  buttonUnMark: {
+    color: "gray",
+    border: "1px solid gray"
+  },
   submit: {
     background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
   },
@@ -107,12 +120,11 @@ const useStyles = makeStyles(theme => ({
     borderRight: `1px solid ${theme.palette.divider}`
   },
   divider: {
-    margin: theme.spacing(2, 0)
+    margin: theme.spacing(4, 0)
   }
 }));
 
 function EditProfile() {
-  const My_tags = [{ tags: "Khouribga" }, { tags: "1337" }];
   const months = [
     {
       value: "1",
@@ -180,45 +192,15 @@ function EditProfile() {
     {
       value: "Married",
       label: "Married"
-    },
-    {
-      value: "Its complicated ",
-      label: "Its complicated "
-    },
-    {
-      value: "In an open relationship",
-      label: "In an open relationship"
-    },
-    {
-      value: "Widowed",
-      label: "Widowed"
-    },
-    {
-      value: "Separated",
-      label: "Separated"
-    },
-    {
-      value: "9",
-      label: "September"
-    },
-    {
-      value: "Divorced",
-      label: "Divorced"
-    },
-    {
-      value: "In a civil union",
-      label: "In a civil union"
-    },
-    {
-      value: "In a domestic partnership",
-      label: "In a domestic partnership"
     }
   ];
   const classes = useStyles();
   const theme = useTheme();
   const [index, setIndex] = useState(0);
+  const [user_cities, setcities] = useState([]);
   const isFirstRun = useRef(true);
-  const [state, dispatch] = useUserStore();
+  const [isLoading, setisLoading] = useState(true);
+  const [{ alert, profile, auth }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
 
   const [myPhoto, setPhoto] = useState({
@@ -231,13 +213,15 @@ function EditProfile() {
     fourth_Image: ""
   });
   const [mydata, setData] = useState({
-    gender: "male",
-    day: "",
-    months: "",
-    year: "",
-    phoneNumber: "",
-    tags: [],
-    relationship: ""
+    user_gender: "",
+    user_relationship: "",
+    user_birth_day: "",
+    user_birth_month: "",
+    user_gender_interest: "",
+    user_birth_year: "",
+    user_tags: [],
+    user_city: "",
+    user_current_occupancy: ""
   });
 
   const handleChange = event => {
@@ -247,30 +231,20 @@ function EditProfile() {
     });
   };
 
-  const submitForm = form => {};
+  const submitForm = form => {
+    form.preventDefault();
+    async function update() {
+      await updateUserInfo(mydata, stableDispatch);
+    }
+    update();
+  };
 
   const handleIndexChange = (event, newValue) => {
     setIndex(newValue);
   };
 
-  function handleInputUpdate(event, values) {
-    if (values.includes(undefined)) {
-      values.pop();
-    }
-    if (!mydata.tags.includes(values[values.length - 1].tags))
-      setData({
-        ...mydata,
-        tags: values
-      });
-  }
   const handleChangeIndex = index => {
     setIndex(index);
-  };
-  const handlePhoneOnChange = value => {
-    setData({
-      ...mydata,
-      phoneNumber: value
-    });
   };
 
   const onImageChange = event => {
@@ -287,35 +261,65 @@ function EditProfile() {
   };
 
   const handleCoverSet = filed => {
-    setCover(filed, dispatch);
+    setUserCover(filed, dispatch);
   };
   const handleClick = (photo, filed) => {
-    removeImage(photo, filed, dispatch);
-    // here we gonna work on remove the chossen image
+    removeUserImage(photo, filed, dispatch);
   };
 
-  useEffect(() => {
+  const handleAddChip = chip => {
+    setData(previousData => ({
+      ...previousData,
+      user_tags: previousData.user_tags.concat(chip)
+    }));
+  };
+
+  const handleDeleteChip = (chip, index) => {
+    if (index > -1) {
+      const res = mydata.user_tags;
+      res.splice(index, 1);
+      setData(previousData => ({
+        ...previousData,
+        user_tags: res
+      }));
+    }
+  };
+
+  if (alert.msg != "")
     setTimeout(() => {
       stableDispatch({
         type: REMOVE_ALERT
       });
-    }, 1500);
-  }, [state.alert.msg, stableDispatch]);
+    }, 2000);
+
   useEffect(() => {
-    async function getImages() {
-      await getImage(stableDispatch);
+    async function getUser() {
+      await getUserImages(stableDispatch);
+      await getUserInfo(stableDispatch);
+      const cities = await getpreedefined();
+      setcities(cities);
+      console.log("1", cities);
+      setisLoading(false);
     }
-    getImages();
+    stableDispatch({
+      type: REMOVE_ALERT
+    });
+    getUser();
   }, [stableDispatch]);
+  console.log(isLoading);
+  useEffect(() => {
+    setData(profile.info);
+  }, [profile.info]);
 
   useEffect(() => {
     if (!isFirstRun.current) {
       const formData = new FormData();
       formData.append("myImage", myPhoto.file);
-      setImage(formData, myPhoto.id, stableDispatch);
+      setUserImages(formData, myPhoto.id, stableDispatch);
     }
     isFirstRun.current = false;
   }, [myPhoto.file, myPhoto.id, stableDispatch]);
+  if (isLoading) return null;
   return (
     <Container component="main" maxWidth="md">
       <div className={classes.paper}>
@@ -357,6 +361,8 @@ function EditProfile() {
             dir={theme.direction}
             className={classes.tab}
           >
+            {alert.msg && <Alert message={alert.msg} type={alert.alertType} />}
+
             {/* NEXT GRIDE */}
             <form
               className={classes.form}
@@ -378,25 +384,22 @@ function EditProfile() {
                 </Typography>
               </Grid>
               <Grid item xs={12} container justify="center">
-                <FormControl
-                  component="fieldset"
-                  className={classes.formControl}
-                >
+                <FormControl component="fieldset">
                   <RadioGroup
                     row
                     aria-label="gender"
-                    name="gender"
-                    value={mydata.gender}
+                    name="user_gender"
+                    value={mydata.user_gender}
                     onChange={handleChange}
                   >
                     <FormControlLabel
-                      value="male"
+                      value="Male"
                       control={<Radio color="secondary" />}
                       label="👨Male"
                       labelPlacement="start"
                     />
                     <FormControlLabel
-                      value="female"
+                      value="Female"
                       control={<Radio color="secondary" />}
                       label="👩Female"
                       labelPlacement="start"
@@ -419,8 +422,8 @@ function EditProfile() {
                 select
                 variant="outlined"
                 label="Your Relationship status"
-                value={mydata.months}
-                name="relationship"
+                value={mydata.user_relationship}
+                name="user_relationship"
                 fullWidth
                 onChange={handleChange}
                 SelectProps={{
@@ -436,13 +439,119 @@ function EditProfile() {
                   </option>
                 ))}
               </TextField>
-
+              {/* Next Gride */}
               <Divider className={classes.divider} />
-              <Grid xs={12} container item justify="center">
-                <Typography variant="subtitle1" gutterBottom>
+              <Grid xs={12} container item justify="center" pt={2}>
+                <Typography variant="subtitle1" pt={3}>
                   Details About You:
                 </Typography>
               </Grid>
+              <Grid xs={12} container item justify="center">
+                <Typography variant="overline" className={classes.Typography}>
+                  Interests:
+                </Typography>
+              </Grid>
+              <Grid item xs={12} container justify="center">
+                <FormControl error component="fieldset">
+                  <RadioGroup
+                    row
+                    aria-label="gender"
+                    name="user_gender_interest"
+                    value={mydata.user_gender_interest}
+                    onChange={handleChange}
+                  >
+                    <FormControlLabel
+                      value="Male"
+                      control={<Radio color="secondary" />}
+                      label="👨Male"
+                      labelPlacement="start"
+                    />
+                    <FormControlLabel
+                      value="Female"
+                      control={<Radio color="secondary" />}
+                      label="👩Female"
+                      labelPlacement="start"
+                    />
+                    <FormControlLabel
+                      value="bisexual"
+                      control={<Radio color="secondary" />}
+                      label="🏳️‍🌈Bisexual"
+                      labelPlacement="start"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+              {/* Next Gride */}
+              <Grid xs={12} container item justify="center">
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  Current Occupancy:
+                </Typography>
+              </Grid>
+              <TextField
+                className={classes.input}
+                select
+                variant="outlined"
+                label="Your City"
+                value={""}
+                name="user_city"
+                size="medium"
+                onChange={handleChange}
+                SelectProps={{
+                  native: true,
+                  MenuProps: {
+                    className: classes.menu
+                  }
+                }}
+              >
+                {[
+                  { id: 0, value: "Student" },
+                  { id: 1, value: "Employer" },
+                  { id: 2, value: "None" }
+                ].map(option => (
+                  <option key={option.id} value={option.value}>
+                    {option.value}
+                  </option>
+                ))}
+              </TextField>
+
+              {/* Next Gride */}
+              <Grid xs={12} container item justify="center">
+                <Typography
+                  variant="overline"
+                  gutterBottom
+                  className={classes.Typography}
+                >
+                  City:
+                </Typography>
+              </Grid>
+              <TextField
+                className={classes.input}
+                select
+                variant="outlined"
+                label="Your City"
+                value={""}
+                name="user_city"
+                size="medium"
+                onChange={handleChange}
+                SelectProps={{
+                  native: true,
+                  MenuProps: {
+                    className: classes.menu
+                  }
+                }}
+              >
+                {user_cities.map(option => (
+                  <option key={option.id} value={option.value}>
+                    {option.value}
+                  </option>
+                ))}
+              </TextField>
+
+              {/* Next Gride */}
               <Grid xs={12} container item justify="center">
                 <Typography
                   variant="overline"
@@ -455,9 +564,10 @@ function EditProfile() {
               <Grid item xs={12} container direction="row" justify="center">
                 <Grid item xs={2}>
                   <TextField
-                    name="day"
+                    name="user_birth_day"
                     variant="outlined"
                     fullWidth
+                    value={mydata.user_birth_day}
                     onChange={handleChange}
                     label="Day"
                   />
@@ -468,8 +578,8 @@ function EditProfile() {
                     select
                     variant="outlined"
                     label="Month"
-                    value={mydata.months}
-                    name="months"
+                    value={mydata.user_birth_month}
+                    name="user_birth_month"
                     fullWidth
                     onChange={handleChange}
                     SelectProps={{
@@ -488,8 +598,9 @@ function EditProfile() {
                 </Grid>
                 <Grid item xs={5}>
                   <TextField
-                    name="year"
+                    name="user_birth_year"
                     variant="outlined"
+                    value={mydata.user_birth_year}
                     fullWidth
                     onChange={handleChange}
                     label="YYYY"
@@ -497,58 +608,68 @@ function EditProfile() {
                 </Grid>
               </Grid>
               {/* Next Gride */}
-
-              <Grid xs={12} container item justify="center" pt={5}>
+              {/* Next Gride */}
+              <Grid xs={12} container item justify="center">
                 <Typography
                   variant="overline"
                   gutterBottom
                   className={classes.Typography}
                 >
-                  Phone Number
+                  biography:
                 </Typography>
               </Grid>
-              <Grid container xs={12} item justify="center">
-                <Grid>
-                  <PhoneInput
-                    defaultCountry={"us"}
-                    onChange={handlePhoneOnChange}
-                    value={mydata.phoneNumber}
+              <Grid item xs={12} container direction="row" justify="center">
+                <Grid item xs={12}>
+                  <TextField
+                    id="outlined-multiline-static"
+                    label="Multiline"
+                    multiline
+                    rows="4"
+                    fullWidth
+                    defaultValue="Default Value"
+                    className={classes.textField}
+                    margin="normal"
+                    variant="outlined"
                   />
                 </Grid>
               </Grid>
+              {/* Next Gride */}
               <Grid xs={12} container item justify="center">
-                <Typography variant="overline" className={classes.Typography}>
-                  Interests:
+                <Typography variant="subtitle1" gutterBottom>
+                  Tags:
                 </Typography>
               </Grid>
-              <Grid item xs={12}>
-                <Autocomplete
-                  multiple
-                  options={My_tags}
-                  getOptionLabel={option => option.tags}
-                  filterSelectedOptions
-                  onChange={handleInputUpdate}
-                  renderInput={params => (
-                    <TextField
-                      className={classes.input}
-                      {...params}
-                      variant="outlined"
-                      placeholder="Favorites"
-                      margin="normal"
-                      fullWidth
-                    />
-                  )}
-                />
-              </Grid>
+              <ChipInput
+                value={mydata.user_tags}
+                onAdd={chip => handleAddChip(chip)}
+                onDelete={(chip, index) => handleDeleteChip(chip, index)}
+              />
               {/* Next Gride */}
+              {/* {next Gride } */}
+              <Grid xs={12} container item justify="center">
+                <Grid
+                  item
+                  xs={12}
+                  style={{ position: "relative", height: "30vh" }}
+                >
+                  <GoogleApiWrapper onMarkerClick />
+                </Grid>
+              </Grid>
               <Divider className={classes.divider} />
+              <Button
+                type="submit"
+                size="medium"
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Save
+              </Button>
             </form>
           </TabPanel>
           <TabPanel value={index} index={1} dir={theme.direction}>
             {/* Next Tab */}
-            {state.alert.msg && (
-              <Alert message={state.alert.msg} type={state.alert.alertType} />
-            )}
+            {alert.msg && <Alert message={alert.msg} type={alert.alertType} />}
             <Grid
               container
               direction="row"
@@ -581,7 +702,7 @@ function EditProfile() {
                   <IconButton component="span">
                     <Avatar
                       src={
-                        `./uploads/${state.photo.profile_Image}?` + Date.now()
+                        `./uploads/${profile.photo.profile_Image}?` + Date.now()
                       }
                       style={{
                         margin: "10px",
@@ -591,7 +712,7 @@ function EditProfile() {
                     />
                   </IconButton>
                 </label>
-                {state.photo.profile_Image !== "photo_holder.png" && (
+                {profile.photo.profile_Image !== "photo_holder.png" && (
                   <Grid xs={12} container item justify="center">
                     <Button
                       size="small"
@@ -599,7 +720,10 @@ function EditProfile() {
                       color="secondary"
                       startIcon={<DeleteIcon />}
                       onClick={() =>
-                        handleClick(state.photo.profile_Image, "profile_Image")
+                        handleClick(
+                          profile.photo.profile_Image,
+                          "profile_Image"
+                        )
                       }
                     >
                       Remove
@@ -636,7 +760,7 @@ function EditProfile() {
                     >
                       <Avatar
                         variant="square"
-                        src={`./uploads/${state.photo.first_Image}`}
+                        src={`./uploads/${profile.photo.first_Image}`}
                         style={{
                           borderRadius: 0,
                           width: "100%",
@@ -645,7 +769,7 @@ function EditProfile() {
                       />
                     </IconButton>
                   </label>
-                  {state.photo.first_Image !== "photo_holder.png" && (
+                  {profile.photo.first_Image !== "photo_holder.png" && (
                     <Grid container>
                       <Grid item xs={6}>
                         <Button
@@ -653,7 +777,10 @@ function EditProfile() {
                           variant="outlined"
                           startIcon={<DeleteIcon />}
                           onClick={() =>
-                            handleClick(state.photo.first_Image, "first_Image")
+                            handleClick(
+                              profile.photo.first_Image,
+                              "first_Image"
+                            )
                           }
                         >
                           Remove
@@ -661,10 +788,22 @@ function EditProfile() {
                       </Grid>
                       <Grid item xs={6}>
                         <Button
+                          className={
+                            profile.photo.first_Image ===
+                            profile.photo.cover_Image
+                              ? classes.buttonMark
+                              : classes.buttonUnMark
+                          }
                           size="small"
                           variant="outlined"
-                          color="secondary"
-                          startIcon={<AspectRatioIcon />}
+                          startIcon={
+                            profile.photo.first_Image ===
+                            profile.photo.cover_Image ? (
+                              <CheckCircleIcon />
+                            ) : (
+                              <ClearIcon />
+                            )
+                          }
                           onClick={() => handleCoverSet("first_Image")}
                         >
                           Cover
@@ -698,7 +837,7 @@ function EditProfile() {
                     >
                       <Avatar
                         variant="square"
-                        src={`./uploads/${state.photo.second_Image}`}
+                        src={`./uploads/${profile.photo.second_Image}`}
                         style={{
                           borderRadius: 0,
                           width: "100%",
@@ -707,7 +846,7 @@ function EditProfile() {
                       />
                     </IconButton>
                   </label>
-                  {state.photo.second_Image !== "photo_holder.png" && (
+                  {profile.photo.second_Image !== "photo_holder.png" && (
                     <Grid container>
                       <Grid item xs={6}>
                         <Button
@@ -716,7 +855,7 @@ function EditProfile() {
                           startIcon={<DeleteIcon />}
                           onClick={() =>
                             handleClick(
-                              state.photo.second_Image,
+                              profile.photo.second_Image,
                               "second_Image"
                             )
                           }
@@ -726,10 +865,22 @@ function EditProfile() {
                       </Grid>
                       <Grid item xs={6}>
                         <Button
+                          className={
+                            profile.photo.second_Image ===
+                            profile.photo.cover_Image
+                              ? classes.buttonMark
+                              : classes.buttonUnMark
+                          }
                           size="small"
                           variant="outlined"
-                          color="secondary"
-                          startIcon={<AspectRatioIcon />}
+                          startIcon={
+                            profile.photo.second_Image ===
+                            profile.photo.cover_Image ? (
+                              <CheckCircleIcon />
+                            ) : (
+                              <ClearIcon />
+                            )
+                          }
                           onClick={() => handleCoverSet("second_Image")}
                         >
                           Cover
@@ -767,7 +918,7 @@ function EditProfile() {
                   >
                     <Avatar
                       variant="square"
-                      src={`./uploads/${state.photo.third_Image}`}
+                      src={`./uploads/${profile.photo.third_Image}`}
                       style={{
                         borderRadius: 0,
                         width: "100%",
@@ -776,7 +927,7 @@ function EditProfile() {
                     />
                   </IconButton>
                 </label>
-                {state.photo.third_Image !== "photo_holder.png" && (
+                {profile.photo.third_Image !== "photo_holder.png" && (
                   <Grid container>
                     <Grid item xs={6}>
                       <Button
@@ -784,7 +935,7 @@ function EditProfile() {
                         variant="outlined"
                         startIcon={<DeleteIcon />}
                         onClick={() =>
-                          handleClick(state.photo.third_Image, "third_Image")
+                          handleClick(profile.photo.third_Image, "third_Image")
                         }
                       >
                         Remove
@@ -792,10 +943,22 @@ function EditProfile() {
                     </Grid>
                     <Grid item xs={6}>
                       <Button
+                        className={
+                          profile.photo.third_Image ===
+                          profile.photo.cover_Image
+                            ? classes.buttonMark
+                            : classes.buttonUnMark
+                        }
                         size="small"
                         variant="outlined"
-                        color="secondary"
-                        startIcon={<AspectRatioIcon />}
+                        startIcon={
+                          profile.photo.third_Image ===
+                          profile.photo.cover_Image ? (
+                            <CheckCircleIcon />
+                          ) : (
+                            <ClearIcon />
+                          )
+                        }
                         onClick={() => handleCoverSet("third_Image")}
                       >
                         Cover
@@ -830,7 +993,7 @@ function EditProfile() {
                     <Avatar
                       variant="square"
                       key="1"
-                      src={`./uploads/${state.photo.fourth_Image}`}
+                      src={`./uploads/${profile.photo.fourth_Image}`}
                       style={{
                         borderRadius: 0,
                         width: "100%",
@@ -839,7 +1002,7 @@ function EditProfile() {
                     />
                   </IconButton>
                 </label>
-                {state.photo.fourth_Image !== "photo_holder.png" && (
+                {profile.photo.fourth_Image !== "photo_holder.png" && (
                   <Grid container>
                     <Grid item xs={6}>
                       <Button
@@ -847,7 +1010,10 @@ function EditProfile() {
                         variant="outlined"
                         startIcon={<DeleteIcon />}
                         onClick={() =>
-                          handleClick(state.photo.fourth_Image, "fourth_Image")
+                          handleClick(
+                            profile.photo.fourth_Image,
+                            "fourth_Image"
+                          )
                         }
                       >
                         Remove
@@ -855,10 +1021,22 @@ function EditProfile() {
                     </Grid>
                     <Grid item xs={6}>
                       <Button
+                        className={
+                          profile.photo.fourth_Image ===
+                          profile.photo.cover_Image
+                            ? classes.buttonMark
+                            : classes.buttonUnMark
+                        }
                         size="small"
                         variant="outlined"
-                        color="secondary"
-                        startIcon={<AspectRatioIcon />}
+                        startIcon={
+                          profile.photo.fourth_Image ===
+                          profile.photo.cover_Image ? (
+                            <CheckCircleIcon />
+                          ) : (
+                            <ClearIcon />
+                          )
+                        }
                         onClick={() => handleCoverSet("fourth_Image")}
                       >
                         Cover

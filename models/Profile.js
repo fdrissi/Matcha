@@ -149,6 +149,41 @@ async function fixPosition(id, row) {
   }
   return true;
 }
+
+// user info
+
+async function getUserInfo(id) {
+  let sql =
+    "SELECT * , DATE_FORMAT(user_birth, '%Y-%m-%d') as user_birth FROM user_info WHERE id = ?";
+  const [result] = await pool.query(sql, [id]);
+  return result[0];
+}
+
+async function updateUserInfo(data, id) {
+  const {
+    user_gender,
+    user_tags,
+    user_relationship,
+    user_gender_interest
+  } = data;
+  const stringObj = JSON.stringify(user_tags);
+  console.log(stringObj);
+
+  let sql =
+    "update user_info SET user_gender = ? , user_tags = ?,user_relationship = ? ,user_gender_interest = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [
+    user_gender,
+    stringObj,
+    user_relationship,
+    user_gender_interest,
+    id
+  ]);
+  if (result.changedRows) {
+    return true;
+  } else {
+    return false;
+  }
+}
 module.exports = {
   SetImage,
   getImage,
@@ -160,5 +195,7 @@ module.exports = {
   fixPosition,
   setImageRow,
   getImageByRow,
-  setImageCover
+  setImageCover,
+  getUserInfo,
+  updateUserInfo
 };

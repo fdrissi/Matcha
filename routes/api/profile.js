@@ -3,10 +3,12 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const auth = require("../../middleware/auth");
-const photoModel = require("../../models/Profile");
+const profileModel = require("../../models/Profile");
 const fs = require("file-system");
 const { promisify } = require("util");
 var Jimp = require("jimp");
+const publicIp = require("public-ip");
+const cities = require("../globals");
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -46,30 +48,26 @@ router.post(
     const { row } = req.params;
     const id = req.user.id;
     const image = new Jimp(file.path, async function(err, image) {
+      console.log(await publicIp.v4());
       if (!err && file) {
-        // var w = image.bitmap.width; //  width of the image
-        // var h = image.bitmap.height; // height of the image
-        // console.log(w);
-        // console.log(h);
-        let check;
         let filename = id + "/" + file.filename;
-        const remove = await photoModel.removeOnUpload(id, row);
-        const counter = await photoModel.getCounter(id);
+        const remove = await profileModel.removeOnUpload(id, row);
+        const counter = await profileModel.getCounter(id);
         if (row === "profile_Image")
-          check = await photoModel.setProfile(id, filename);
+          check = await profileModel.setProfile(id, filename);
         else if (remove !== "photo_holder.png" && row !== "profile_Image")
-          check = await photoModel.setImageRow(id, row, filename);
-        else check = await photoModel.SetImage(id, filename, counter);
-        const result = await photoModel.getImage(id);
-        const cover = await photoModel.getImageByRow(id, "cover_Image");
+          check = await profileModel.setImageRow(id, row, filename);
+        else check = await profileModel.SetImage(id, filename, counter);
+        const result = await profileModel.getImage(id);
+        const cover = await profileModel.getImageByRow(id, "cover_Image");
         if (check) {
           if (remove !== "photo_holder.png" && remove !== `${id}/profile.png`) {
             await unlinkAsync(`./client/public/uploads/${remove}`);
             if (remove === cover)
-              await photoModel.setImageCover(id, "cover_holder.png");
+              await profileModel.setImageCover(id, "cover_holder.png");
           }
           if (remove === "photo_holder.png" && row !== "profile_Image")
-            await photoModel.imagesCounter(id, "add");
+            await profileModel.imagesCounter(id, "add");
           return res.json({
             success: true,
             errorMsg: "Your image hass been uploaded 🤘",
@@ -97,7 +95,7 @@ router.post(
 // @access  Private
 router.get("/getImage", [auth], async (req, res) => {
   const id = req.user.id;
-  const result = await photoModel.getImage(id);
+  const result = await profileModel.getImage(id);
   if (result) {
     delete result.id;
     delete result.counter;
@@ -118,7 +116,7 @@ router.post("/setCover", [auth], async (req, res) => {
   try {
     const { filed } = req.body.data;
     const id = req.user.id;
-    const result = await photoModel.getImageByRow(id, filed);
+    const result = await profileModel.getImageByRow(id, filed);
     console.log(result);
     if (result === "photo_holder.png") {
       return res.json({
@@ -141,11 +139,13 @@ router.post("/setCover", [auth], async (req, res) => {
                   "Your Cover Mut Be equal or mor than 850px width and 315 height 😮"
               });
             }
-            const response = await photoModel.setImageCover(id, result);
+            const response = await profileModel.setImageCover(id, result);
             if (response) {
+              const result = await profileModel.getImage(id);
               return res.json({
                 success: true,
-                errorMsg: "Your Cover hass been Set 🤘"
+                errorMsg: "Your Cover hass been Set 🤘",
+                result
               });
             } else {
               return res.json({
@@ -180,23 +180,23 @@ router.delete("/removeImage", [auth], async (req, res) => {
         errorMsg: "You Can't Delete This image 😤"
       });
     default:
-      const check = await photoModel.getImageByRow(id, filed);
+      const check = await profileModel.getImageByRow(id, filed);
       if (check !== photo) {
-        const result = await photoModel.getImage(id);
+        const result = await profileModel.getImage(id);
         return res.json({
           success: false,
           errorMsg: "You Can't Delete This photo",
           result
         });
-      } else if (filed === "profile_Image") await photoModel.setHolder(id);
+      } else if (filed === "profile_Image") await profileModel.setHolder(id);
       else {
-        await photoModel.fixPosition(id, filed);
+        await profileModel.fixPosition(id, filed);
       }
-      const result = await photoModel.getImage(id);
+      const result = await profileModel.getImage(id);
       if (result) {
-        if (filed !== "profile_Image") photoModel.imagesCounter(id, "delete");
+        if (filed !== "profile_Image") profileModel.imagesCounter(id, "delete");
         await unlinkAsync(`./client/public/uploads/${photo}`);
-        await photoModel.setImageCover(id, "cover_holder.png");
+        await profileModel.setImageCover(id, "cover_holder.png");
         return res.json({
           success: true,
           errorMsg: "Your image hass been Deleted 🗑️",
@@ -209,6 +209,73 @@ router.delete("/removeImage", [auth], async (req, res) => {
           result
         });
       }
+  }
+});
+
+// Profile_info
+
+// @route   Post api/profle/getInfo
+// @desc    get user info
+// @access  Private
+router.get("/getUserInfo", [auth], async (req, res) => {
+  const id = req.user.id;
+  const result = await profileModel.getUserInfo(id);
+  var obj = JSON.parse(result.user_tags);
+  console.log(obj);
+  const [year, month, day] = result.user_birth
+    ? result.user_birth.split("-")
+    : "";
+  const info = {
+    user_gender: result.user_gender,
+    user_relationship: result.user_relationship,
+    user_birth_day: day,
+    user_tags: obj,
+    user_birth_month: month,
+    user_gender_interest: result.user_gender_interest,
+    user_birth_year: year,
+    user_city: ""
+  };
+  return res.json({
+    success: true,
+    info
+  });
+});
+
+// @route   Post api/profle/updateUserInfo
+// @desc    update user info
+// @access  Private
+
+router.post("/updateUserInfo", [auth], async (req, res) => {
+  try {
+    const { data } = req.body;
+    const id = req.user.id;
+    const result = await profileModel.updateUserInfo(data, id);
+    if (result) {
+      // that mean that there is a change
+    } else {
+      // mean taht there is no change
+      return res.json({
+        success: false,
+        errorMsg: "Nothing To be Update"
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Get api/profle/getpreedefined
+// @desc    get preedefined data
+// @access  public
+
+router.get("/getpreedefined", async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      cities
+    });
+  } catch (error) {
+    console.log(error);
   }
 });
 
