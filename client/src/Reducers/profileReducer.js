@@ -19,7 +19,8 @@ export const profileInitState = {
     user_birth_year: "",
     user_tags: [],
     user_city: "",
-    user_current_occupancy: ""
+    user_current_occupancy: "",
+    user_biography: "",
   }
 };
 

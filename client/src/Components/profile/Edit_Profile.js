@@ -221,7 +221,8 @@ function EditProfile() {
     user_birth_year: "",
     user_tags: [],
     user_city: "",
-    user_current_occupancy: ""
+    user_current_occupancy: "",
+    user_biography: "",
   });
 
   const handleChange = event => {
@@ -266,6 +267,7 @@ function EditProfile() {
   const handleClick = (photo, filed) => {
     removeUserImage(photo, filed, dispatch);
   };
+  console.log(mydata);
 
   const handleAddChip = chip => {
     setData(previousData => ({
@@ -625,7 +627,9 @@ function EditProfile() {
                     label="Multiline"
                     multiline
                     rows="4"
+                    name="user_biography"
                     fullWidth
+                    onChange={handleChange}
                     defaultValue="Default Value"
                     className={classes.textField}
                     margin="normal"
