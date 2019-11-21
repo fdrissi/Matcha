@@ -63,8 +63,7 @@ router.post("/register", [validateInput], async (req, res) => {
     res.json({
       success: true,
       SuccessMsg: `We'll send an email to ${req.body.email} In 5 minutes. Open it up to activate your account.`,
-      errorMsg: "Register Success",
-      errors
+      errorMsg: "Register Success"
     });
   }
 });
