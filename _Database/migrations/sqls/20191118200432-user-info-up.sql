@@ -10,7 +10,7 @@ user_gender_interest ENUM
     user_relationship ENUM
 ('Single', 'In a relationship', 'Engaged', 'Married' ) DEFAULT 'Single',
 user_tags varchar
-(255) NOT NULL,
+(255),
     user_birth date,
     user_interests varchar
 (255),
@@ -20,7 +20,8 @@ user_city VARCHAR
 (15),
  user_current_occupancy ENUM
 ('Student', 'Employer', 'None') DEFAULT 'None',
-user_biography VARCHAR (255) 
+user_biography VARCHAR
+(255),
 info_verified boolean DEFAULT FALSE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

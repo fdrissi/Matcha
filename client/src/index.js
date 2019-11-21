@@ -8,6 +8,20 @@ import Navbar from "./Components/inc/Navbar";
 import Landing from "./Components/layouts/Landing";
 import Routes from "./Components/routing/Routes";
 import Footer from "./Components/inc/Footer";
+import { createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider } from "@material-ui/styles";
+
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: [
+      "Ubuntu",
+      "Roboto",
+      '"Helvetica Neue"',
+      "Arial",
+      "sans-serif"
+    ].join(",")
+  }
+});
 
 function App() {
   const [, dispatch] = useUserStore();
@@ -30,8 +44,10 @@ function App() {
 }
 
 ReactDOM.render(
-  <UserProvider>
-    <App />
-  </UserProvider>,
+  <ThemeProvider theme={theme}>
+    <UserProvider>
+      <App />
+    </UserProvider>
+  </ThemeProvider>,
   document.getElementById("root")
 );

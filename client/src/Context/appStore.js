@@ -21,7 +21,6 @@ export const UserProvider = ({ children }) => {
     alert: useReducer(alertReducer, alertInitState),
     auth: useReducer(authReducer, authInitState),
     register: useReducer(registerReducer, registerInitState),
-    token: useReducer(passeditReducer, tokenvalidationInitState),
     profile: useReducer(profileReducer, profileInitState),
     updateUserInfo: useReducer(updateUserReducer, updateInitState),
     token: useReducer(passeditReducer, tokenvalidationInitState)

@@ -223,6 +223,10 @@ function EditProfile() {
     user_city: "",
     user_current_occupancy: "",
     user_biography: "",
+    location: {
+      lat: 32.879101,
+      lng: -6.91118
+    }
   });
 
   const handleChange = event => {
@@ -654,9 +658,13 @@ function EditProfile() {
                 <Grid
                   item
                   xs={12}
-                  style={{ position: "relative", height: "30vh" }}
+                  style={{
+                    position: "relative",
+                    marginBottom: "2vh",
+                    marginTop: "2vh"
+                  }}
                 >
-                  <GoogleApiWrapper onMarkerClick />
+                  <GoogleApiWrapper data={mydata} setData={setData} />
                 </Grid>
               </Grid>
               <Divider className={classes.divider} />
@@ -1058,7 +1066,7 @@ function EditProfile() {
 }
 const editProfile = () => {
   return (
-    <div style={{ flex: 1 }}>
+    <div style={{ flex: 1, marginBottom: "2%" }}>
       <EditProfile />
     </div>
   );

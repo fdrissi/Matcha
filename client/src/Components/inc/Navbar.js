@@ -1,10 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
+import { useUserStore } from "../../Context/appStore";
 import { Route, Link } from "react-router-dom";
-import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
+import {
+  IconButton,
+  Menu,
+  Button,
+  Typography,
+  Toolbar,
+  AppBar,
+  makeStyles,
+  MenuItem,
+  Badge
+} from "@material-ui/core";
+import AccountCircle from "@material-ui/icons/AccountCircle";
+import MailIcon from "@material-ui/icons/Mail";
+import NotificationsIcon from "@material-ui/icons/Notifications";
+import MoreIcon from "@material-ui/icons/MoreVert";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -16,6 +27,9 @@ const useStyles = makeStyles(theme => ({
   title: {
     flexGrow: 1,
     fontWeight: 600
+  },
+  actions: {
+    fontSize: "25px"
   }
 }));
 
@@ -34,6 +48,28 @@ const style = {
   }
 };
 
+const NavActions = () => {
+  const classes = useStyles();
+  return (
+    <>
+      <MenuItem>
+        <IconButton aria-label="show 4 new mails" color="inherit">
+          <Badge badgeContent={4} color="secondary">
+            <MailIcon className={classes.actions} />
+          </Badge>
+        </IconButton>
+      </MenuItem>
+      <MenuItem>
+        <IconButton aria-label="show 11 new notifications" color="inherit">
+          <Badge badgeContent={11} color="secondary">
+            <NotificationsIcon className={classes.actions} />
+          </Badge>
+        </IconButton>
+      </MenuItem>
+    </>
+  );
+};
+
 const NavBrand = ({ style, children }) => (
   <Typography variant="h4" className={style}>
     <Link to="/" style={{ color: "white", textDecoration: "none" }}>
@@ -48,9 +84,57 @@ const NavBtn = ({ text, link }) => (
   </Link>
 );
 
+const NavCircle = ({ user }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenu = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  return (
+    <div>
+      <IconButton
+        aria-label="account of current user"
+        aria-controls="menu-appbar"
+        aria-haspopup="true"
+        onClick={handleMenu}
+        color="inherit"
+      >
+        <AccountCircle style={{ fontSize: "40px" }} />
+      </IconButton>
+      <Menu
+        style={{ top: "35px" }}
+        id="menu-appbar"
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right"
+        }}
+        keepMounted
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right"
+        }}
+        open={open}
+        onClose={handleClose}
+      >
+        <Link to={`/profile/`}>
+          <MenuItem onClick={handleClose}>Profile</MenuItem>
+        </Link>
+        <MenuItem onClick={handleClose}>My account</MenuItem>
+      </Menu>
+    </div>
+  );
+};
+
 export default function Navbar() {
   const classes = useStyles();
-
+  const [{ auth }] = useUserStore();
+  if (auth.loading) return null;
   return (
     <>
       <AppBar position="static" style={style.bar}>
@@ -60,8 +144,17 @@ export default function Navbar() {
               <span style={style.brand}>Mat</span>Cha
             </NavBrand>
             <Route>
-              <NavBtn text="Login" link="/Login" />
-              <NavBtn text="Register" link="/register" />
+              {auth.isAuthenticated ? (
+                <>
+                  <NavActions />
+                  <NavCircle user={auth.userInfo.username} />
+                </>
+              ) : (
+                <>
+                  <NavBtn text="Login" link="/Login" />
+                  <NavBtn text="Register" link="/register" />
+                </>
+              )}
             </Route>
           </Toolbar>
         </div>

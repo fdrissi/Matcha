@@ -45,10 +45,10 @@ router.post("/login", async (req, res) => {
 // @access  Public
 router.post("/register", [validateInput], async (req, res) => {
   const errors = {
+    email: "",
+    userName: "",
     firstName: "",
     lastName: "",
-    userName: "",
-    email: "",
     password: "",
     confirmPassword: ""
   };

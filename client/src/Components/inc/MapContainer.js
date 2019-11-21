@@ -1,37 +1,55 @@
 import React, { useState } from "react";
-import { Map, GoogleApiWrapper } from "google-maps-react";
-import { InfoWindow, Marker } from "google-maps-react";
+import {
+  withScriptjs,
+  withGoogleMap,
+  GoogleMap,
+  Marker
+} from "react-google-maps";
 
-export function MapContainer({ google }) {
-  const [marker, setMarker] = useState({
-    showingInfoWindow: false,
-    activeMarker: {},
-    selectedPlace: {}
-  });
+const MyMapComponent = withScriptjs(
+  withGoogleMap(({ isMarkerShown, data, setData }) => {
+    const { lat, lng } = data.location;
 
-  const onMarkerClick = (props, marker, e) => {
-    // ..
-    console.log(marker);
-    console.log(props);
-    console.log(e);
-  };
+    const handleLocationChange = e => {
+      const location = {
+        lat: e.latLng.lat(),
+        lng: e.latLng.lng()
+      };
+      setData({ ...data, location });
+    };
+
+    return (
+      <GoogleMap
+        defaultZoom={8}
+        defaultCenter={{ lat, lng }}
+        onClick={e => handleLocationChange(e)}
+      >
+        {isMarkerShown && (
+          <Marker
+            position={{ lat, lng }}
+            icon={{
+              url: "/img/location.png",
+              scaledSize: new window.google.maps.Size(25, 25)
+            }}
+          />
+        )}
+      </GoogleMap>
+    );
+  })
+);
+
+const MapContainer = ({ data, setData }) => {
   return (
-    <Map
-      google={google}
-      zoom={14}
-      initialCenter={{
-        lat: -1.2884,
-        lng: 36.8233
-      }}
-    >
-      <Marker
-        onClick={onMarkerClick()}
-        name={"Kenyatta International Convention Centre"}
-      />
-      <InfoWindow></InfoWindow>
-    </Map>
+    <MyMapComponent
+      data={data}
+      setData={setData}
+      isMarkerShown
+      googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=AIzaSyCjR4ewWqdPGjnGwre1aSN3l2llz6dp7IQ"
+      loadingElement={<div style={{ height: `100%` }} />}
+      containerElement={<div style={{ height: `40vh` }} />}
+      mapElement={<div style={{ height: `100%` }} />}
+    />
   );
-}
-export default GoogleApiWrapper({
-  apiKey: "AIzaSyCjR4ewWqdPGjnGwre1aSN3l2llz6dp7IQ"
-})(MapContainer);
+};
+
+export default MapContainer;
