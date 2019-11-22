@@ -240,7 +240,9 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
       lng: -6.91118
     }
   };
-  let get_info = JSON.stringify(my_info, function (key, value) {return (value === undefined) ? "" : value});
+  let get_info = JSON.stringify(my_info, function(key, value) {
+    return value === undefined ? "" : value;
+  });
   let info = JSON.parse(get_info);
   return res.json({
     success: true,
@@ -258,8 +260,7 @@ router.post(
     try {
       const { data } = req.body;
       const id = req.user.id;
-      console.log(data);
-      const result = await profileModel.updateUserInfo(data, id);
+      //const result = await profileModel.updateUserInfo(data, id);
       if (result) {
         // that mean that there is a change
       } else {
