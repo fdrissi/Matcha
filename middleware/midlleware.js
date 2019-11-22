@@ -3,144 +3,148 @@ const config = require("config");
 const userModel = require("../models/User");
 const escapeSpecialChars = require("../helpers/escapeSpecialChars");
 const bcrypt = require("bcryptjs");
-
+const predefined = require("../routes/globals");
 
 async function validateEmail(req) {
-    req.body.email = req.body.email.toLowerCase().trim();
-    const user = await userModel.findById(req.user.id);
-    if (user.email !== req.body.email) {
-      if (await userModel.findByEmail(req.body.email))
-        return "Email already exists";
-      else {
-        let regex = /\S+@\S+\.\S+/;
-        if (!regex.test(req.body.email)) return "Enter valid Email";
-      }
+  req.body.email = req.body.email.toLowerCase().trim();
+  const user = await userModel.findById(req.user.id);
+  if (user.email !== req.body.email) {
+    if (await userModel.findByEmail(req.body.email))
+      return "Email already exists";
+    else {
+      let regex = /\S+@\S+\.\S+/;
+      if (!regex.test(req.body.email)) return "Enter valid Email";
     }
-    return "";
   }
-  
-  async function validateUsername(req) {
-    req.body.userName = req.body.userName.toLowerCase().trim();
-    const user = await userModel.findById(req.user.id);
-    if (user.username !== req.body.userName) {
-      if (await userModel.findByUsername(req.body.userName))
-        return "Username already exists";
-      else {
-        let regex = /^[a-z0-9]{3,10}$/;
-        if (!regex.test(req.body.userName)) return "Enter valid Username";
-      }
-    }
-    return "";
-  }
-  
-  function validatePassword(req) {
-    let regex = /(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/i;
-    if (req.body.newPassword !== "") {
-      if (!regex.test(req.body.newPassword)) {
-        return ["Enter valid Password", "Enter valid Password"];
-      } else if (req.body.newPassword !== req.body.confirmPassword)
-        return ["", "Password not matche"];
-    }
-    return ["", ""];
-  }
-  
-  function validateFirstName(req) {
-    req.body.firstName = req.body.firstName.trim();
-    let firstName = "";
-    let regex = /^[A-Za-z]{3,20}$/;
-    firstName = !regex.test(req.body.firstName) ? "Enter valid First Name" : "";
-    return firstName;
-  }
-  
-  function validateLastName(req) {
-    req.body.lastName = req.body.lastName.trim();
-    let lastName = "";
-    let regex = /^[A-Za-z]{3,20}$/;
-    lastName = !regex.test(req.body.lastName) ? "Enter valid Last Name" : "";
-    return lastName;
-  }
+  return "";
+}
 
-  // Check it is empty
-function checkProperties(obj) {
-    for (var key in obj) {
-      if (obj[key] !== null && obj[key] != "") return false;
+async function validateUsername(req) {
+  req.body.userName = req.body.userName.toLowerCase().trim();
+  const user = await userModel.findById(req.user.id);
+  if (user.username !== req.body.userName) {
+    if (await userModel.findByUsername(req.body.userName))
+      return "Username already exists";
+    else {
+      let regex = /^[a-z0-9]{3,10}$/;
+      if (!regex.test(req.body.userName)) return "Enter valid Username";
     }
-    return true;
   }
-module.exports =   middleware = {
-    //auth
-    auth: function (req, res, next)  {
-        const token = req.cookies.token;
-        if (!token) {
-          return res.json({ success: false, errorMsg: "Access denied" });
-        }
-      
-        try {
-          const decoded = jwt.decode(token, config.get("keyOrSecret"));
-          if (Date.now() >= decoded.exp * 1000) {
-            res.clearCookie("token");
-            return res.json({ success: false, errorMsg: "Access denied" });
-          }
-          req.user = decoded.user;
-          next();
-        } catch (error) {
-          return res.json({ success: false, errorMsg: "Access denied" });
-        }
-    },
-     async setting(req, res, next) {
-        req.body = escapeSpecialChars(req.body);
-      
-        const errors = {
-          firstName: "",
-          lastName: "",
-          userName: "",
-          email: "",
-          newPassword: "",
-          password: "",
-          confirmPassword: ""
-        };
-      
-        const user = await userModel.findById(req.user.id);
-        const isMatched = bcrypt.compareSync(req.body.oldPassword, user.password);
-        if (!isMatched)
-          return res.json({
-            success: false,
-            errorMsg: "Invalid user password",
-            errors
-          });
-      
-        if (typeof req.body.firstName !== "undefined") {
-          errors.firstName = validateFirstName(req);
-        }
-      
-        if (typeof req.body.lastName !== "undefined") {
-          errors.lastName = validateLastName(req);
-        }
-      
-        if (typeof req.body.userName !== "undefined") {
-          errors.userName = await validateUsername(req);
-        }
-      
-        if (typeof req.body.email !== "undefined") {
-          errors.email = await validateEmail(req);
-        }
-      
-        if (typeof req.body.newPassword !== "undefined") {
-          const [newPassword, confirmPassword] = validatePassword(req);
-          errors.newPassword = newPassword;
-          errors.confirmPassword = confirmPassword;
-        }
-      
-        if (!checkProperties(errors))
-          return res.json({
-            success: false,
-            errors,
-            errorMsg: "Update User Info Unsuccess"
-          });
-        next();
-      },
-    // For THE REGISTRATION VALIDATION
-    async  register(req, res, next) {
+  return "";
+}
+
+function validatePassword(req) {
+  let regex = /(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/i;
+  if (req.body.newPassword !== "") {
+    if (!regex.test(req.body.newPassword)) {
+      return ["Enter valid Password", "Enter valid Password"];
+    } else if (req.body.newPassword !== req.body.confirmPassword)
+      return ["", "Password not matche"];
+  }
+  return ["", ""];
+}
+
+function validateFirstName(req) {
+  req.body.firstName = req.body.firstName.trim();
+  let firstName = "";
+  let regex = /^[A-Za-z]{3,20}$/;
+  firstName = !regex.test(req.body.firstName) ? "Enter valid First Name" : "";
+  return firstName;
+}
+
+function validateLastName(req) {
+  req.body.lastName = req.body.lastName.trim();
+  let lastName = "";
+  let regex = /^[A-Za-z]{3,20}$/;
+  lastName = !regex.test(req.body.lastName) ? "Enter valid Last Name" : "";
+  return lastName;
+}
+
+// Check it is empty
+function checkProperties(obj) {
+  for (var key in obj) {
+    if (obj[key] !== null && obj[key] != "") return false;
+  }
+  return true;
+}
+
+function arrayContains(needle, arrhaystack) {
+  return arrhaystack.indexOf(needle) > -1;
+}
+module.exports = middleware = {
+  //auth
+  auth: function(req, res, next) {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.json({ success: false, errorMsg: "Access denied" });
+    }
+
+    try {
+      const decoded = jwt.decode(token, config.get("keyOrSecret"));
+      if (Date.now() >= decoded.exp * 1000) {
+        res.clearCookie("token");
+        return res.json({ success: false, errorMsg: "Access denied" });
+      }
+      req.user = decoded.user;
+      next();
+    } catch (error) {
+      return res.json({ success: false, errorMsg: "Access denied" });
+    }
+  },
+  async setting(req, res, next) {
+    req.body = escapeSpecialChars(req.body);
+
+    const errors = {
+      firstName: "",
+      lastName: "",
+      userName: "",
+      email: "",
+      newPassword: "",
+      password: "",
+      confirmPassword: ""
+    };
+
+    const user = await userModel.findById(req.user.id);
+    const isMatched = bcrypt.compareSync(req.body.oldPassword, user.password);
+    if (!isMatched)
+      return res.json({
+        success: false,
+        errorMsg: "Invalid user password",
+        errors
+      });
+
+    if (typeof req.body.firstName !== "undefined") {
+      errors.firstName = validateFirstName(req);
+    }
+
+    if (typeof req.body.lastName !== "undefined") {
+      errors.lastName = validateLastName(req);
+    }
+
+    if (typeof req.body.userName !== "undefined") {
+      errors.userName = await validateUsername(req);
+    }
+
+    if (typeof req.body.email !== "undefined") {
+      errors.email = await validateEmail(req);
+    }
+
+    if (typeof req.body.newPassword !== "undefined") {
+      const [newPassword, confirmPassword] = validatePassword(req);
+      errors.newPassword = newPassword;
+      errors.confirmPassword = confirmPassword;
+    }
+
+    if (!checkProperties(errors))
+      return res.json({
+        success: false,
+        errors,
+        errorMsg: "Update User Info Unsuccess"
+      });
+    next();
+  },
+  // For THE REGISTRATION VALIDATION
+  async register(req, res, next) {
     const errors = {
       firstName: "",
       lastName: "",
@@ -191,7 +195,7 @@ module.exports =   middleware = {
             "name must be between 3 and 20 characters without special characters";
       }
     }
-  
+
     // validate lastName
     if (typeof req.body.lastName !== "undefined") {
       if (checkProperties(req.body.lastName.trim())) {
@@ -226,11 +230,70 @@ module.exports =   middleware = {
       }
     }
     if (!checkProperties(errors))
-      return res.json({ success: false, errors, errorMsg: "Register unsuccess" });
+      return res.json({
+        success: false,
+        errors,
+        errorMsg: "Register unsuccess"
+      });
     next();
   },
   async edit_profile(req, res, next) {
-    console.log(req.body.data);
+    const errors = {
+      current_occupancy: "",
+      city: "",
+      birth_day: "",
+      birth_month: "",
+      birth_year: "",
+      biography: "",
+      tags: ""
+    };
+    const { data } = req.body;
+    console.log(data);
+    // check user_gender value
+    if (!arrayContains(data.user_gender, ["Famel", "Male"])) {
+      return res.json({ success: false, errorMsg: "Gender Not Existe 🤥" });
+    }
+    // check user_relationship value
+    if (
+      !arrayContains(data.user_relationship, [
+        "Single",
+        "In a relationship",
+        "Engaged",
+        "Married"
+      ])
+    ) {
+      return res.json({
+        success: false,
+        errorMsg: "Relationship Not Existe 🤥"
+      });
+    }
+    // check user_current_occupancy value
+    if (
+      !arrayContains(data.user_gender_interest, ["Bisexual", "Female", "Male"])
+    ) {
+      return res.json({
+        success: false,
+        errorMsg: "Gender Interest Not Existe 🤥"
+      });
+    }
+    // check user_current_occupancy value
+    if (
+      !arrayContains(data.user_current_occupancy, [
+        "Student",
+        "Employer",
+        "None"
+      ])
+    ) {
+      errors.current_occupancy = "invalid choice";
+    }
+    // check user_city
+    const found = predefined[0].some(item => item.value === data.user_city);
+    if (!found) {
+      errors.city = "The City Name is Not Valide ";
+    }
+    console.log(errors);
+    return 0;
+    // check user_birth value
     next();
   }
-}
+};

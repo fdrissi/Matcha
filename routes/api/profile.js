@@ -240,7 +240,9 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
       lng: -6.91118
     }
   };
-  let get_info = JSON.stringify(my_info, function (key, value) {return (value === undefined) ? "" : value});
+  let get_info = JSON.stringify(my_info, function(key, value) {
+    return value === undefined ? "" : value;
+  });
   let info = JSON.parse(get_info);
   return res.json({
     success: true,
@@ -252,24 +254,28 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
 // @desc    update user info
 // @access  Private
 
-router.post("/updateUserInfo", [middleware.auth, middleware.edit_profile], async (req, res) => {
-  try {
-    const { data } = req.body;
-    const id = req.user.id;
-    const result = await profileModel.updateUserInfo(data, id);
-    if (result) {
-      // that mean that there is a change
-    } else {
-      // mean taht there is no change
-      return res.json({
-        success: false,
-        errorMsg: "Nothing To be Update"
-      });
+router.post(
+  "/updateUserInfo",
+  [middleware.auth, middleware.edit_profile],
+  async (req, res) => {
+    try {
+      const { data } = req.body;
+      const id = req.user.id;
+      //const result = await profileModel.updateUserInfo(data, id);
+      if (result) {
+        // that mean that there is a change
+      } else {
+        // mean taht there is no change
+        return res.json({
+          success: false,
+          errorMsg: "Nothing To be Update"
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.log(error);
   }
-});
+);
 
 // @route   Get api/profle/getpreedefined
 // @desc    get preedefined data
