@@ -139,10 +139,6 @@ module.exports =   middleware = {
           });
         next();
       },
-    logger: function(req, res, next) {
-       console.log('Original request hit : '+req.originalUrl);
-       next();
-    },
     // For THE REGISTRATION VALIDATION
     async  register(req, res, next) {
     const errors = {
