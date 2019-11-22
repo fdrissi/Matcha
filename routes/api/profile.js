@@ -250,7 +250,7 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
 // @desc    update user info
 // @access  Private
 
-router.post("/updateUserInfo", [middleware.auth], async (req, res) => {
+router.post("/updateUserInfo", [middleware.auth, middleware.edit_profile], async (req, res) => {
   try {
     const { data } = req.body;
     const id = req.user.id;
