@@ -70,14 +70,18 @@ export const setUserCover = async (filed, dispatch) => {
   } catch (error) {}
 };
 
-export const getUserImages = async dispatch => {
+export const getUserImages = async (dispatch, id = null) => {
   const config = {
     header: {
       "Content-Type": "application/json"
     }
   };
   try {
-    const res = await axios.get("api/profile/getImage", config);
+    const res = await axios.get(
+      "/api/profile/getImage",
+      { params: { id } },
+      config
+    );
     if (res.data.success) {
       dispatch({
         type: PHOTO_SUCCESS,
@@ -134,7 +138,7 @@ export const getUserInfo = async (dispatch, id = null) => {
   };
   try {
     const res = await axios.get(
-      "api/profile/getUserInfo",
+      "/api/profile/getUserInfo",
       { params: { id } },
       config
     );

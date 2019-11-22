@@ -5,10 +5,8 @@ import { alertReducer, alertInitState } from "../Reducers/alertReducer";
 import {
   authReducer,
   authInitState,
-  registerReducer,
-  registerInitState,
-  updateSettingReducer,
-  settingInitState,
+  operationsReducer,
+  errorsInitState,
   passeditReducer,
   tokenvalidationInitState
 } from "../Reducers/authReducer";
@@ -20,9 +18,8 @@ export const UserProvider = ({ children }) => {
   const globalReducers = useCombinedReducers({
     alert: useReducer(alertReducer, alertInitState),
     auth: useReducer(authReducer, authInitState),
-    register: useReducer(registerReducer, registerInitState),
+    errors: useReducer(operationsReducer, errorsInitState),
     profile: useReducer(profileReducer, profileInitState),
-    updateSettingInfo: useReducer(updateSettingReducer, settingInitState),
     token: useReducer(passeditReducer, tokenvalidationInitState)
   });
   return (

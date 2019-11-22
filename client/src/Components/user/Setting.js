@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -18,7 +17,7 @@ import Paper from "@material-ui/core/Paper";
 import { updateUser, loadUser } from "../../actions/userAction";
 import Alert from "../inc/Alert";
 import {
-  CLEAR_ERRORS,
+  REMOVE_ERRORS,
   REMOVE_ALERT,
   REMOVE_SPECIFIC_ERROR
 } from "../../actions/actionTypes";
@@ -55,7 +54,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Form = () => {
-  const [{ auth, alert, updateSettingInfo }, dispatch] = useUserStore();
+  const [{ auth, alert, errors }, dispatch] = useUserStore();
   const classes = useStyles();
 
   const [formData, setFormData] = useState({
@@ -132,7 +131,7 @@ const Form = () => {
         type: REMOVE_ALERT
       });
       dispatch({
-        type: CLEAR_ERRORS
+        type: REMOVE_ERRORS
       });
     };
   }, []);
@@ -153,8 +152,8 @@ const Form = () => {
         <Grid container spacing={2}>
           <Grid item sx={12} sm={6}>
             <TextField
-              error={updateSettingInfo.errors.firstName ? true : false}
-              helperText={updateSettingInfo.errors.firstName}
+              error={errors.errors.firstName ? true : false}
+              helperText={errors.errors.firstName}
               variant="standard"
               margin="normal"
               fullWidth
@@ -169,8 +168,8 @@ const Form = () => {
 
           <Grid item sx={12} sm={6}>
             <TextField
-              error={updateSettingInfo.errors.lastName ? true : false}
-              helperText={updateSettingInfo.errors.lastName}
+              error={errors.errors.lastName ? true : false}
+              helperText={errors.errors.lastName}
               variant="standard"
               margin="normal"
               fullWidth
@@ -184,8 +183,8 @@ const Form = () => {
 
           <Grid item xs={12}>
             <TextField
-              error={updateSettingInfo.errors.userName ? true : false}
-              helperText={updateSettingInfo.errors.userName}
+              error={errors.errors.userName ? true : false}
+              helperText={errors.errors.userName}
               variant="standard"
               margin="normal"
               fullWidth
@@ -200,8 +199,8 @@ const Form = () => {
 
           <Grid item xs={12}>
             <TextField
-              error={updateSettingInfo.errors.email ? true : false}
-              helperText={updateSettingInfo.errors.email}
+              error={errors.errors.email ? true : false}
+              helperText={errors.errors.email}
               variant="standard"
               margin="normal"
               fullWidth
@@ -216,8 +215,8 @@ const Form = () => {
 
           <Grid item xs={12}>
             <TextField
-              error={updateSettingInfo.errors.newPassword ? true : false}
-              helperText={updateSettingInfo.errors.newPassword}
+              error={errors.errors.newPassword ? true : false}
+              helperText={errors.errors.newPassword}
               variant="standard"
               margin="normal"
               fullWidth
@@ -232,8 +231,8 @@ const Form = () => {
 
           <Grid item xs={12}>
             <TextField
-              error={updateSettingInfo.errors.confirmPassword ? true : false}
-              helperText={updateSettingInfo.errors.confirmPassword}
+              error={errors.errors.confirmPassword ? true : false}
+              helperText={errors.errors.confirmPassword}
               variant="standard"
               margin="normal"
               fullWidth

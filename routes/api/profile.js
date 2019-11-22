@@ -94,7 +94,7 @@ router.post(
 // @desc    Get user images
 // @access  Private
 router.get("/getImage", [middleware.auth], async (req, res) => {
-  const id = req.user.id;
+  const id = req.query.id ? req.query.id : req.user.id;
   const result = await profileModel.getImage(id);
   if (result) {
     delete result.id;
@@ -253,7 +253,6 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
 // @route   Post api/profle/updateSettingInfo
 // @desc    update user info
 // @access  Private
-
 router.post(
   "/updateUserInfo",
   [middleware.auth, middleware.edit_profile],

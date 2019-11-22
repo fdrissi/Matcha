@@ -127,7 +127,7 @@ function SignUp() {
       });
     };
   }, [stableDispatch]);
-  if (state.register.register_success) {
+  if (state.register.success) {
     let time = setTimeout(() => test(time), 5000);
     const payload = {};
     dispatch({
