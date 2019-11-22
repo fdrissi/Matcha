@@ -4,7 +4,7 @@ import {
   removeUserImage,
   setUserCover,
   getUserInfo,
-  updateSettingInfo,
+  updateUserInfo,
   getpreedefined
 } from "../../actions/profileAction";
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -239,10 +239,11 @@ function EditProfile() {
   const submitForm = form => {
     form.preventDefault();
     async function update() {
-      await updateSettingInfo(mydata, stableDispatch);
+      await updateUserInfo(mydata, stableDispatch);
     }
     update();
   };
+  console.log(mydata);
 
   const handleIndexChange = (event, newValue) => {
     setIndex(newValue);
@@ -484,7 +485,7 @@ function EditProfile() {
                       labelPlacement="start"
                     />
                     <FormControlLabel
-                      value="bisexual"
+                      value="Bisexual"
                       control={<Radio color="secondary" />}
                       label="🏳️‍🌈Bisexual"
                       labelPlacement="start"

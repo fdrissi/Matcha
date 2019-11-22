@@ -159,7 +159,7 @@ async function getUserInfo(id) {
   return result[0];
 }
 
-async function updateSettingInfo(data, id) {
+async function updateUserInfo(data, id) {
   const {
     user_gender,
     user_tags,
@@ -197,5 +197,5 @@ module.exports = {
   getImageByRow,
   setImageCover,
   getUserInfo,
-  updateSettingInfo
+  updateUserInfo
 };

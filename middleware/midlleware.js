@@ -228,5 +228,9 @@ module.exports =   middleware = {
     if (!checkProperties(errors))
       return res.json({ success: false, errors, errorMsg: "Register unsuccess" });
     next();
+  },
+  async edit_profile(req, res, next) {
+    console.log(req);
+    next();
   }
 }
