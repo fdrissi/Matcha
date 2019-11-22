@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useUserStore } from "../../Context/appStore";
-import { getUserInfo } from "../../actions/profileAction";
+import { getUserInfo, getUserImages } from "../../actions/profileAction";
 import {
   makeStyles,
   Avatar,
@@ -93,9 +93,10 @@ const useStyles = makeStyles(() => ({
 
 const UserInfo = () => {
   const classes = useStyles();
+  const [{ auth, profile }] = useUserStore();
   return (
     <>
-      <h3 className={classes.name}>First Name</h3>
+      <h3 className={classes.name}>{auth.userInfo.first_name}</h3>
       <h4 className={classes.info}>Age</h4>
       <br />
       <h4 className={classes.info} style={{ marginRight: "5%" }}>
@@ -108,11 +109,12 @@ const UserInfo = () => {
 
 const ProfileImage = () => {
   const classes = useStyles();
+  const [{ profile }] = useUserStore();
   return (
     <>
       <Avatar
         alt="Profile"
-        src="/img/profiletest.png"
+        src={`/uploads/${profile.photo.profile_Image}`}
         className={classes.avatar}
       />
     </>
@@ -375,24 +377,30 @@ export const Profile = ({ match }) => {
   const classes = useStyles();
   const [{ auth, alert, profile }, dispatch] = useUserStore();
   let id = match.params.id;
-  getUserInfo(id);
-  console.log(profile);
+  useEffect(() => {
+    console.log(profile);
+  }, [profile]);
+  useEffect(() => {
+    getUserInfo(dispatch, id);
+    getUserImages(dispatch, id);
+  }, []);
+
   const imgs = [
     {
       id: 1,
-      src: "https://via.placeholder.com/200x200"
+      src: `/uploads/${profile.photo.cover_Image}`
     },
     {
       id: 2,
-      src: "https://via.placeholder.com/200x200"
+      src: `/uploads/${profile.photo.first_Image}`
     },
     {
       id: 3,
-      src: "https://via.placeholder.com/200x200"
+      src: `/uploads/${profile.photo.second_Image}`
     },
     {
       id: 4,
-      src: "https://via.placeholder.com/200x200"
+      src: `/uploads/${profile.photo.third_Image}`
     }
   ];
   return (

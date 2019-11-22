@@ -116,7 +116,7 @@ const Editpass = params => {
   }, [params.params.token, stableDispatch]);
   useEffect(() => {
     return () => {
-      if (!state.register.register_success && token_valide) {
+      if (!state.register.success && token_valide) {
         stableDispatch({
           type: REMOVE_ALERT
         });
@@ -125,7 +125,7 @@ const Editpass = params => {
         });
       }
     };
-  }, [state.register.register_success, token_valide, stableDispatch]);
+  }, [state.register.success, token_valide, stableDispatch]);
 
   if (is_loading) {
     return null;
