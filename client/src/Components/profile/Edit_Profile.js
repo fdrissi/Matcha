@@ -37,7 +37,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ClearIcon from "@material-ui/icons/Clear";
 import ChipInput from "material-ui-chip-input";
 import GoogleApiWrapper from "../inc/MapContainer";
-
+import CircularProgress from "@material-ui/core/CircularProgress";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Alert from "../inc/Alert";
 
@@ -223,7 +223,7 @@ function EditProfile() {
     user_city: "",
     user_current_occupancy: "",
     user_biography: "",
-    location: {
+    user_location: {
       lat: 32.879101,
       lng: -6.91118
     }
@@ -323,8 +323,14 @@ function EditProfile() {
     }
     isFirstRun.current = false;
   }, [myPhoto.file, myPhoto.id, stableDispatch]);
-
-  if (isLoading) return null;
+  if (isLoading)
+    return (
+      <Container component="main" maxWidth="md">
+        <div className={classes.paper}>
+          <CircularProgress />
+        </div>
+      </Container>
+    );
   return (
     <Container component="main" maxWidth="md">
       <div className={classes.paper}>
@@ -500,9 +506,8 @@ function EditProfile() {
                 className={classes.input}
                 select
                 variant="outlined"
-                label="Your City"
-                value={""}
-                name="user_city"
+                value={mydata.user_current_occupancy}
+                name="user_current_occupancy"
                 size="medium"
                 onChange={handleChange}
                 SelectProps={{
@@ -627,13 +632,13 @@ function EditProfile() {
                 <Grid item xs={12}>
                   <TextField
                     id="outlined-multiline-static"
-                    label="Multiline"
+                    label="Your Biography"
                     multiline
                     rows="4"
                     name="user_biography"
                     fullWidth
                     onChange={handleChange}
-                    defaultValue="Default Value"
+                    defaultValue={mydata.user_biography}
                     className={classes.textField}
                     margin="normal"
                     variant="outlined"
