@@ -125,79 +125,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function EditProfile() {
-  const months = [
-    {
-      value: "1",
-      label: "January"
-    },
-    {
-      value: "2",
-      label: "February"
-    },
-    {
-      value: "3",
-      label: "March"
-    },
-    {
-      value: "4",
-      label: "April"
-    },
-    {
-      value: "5",
-      label: "May"
-    },
-    {
-      value: "6",
-      label: "June"
-    },
-    {
-      value: "7",
-      label: "July"
-    },
-    {
-      value: "8",
-      label: "August"
-    },
-    {
-      value: "9",
-      label: "September"
-    },
-    {
-      value: "10",
-      label: "October"
-    },
-    {
-      value: "11",
-      label: "November"
-    },
-    {
-      value: "12",
-      label: "December"
-    }
-  ];
+  
 
-  const relationship_status = [
-    {
-      value: "Single",
-      label: "Single"
-    },
-    {
-      value: "In a relationship",
-      label: "In a relationship"
-    },
-    {
-      value: "Engaged",
-      label: "Engaged"
-    },
-    {
-      value: "Married",
-      label: "Married"
-    }
-  ];
   const classes = useStyles();
   const theme = useTheme();
   const [index, setIndex] = useState(0);
-  const [user_cities, setcities] = useState([]);
+  const [predefined_cities, setCities] = useState([]);
+  const [predefined_months, setMonths] = useState([]);
+  const [predefined_occupancy, setOcupancy] = useState([]);
+  const [predefined_rlationship, setRelation] = useState([]);
   const isFirstRun = useRef(true);
   const [isLoading, setisLoading] = useState(true);
   const [{ alert, profile, auth }, dispatch] = useUserStore();
@@ -243,8 +179,8 @@ function EditProfile() {
     }
     update();
   };
-  console.log(mydata);
 
+  
   const handleIndexChange = (event, newValue) => {
     setIndex(newValue);
   };
@@ -302,8 +238,11 @@ function EditProfile() {
     async function getUser() {
       await getUserImages(stableDispatch);
       await getUserInfo(stableDispatch);
-      const cities = await getpreedefined();
-      setcities(cities);
+      const predefined = await getpreedefined();
+      setCities(predefined[0]);
+      setMonths(predefined[1]);
+      setOcupancy(predefined[2]);
+      setRelation(predefined[3]);
       setisLoading(false);
     }
     stableDispatch({
@@ -445,7 +384,7 @@ function EditProfile() {
                   }
                 }}
               >
-                {relationship_status.map(option => (
+                {predefined_rlationship.map(option => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -518,11 +457,7 @@ function EditProfile() {
                   }
                 }}
               >
-                {[
-                  { id: 0, value: "Student" },
-                  { id: 1, value: "Employer" },
-                  { id: 2, value: "None" }
-                ].map(option => (
+                {predefined_occupancy.map(option => (
                   <option key={option.id} value={option.value}>
                     {option.value}
                   </option>
@@ -555,7 +490,7 @@ function EditProfile() {
                   }
                 }}
               >
-                {user_cities.map(option => (
+                {predefined_cities.map(option => (
                   <option key={option.id} value={option.value}>
                     {option.value}
                   </option>
@@ -581,6 +516,7 @@ function EditProfile() {
                     value={mydata.user_birth_day}
                     onChange={handleChange}
                     label="Day"
+                    inputProps={{maxLength: 2}}
                   />
                 </Grid>
                 <Grid item xs={3}>
@@ -600,7 +536,7 @@ function EditProfile() {
                       }
                     }}
                   >
-                    {months.map(option => (
+                    {predefined_months.map(option => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -615,6 +551,7 @@ function EditProfile() {
                     fullWidth
                     onChange={handleChange}
                     label="YYYY"
+                    inputProps={{maxLength: 4}}
                   />
                 </Grid>
               </Grid>

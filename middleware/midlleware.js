@@ -230,7 +230,7 @@ module.exports =   middleware = {
     next();
   },
   async edit_profile(req, res, next) {
-    console.log(req);
+    console.log(req.body.data);
     next();
   }
 }

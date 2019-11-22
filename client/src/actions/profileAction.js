@@ -183,6 +183,7 @@ export const updateUserInfo = async (mydata, dispatch) => {
 export const getpreedefined = async () => {
   const res = await axios.get("api/profile/getpreedefined");
   if (res.data.success) {
-    return res.data.cities;
+    console.log(res.data.predefined);
+    return res.data.predefined;
   }
 };
