@@ -21,7 +21,7 @@ export const profileInitState = {
     user_city: "",
     user_current_occupancy: "",
     user_biography: "",
-    location: {
+    user_location: {
       lat: 32.879101,
       lng: -6.91118
     }
