@@ -1,4 +1,6 @@
-module.exports = cities = [
+module.exports = 
+predefined = [
+cities = [
   { id: 0, value: "Ain Harrouda" },
   { id: 1, value: "Ben Yakhlef" },
   { id: 2, value: "Bouskoura" },
@@ -393,4 +395,87 @@ module.exports = cities = [
   { id: 391, value: "Awsard" },
   { id: 392, value: "Oued-Eddahab" },
   { id: 393, value: "Stehat" }
+],
+ months = [
+  {
+    value: "1",
+    label: "January"
+  },
+  {
+    value: "2",
+    label: "February"
+  },
+  {
+    value: "3",
+    label: "March"
+  },
+  {
+    value: "4",
+    label: "April"
+  },
+  {
+    value: "5",
+    label: "May"
+  },
+  {
+    value: "6",
+    label: "June"
+  },
+  {
+    value: "7",
+    label: "July"
+  },
+  {
+    value: "8",
+    label: "August"
+  },
+  {
+    value: "9",
+    label: "September"
+  },
+  {
+    value: "10",
+    label: "October"
+  },
+  {
+    value: "11",
+    label: "November"
+  },
+  {
+    value: "12",
+    label: "December"
+  }
+],
+occupancy = [
+  {
+    id: 0,
+    value: "Student"
+  },
+  { 
+    id: 1, 
+    value: "Employer" 
+  },
+  { 
+    id: 2, 
+    value: "None" 
+  }
+],
+relationship = [
+  {
+    value: "Single",
+    label: "Single"
+  },
+  {
+    value: "In a relationship",
+    label: "In a relationship"
+  },
+  {
+    value: "Engaged",
+    label: "Engaged"
+  },
+  {
+    value: "Married",
+    label: "Married"
+  }
+]
 ];

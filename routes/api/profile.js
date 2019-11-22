@@ -8,7 +8,7 @@ const fs = require("file-system");
 const { promisify } = require("util");
 var Jimp = require("jimp");
 const publicIp = require("public-ip");
-const cities = require("../globals");
+const predefined = require("../globals");
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -224,7 +224,7 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
   const [year, month, day] = result.user_birth
     ? result.user_birth.split("-")
     : "";
-  const info = {
+  const my_info = {
     user_gender: result.user_gender,
     user_relationship: result.user_relationship,
     user_birth_day: day,
@@ -240,6 +240,8 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
       lng: -6.91118
     }
   };
+  let get_info = JSON.stringify(my_info, function (key, value) {return (value === undefined) ? "" : value});
+  let info = JSON.parse(get_info);
   return res.json({
     success: true,
     info
@@ -254,7 +256,6 @@ router.post("/updateUserInfo", [middleware.auth, middleware.edit_profile], async
   try {
     const { data } = req.body;
     const id = req.user.id;
-    console.log(data);
     const result = await profileModel.updateUserInfo(data, id);
     if (result) {
       // that mean that there is a change
@@ -278,7 +279,7 @@ router.get("/getpreedefined", async (req, res) => {
   try {
     res.json({
       success: true,
-      cities
+      predefined
     });
   } catch (error) {
     console.log(error);
