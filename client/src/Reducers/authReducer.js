@@ -8,7 +8,6 @@ import {
   REMOVE_ERRORS,
   SUCCESS_UPDATE_USER,
   FAILIED_UPDATE_USER,
-  CLEAR_ERRORS,
   SUCCES_TOKEN,
   WRONG_TOKEN,
   REMOVE_SPECIFIC_ERROR
@@ -63,73 +62,45 @@ export const authReducer = (state, action) => {
   }
 };
 
-export const registerInitState = {
-  register_success: false,
+export const errorsInitState = {
+  success: false,
   errors: {
     email: "",
     userName: "",
     firstName: "",
     lastName: "",
     password: "",
+    newPassword: "",
     confirmPassword: ""
   }
 };
 
-export const registerReducer = (state = registerInitState, action) => {
+export const operationsReducer = (state = errorsInitState, action) => {
   const { type, payload } = action;
   switch (type) {
     case SUCCESS_REGISTRATION:
+    case SUCCESS_UPDATE_USER:
       return {
         ...state,
-        register_success: true
+        success: true
       };
     case FAILIED_REGISTRATION:
       return {
         ...state,
         register_message: payload.message,
-        register_success: false,
+        success: false,
         errors: payload.errors
-      };
-    case REMOVE_ERRORS:
-      return (state = registerInitState);
-    case REMOVE_SPECIFIC_ERROR:
-      return { ...state, errors: { ...state.errors, [payload.name]: "" } };
-    default:
-      return state;
-  }
-};
-
-export const settingInitState = {
-  update_success: false,
-  errors: {
-    firstName: "",
-    lastName: "",
-    userName: "",
-    email: "",
-    newPassword: "",
-    password: "",
-    confirmPassword: ""
-  }
-};
-
-export const updateSettingReducer = (state = settingInitState, action) => {
-  const { type, payload } = action;
-  switch (type) {
-    case SUCCESS_UPDATE_USER:
-      return {
-        ...state,
-        update_success: true
       };
     case FAILIED_UPDATE_USER:
       return {
         ...state,
-        update_success: false,
+        success: false,
         errors: payload.errors
       };
+    case REMOVE_ERRORS:
+      return (state = errorsInitState);
     case REMOVE_SPECIFIC_ERROR:
       return { ...state, errors: { ...state.errors, [payload.name]: "" } };
-    case CLEAR_ERRORS:
-      return (state = settingInitState);
     default:
       return state;
   }

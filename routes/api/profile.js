@@ -94,7 +94,7 @@ router.post(
 // @desc    Get user images
 // @access  Private
 router.get("/getImage", [middleware.auth], async (req, res) => {
-  const id = req.user.id;
+  const id = req.query.id ? req.query.id : req.user.id;
   const result = await profileModel.getImage(id);
   if (result) {
     delete result.id;
@@ -250,25 +250,29 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
 // @desc    update user info
 // @access  Private
 
-router.post("/updateUserInfo", [middleware.auth, middleware.edit_profile], async (req, res) => {
-  try {
-    const { data } = req.body;
-    const id = req.user.id;
-    console.log(data);
-    const result = await profileModel.updateUserInfo(data, id);
-    if (result) {
-      // that mean that there is a change
-    } else {
-      // mean taht there is no change
-      return res.json({
-        success: false,
-        errorMsg: "Nothing To be Update"
-      });
+router.post(
+  "/updateUserInfo",
+  [middleware.auth, middleware.edit_profile],
+  async (req, res) => {
+    try {
+      const { data } = req.body;
+      const id = req.user.id;
+      console.log(data);
+      const result = await profileModel.updateUserInfo(data, id);
+      if (result) {
+        // that mean that there is a change
+      } else {
+        // mean taht there is no change
+        return res.json({
+          success: false,
+          errorMsg: "Nothing To be Update"
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.log(error);
   }
-});
+);
 
 // @route   Get api/profle/getpreedefined
 // @desc    get preedefined data
