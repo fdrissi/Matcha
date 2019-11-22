@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
-const auth = require("../../middleware/auth");
+const middleware = require("../../middleware/midlleware");
 const profileModel = require("../../models/Profile");
 const fs = require("file-system");
 const { promisify } = require("util");
@@ -42,7 +42,7 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 router.post(
   "/upload/:row",
-  [auth, upload.single("myImage")],
+  [middleware.auth, upload.single("myImage")],
   async (req, res) => {
     const file = req.file;
     const { row } = req.params;
@@ -93,7 +93,7 @@ router.post(
 // @route   Post api/profle/getImage
 // @desc    Get user images
 // @access  Private
-router.get("/getImage", [auth], async (req, res) => {
+router.get("/getImage", [middleware.auth], async (req, res) => {
   const id = req.user.id;
   const result = await profileModel.getImage(id);
   if (result) {
@@ -112,7 +112,7 @@ router.get("/getImage", [auth], async (req, res) => {
 // @route   Post api/profle/setCover
 // @desc    Set user cover
 // @access  Private
-router.post("/setCover", [auth], async (req, res) => {
+router.post("/setCover", [middleware.auth], async (req, res) => {
   try {
     const { filed } = req.body.data;
     const id = req.user.id;
@@ -170,7 +170,7 @@ router.post("/setCover", [auth], async (req, res) => {
 // @route   Post api/profle/removeImage
 // @desc    Remove user images
 // @access  Private
-router.delete("/removeImage", [auth], async (req, res) => {
+router.delete("/removeImage", [middleware.auth], async (req, res) => {
   const { filed, photo } = req.body;
   const id = req.user.id;
   switch (photo) {
@@ -217,11 +217,10 @@ router.delete("/removeImage", [auth], async (req, res) => {
 // @route   Post api/profle/getInfo
 // @desc    get user info
 // @access  Private
-router.get("/getUserInfo", [auth], async (req, res) => {
-  const id = req.user.id;
+router.get("/getUserInfo/:id?", [middleware.auth], async (req, res) => {
+  const id =  (req.params.id) ? req.params.id : req.user.id;
   const result = await profileModel.getUserInfo(id);
   var obj = JSON.parse(result.user_tags);
-  console.log(obj);
   const [year, month, day] = result.user_birth
     ? result.user_birth.split("-")
     : "";
@@ -229,12 +228,17 @@ router.get("/getUserInfo", [auth], async (req, res) => {
     user_gender: result.user_gender,
     user_relationship: result.user_relationship,
     user_birth_day: day,
-    user_tags: obj,
+    user_tags: obj ? obj : [],
     user_birth_month: month,
+    user_current_occupancy: result.user_current_occupancy,
     user_gender_interest: result.user_gender_interest,
     user_birth_year: year,
     user_city: "",
     user_biography: "",
+    user_location: {
+      lat: 32.879101,
+      lng: -6.91118
+    }
   };
   return res.json({
     success: true,
@@ -246,10 +250,11 @@ router.get("/getUserInfo", [auth], async (req, res) => {
 // @desc    update user info
 // @access  Private
 
-router.post("/updateUserInfo", [auth], async (req, res) => {
+router.post("/updateUserInfo", [middleware.auth], async (req, res) => {
   try {
     const { data } = req.body;
     const id = req.user.id;
+    console.log(data);
     const result = await profileModel.updateUserInfo(data, id);
     if (result) {
       // that mean that there is a change

@@ -8,14 +8,14 @@ import {
 
 const MyMapComponent = withScriptjs(
   withGoogleMap(({ isMarkerShown, data, setData }) => {
-    const { lat, lng } = data.location;
+    const { lat, lng } = data.user_location;
 
     const handleLocationChange = e => {
-      const location = {
+      const user_location = {
         lat: e.latLng.lat(),
         lng: e.latLng.lng()
       };
-      setData({ ...data, location });
+      setData({ ...data, user_location });
     };
 
     return (

@@ -2,13 +2,13 @@ const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
 const userModel = require("../../models/User");
-const auth = require("../../middleware/auth");
 const { sendRecovery } = require("../../helpers/emailSender");
-const { validator, validateInput } = require("../../middleware/validations");
 const express = require("express");
 const router = express.Router();
 const key = config.get("keyOrSecret");
 const crypto = require("crypto");
+const middleware = require("../../middleware/midlleware");
+
 
 // @route   POST api/users/login
 // @desc    Login User
@@ -43,7 +43,7 @@ router.post("/login", async (req, res) => {
 // @route   POST api/users/register
 // @desc    Register User
 // @access  Public
-router.post("/register", [validateInput], async (req, res) => {
+router.post("/register", [middleware.register], async (req, res) => {
   const errors = {
     email: "",
     userName: "",
@@ -146,7 +146,7 @@ router.post("/recover", async (req, res) => {
 // @route POST /api/users/passedit
 // @desc Recover USER
 // @access public
-router.post("/passedit", [validateInput], async (req, res) => {
+router.post("/passedit", [middleware.register], async (req, res) => {
   // first of all we have to make sure that we already have that token
   const { token, password } = req.body;
   const user = await userModel.findUserByRecovery(token);
@@ -199,7 +199,7 @@ router.get("/checktoken", async (req, res) => {
 // @route   GET api/users/login
 // @desc    Login User
 // @access  Public
-router.get("/current", auth, async (req, res) => {
+router.get("/current", [middleware.auth], async (req, res) => {
   try {
     const user = await userModel.findById(req.user.id);
     delete user.password;
@@ -258,7 +258,7 @@ router.get("/activation", async (req, res) => {
 // @route   POST api/users/updateUser
 // @desc    Edit user info (name, email, password...)
 // @access  Public
-router.post("/updateUser", [auth, validator], async (req, res) => {
+router.post("/updateUser", [middleware.auth, middleware.setting], async (req, res) => {
   const errors = {
     firstName: "",
     lastName: "",

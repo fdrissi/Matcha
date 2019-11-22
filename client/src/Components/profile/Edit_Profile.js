@@ -9,6 +9,7 @@ import {
 } from "../../actions/profileAction";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
+import { Redirect } from 'react-router';
 import SwipeableViews from "react-swipeable-views";
 import { REMOVE_ALERT } from "../../actions/actionTypes";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -223,7 +224,7 @@ function EditProfile() {
     user_city: "",
     user_current_occupancy: "",
     user_biography: "",
-    location: {
+    user_location: {
       lat: 32.879101,
       lng: -6.91118
     }
@@ -271,7 +272,6 @@ function EditProfile() {
   const handleClick = (photo, filed) => {
     removeUserImage(photo, filed, dispatch);
   };
-  console.log(mydata);
 
   const handleAddChip = chip => {
     setData(previousData => ({
@@ -304,7 +304,6 @@ function EditProfile() {
       await getUserInfo(stableDispatch);
       const cities = await getpreedefined();
       setcities(cities);
-      console.log("1", cities);
       setisLoading(false);
     }
     stableDispatch({
@@ -312,7 +311,6 @@ function EditProfile() {
     });
     getUser();
   }, [stableDispatch]);
-  console.log(isLoading);
   useEffect(() => {
     setData(profile.info);
   }, [profile.info]);
@@ -325,6 +323,7 @@ function EditProfile() {
     }
     isFirstRun.current = false;
   }, [myPhoto.file, myPhoto.id, stableDispatch]);
+  if (!auth.loading && !auth.isAuthenticated) return <Redirect to="/login" />;
   if (isLoading) return null;
   return (
     <Container component="main" maxWidth="md">
@@ -501,9 +500,8 @@ function EditProfile() {
                 className={classes.input}
                 select
                 variant="outlined"
-                label="Your City"
-                value={""}
-                name="user_city"
+                value={mydata.user_current_occupancy}
+                name="user_current_occupancy"
                 size="medium"
                 onChange={handleChange}
                 SelectProps={{
@@ -628,13 +626,13 @@ function EditProfile() {
                 <Grid item xs={12}>
                   <TextField
                     id="outlined-multiline-static"
-                    label="Multiline"
+                    label="Your Biography"
                     multiline
                     rows="4"
                     name="user_biography"
                     fullWidth
                     onChange={handleChange}
-                    defaultValue="Default Value"
+                    defaultValue={mydata.user_biography}
                     className={classes.textField}
                     margin="normal"
                     variant="outlined"
