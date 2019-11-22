@@ -1,4 +1,6 @@
 import React from "react";
+import { useUserStore } from "../../Context/appStore";
+import { getUserInfo } from "../../actions/profileAction";
 import {
   makeStyles,
   Avatar,
@@ -62,8 +64,6 @@ const useStyles = makeStyles(() => ({
     margin: "0% 1%",
     fontSize: "16px",
     fontWeight: "bold",
-    minWidth: "80px",
-    width: "40%",
     border: "1px solid #e74c3c",
     textTransform: "capitalize",
     backgroundColor: "#e74c3c",
@@ -82,14 +82,12 @@ const useStyles = makeStyles(() => ({
   normalli: {
     fontWeight: "normal",
     fontSize: "16px",
-    color: "#000",
-    letterSpacing: "5px"
+    color: "#000"
   },
   boldli: {
     fontWeight: "bold",
     fontSize: "16px",
-    color: "##334249",
-    letterSpacing: "5px"
+    color: "##334249"
   }
 }));
 
@@ -172,19 +170,17 @@ const LongMenu = () => {
   );
 };
 
-export const ButtonRed = ({ text, icon = false }) => {
+export const ButtonRed = ({ icon = false }) => {
   const classes = useStyles();
   return (
     <Fab
       variant="extended"
       color="primary"
       aria-label="add"
-      size="large"
       className={classes.btn}
     >
       <div style={{ width: "100%" }}>
-        {text}
-        <span style={{ verticalAlign: "middle", fontSize: "22px" }}>
+        <span style={{ verticalAlign: "center", fontSize: "28px" }}>
           {icon}
         </span>
       </div>
@@ -229,8 +225,8 @@ const ProfileHeader = () => {
             </Box>
             <Box flexGrow={1}>
               <InfoContainer>
-                <ButtonRed text={"Like"} icon={<ThumbUpAltIcon />} />
-                <ButtonRed text={"Chat"} icon={<QuestionAnswerIcon />} />
+                <ButtonRed icon={<ThumbUpAltIcon />} />
+                <ButtonRed icon={<QuestionAnswerIcon />} />
                 <LongMenu />
               </InfoContainer>
             </Box>
@@ -262,7 +258,6 @@ const ProfileContent = ({ classes }) => {
     "Single",
     "Women",
     "Student",
-    "French, Arabic",
     "#Surfing #Computer"
   ];
   const params = [
@@ -270,10 +265,9 @@ const ProfileContent = ({ classes }) => {
     "Country",
     "City",
     "relationship",
-    "Looking for",
-    "Working as",
-    "Languages",
-    "Interests"
+    "Interest",
+    "Occupancy",
+    "Tags"
   ];
   return (
     <Grid container className={classes.border}>
@@ -322,6 +316,11 @@ const AboutMe = ({ classes, text }) => {
       >
         About Me
       </h4>
+      <img
+        src={"/img/widget-title-border.png"}
+        alt="wrap"
+        style={{ display: "block", marginBottom: "5%" }}
+      />
       <p>{text}</p>
     </div>
   );
@@ -344,7 +343,7 @@ const Gallery = ({ images }) => {
       <img
         src={"/img/widget-title-border.png"}
         alt="wrap"
-        style={{ display: "block", marginBottom: "5%" }}
+        style={{ display: "block" }}
       />
       {images.map(img => {
         return (
@@ -372,8 +371,12 @@ const Gallery = ({ images }) => {
   );
 };
 
-export const Profile = () => {
+export const Profile = ({ match }) => {
   const classes = useStyles();
+  const [{ auth, alert, profile }, dispatch] = useUserStore();
+  let id = match.params.id;
+  getUserInfo(id);
+  console.log(profile);
   const imgs = [
     {
       id: 1,

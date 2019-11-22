@@ -4,12 +4,11 @@ import {
   removeUserImage,
   setUserCover,
   getUserInfo,
-  updateUserInfo,
+  updateSettingInfo,
   getpreedefined
 } from "../../actions/profileAction";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
-import { Redirect } from 'react-router';
 import SwipeableViews from "react-swipeable-views";
 import { REMOVE_ALERT } from "../../actions/actionTypes";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
@@ -38,7 +37,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ClearIcon from "@material-ui/icons/Clear";
 import ChipInput from "material-ui-chip-input";
 import GoogleApiWrapper from "../inc/MapContainer";
-
+import CircularProgress from "@material-ui/core/CircularProgress";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Alert from "../inc/Alert";
 
@@ -240,7 +239,7 @@ function EditProfile() {
   const submitForm = form => {
     form.preventDefault();
     async function update() {
-      await updateUserInfo(mydata, stableDispatch);
+      await updateSettingInfo(mydata, stableDispatch);
     }
     update();
   };
@@ -291,7 +290,7 @@ function EditProfile() {
     }
   };
 
-  if (alert.msg != "")
+  if (alert.msg !== "")
     setTimeout(() => {
       stableDispatch({
         type: REMOVE_ALERT
@@ -309,8 +308,9 @@ function EditProfile() {
     stableDispatch({
       type: REMOVE_ALERT
     });
-    getUser();
-  }, [stableDispatch]);
+    if (auth.isAuthenticated) getUser();
+  }, [stableDispatch, auth]);
+
   useEffect(() => {
     setData(profile.info);
   }, [profile.info]);
@@ -323,8 +323,14 @@ function EditProfile() {
     }
     isFirstRun.current = false;
   }, [myPhoto.file, myPhoto.id, stableDispatch]);
-  if (!auth.loading && !auth.isAuthenticated) return <Redirect to="/login" />;
-  if (isLoading) return null;
+  if (isLoading)
+    return (
+      <Container component="main" maxWidth="md">
+        <div className={classes.paper}>
+          <CircularProgress />
+        </div>
+      </Container>
+    );
   return (
     <Container component="main" maxWidth="md">
       <div className={classes.paper}>

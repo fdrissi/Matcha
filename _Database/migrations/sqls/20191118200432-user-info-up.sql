@@ -18,6 +18,10 @@ user_country VARCHAR
 (10) NOT NULL DEFAULT 'MOROCCO',
 user_city VARCHAR
 (15),
+user_lat VARCHAR DEFAULT '32.879101'
+(15),
+user_lng VARCHAR DEFAULT '-6.91118'
+(15),
  user_current_occupancy ENUM
 ('Student', 'Employer', 'None') DEFAULT 'None',
 user_location INT (11),

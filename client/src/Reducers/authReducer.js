@@ -99,7 +99,7 @@ export const registerReducer = (state = registerInitState, action) => {
   }
 };
 
-export const updateInitState = {
+export const settingInitState = {
   update_success: false,
   errors: {
     firstName: "",
@@ -112,7 +112,7 @@ export const updateInitState = {
   }
 };
 
-export const updateUserReducer = (state = updateInitState, action) => {
+export const updateSettingReducer = (state = settingInitState, action) => {
   const { type, payload } = action;
   switch (type) {
     case SUCCESS_UPDATE_USER:
@@ -129,7 +129,7 @@ export const updateUserReducer = (state = updateInitState, action) => {
     case REMOVE_SPECIFIC_ERROR:
       return { ...state, errors: { ...state.errors, [payload.name]: "" } };
     case CLEAR_ERRORS:
-      return (state = updateInitState);
+      return (state = settingInitState);
     default:
       return state;
   }

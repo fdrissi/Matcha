@@ -217,8 +217,8 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
 // @route   Post api/profle/getInfo
 // @desc    get user info
 // @access  Private
-router.get("/getUserInfo/:id?", [middleware.auth], async (req, res) => {
-  const id =  (req.params.id) ? req.params.id : req.user.id;
+router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
+  const id = req.query.id ? req.query.id : req.user.id;
   const result = await profileModel.getUserInfo(id);
   var obj = JSON.parse(result.user_tags);
   const [year, month, day] = result.user_birth
@@ -246,7 +246,7 @@ router.get("/getUserInfo/:id?", [middleware.auth], async (req, res) => {
   });
 });
 
-// @route   Post api/profle/updateUserInfo
+// @route   Post api/profle/updateSettingInfo
 // @desc    update user info
 // @access  Private
 
