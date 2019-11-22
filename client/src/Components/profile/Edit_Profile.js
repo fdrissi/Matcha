@@ -4,7 +4,7 @@ import {
   removeUserImage,
   setUserCover,
   getUserInfo,
-  updateUserInfo,
+  updateSettingInfo,
   getpreedefined
 } from "../../actions/profileAction";
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -239,7 +239,7 @@ function EditProfile() {
   const submitForm = form => {
     form.preventDefault();
     async function update() {
-      await updateUserInfo(mydata, stableDispatch);
+      await updateSettingInfo(mydata, stableDispatch);
     }
     update();
   };
@@ -271,7 +271,6 @@ function EditProfile() {
   const handleClick = (photo, filed) => {
     removeUserImage(photo, filed, dispatch);
   };
-  console.log(mydata);
 
   const handleAddChip = chip => {
     setData(previousData => ({
@@ -291,7 +290,7 @@ function EditProfile() {
     }
   };
 
-  if (alert.msg != "")
+  if (alert.msg !== "")
     setTimeout(() => {
       stableDispatch({
         type: REMOVE_ALERT
@@ -304,15 +303,14 @@ function EditProfile() {
       await getUserInfo(stableDispatch);
       const cities = await getpreedefined();
       setcities(cities);
-      console.log("1", cities);
       setisLoading(false);
     }
     stableDispatch({
       type: REMOVE_ALERT
     });
-    getUser();
-  }, [stableDispatch]);
-  console.log(isLoading);
+    if (auth.isAuthenticated) getUser();
+  }, [stableDispatch, auth]);
+
   useEffect(() => {
     setData(profile.info);
   }, [profile.info]);
@@ -325,6 +323,7 @@ function EditProfile() {
     }
     isFirstRun.current = false;
   }, [myPhoto.file, myPhoto.id, stableDispatch]);
+
   if (isLoading) return null;
   return (
     <Container component="main" maxWidth="md">

@@ -7,8 +7,8 @@ import {
   authInitState,
   registerReducer,
   registerInitState,
-  updateUserReducer,
-  updateInitState,
+  updateSettingReducer,
+  settingInitState,
   passeditReducer,
   tokenvalidationInitState
 } from "../Reducers/authReducer";
@@ -22,7 +22,7 @@ export const UserProvider = ({ children }) => {
     auth: useReducer(authReducer, authInitState),
     register: useReducer(registerReducer, registerInitState),
     profile: useReducer(profileReducer, profileInitState),
-    updateUserInfo: useReducer(updateUserReducer, updateInitState),
+    updateSettingInfo: useReducer(updateSettingReducer, settingInitState),
     token: useReducer(passeditReducer, tokenvalidationInitState)
   });
   return (

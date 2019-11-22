@@ -11,22 +11,40 @@ import { Notifications } from "../pages/Notifications";
 import Browse from "../pages/Browse";
 import Chat from "../pages/Chat";
 import Edit_Profile from "../profile/Edit_Profile";
+import PrivateRoute from "./PrivateRoute";
+import { useUserStore } from "../../Context/appStore";
 
 const Routes = () => {
+  const [{ auth }] = useUserStore();
   return (
     <div style={{ flex: 1 }}>
       <Switch>
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
-        <Route exact path="/setting" component={Setting} />
+        <PrivateRoute auth={auth} exact path="/setting" component={Setting} />
         <Route exact path="/activate/:username/:token" component={Activate} />
         <Route exact path="/recover" component={Recover} />
         <Route exact path="/editpass/:token/" component={Editpass} />
-        <Route exact path="/profile" component={Profile} />
-        <Route exact path="/browse" component={Browse} />
-        <Route exact path="/chat" component={Chat} />
-        <Route exact path="/notifications" component={Notifications} />
-        <Route exact path="/edit-profile" component={Edit_Profile} />
+        <PrivateRoute
+          auth={auth}
+          exact
+          path="/profile/:id"
+          component={Profile}
+        />
+        <PrivateRoute auth={auth} exact path="/browse" component={Browse} />
+        <PrivateRoute auth={auth} exact path="/chat" component={Chat} />
+        <PrivateRoute
+          auth={auth}
+          exact
+          path="/notifications"
+          component={Notifications}
+        />
+        <PrivateRoute
+          auth={auth}
+          exact
+          path="/edit-profile"
+          component={Edit_Profile}
+        />
       </Switch>
     </div>
   );

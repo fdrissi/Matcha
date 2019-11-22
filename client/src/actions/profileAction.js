@@ -126,9 +126,18 @@ export const removeUserImage = async (photo, filed, dispatch) => {
   } catch (error) {}
 };
 
-export const getUserInfo = async dispatch => {
+export const getUserInfo = async (dispatch, id = null) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
   try {
-    const res = await axios.get("api/profile/getUserInfo");
+    const res = await axios.get(
+      "api/profile/getUserInfo",
+      { params: { id } },
+      config
+    );
     if (res.data.success) {
       dispatch({
         type: INFO_SUCCESS,
@@ -140,7 +149,7 @@ export const getUserInfo = async dispatch => {
   }
 };
 
-export const updateUserInfo = async (mydata, dispatch) => {
+export const updateSettingInfo = async (mydata, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -148,7 +157,7 @@ export const updateUserInfo = async (mydata, dispatch) => {
   };
   try {
     const res = await axios.post(
-      "api/profile/updateUserInfo",
+      "api/profile/updateSettingInfo",
       {
         data: mydata
       },

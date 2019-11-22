@@ -217,11 +217,10 @@ router.delete("/removeImage", [auth], async (req, res) => {
 // @route   Post api/profle/getInfo
 // @desc    get user info
 // @access  Private
-router.get("/getUserInfo", [auth], async (req, res) => {
-  const id = req.user.id;
+router.get("/getUserInfo/", [auth], async (req, res) => {
+  const id = req.query.id ? req.query.id : req.user.id;
   const result = await profileModel.getUserInfo(id);
   var obj = JSON.parse(result.user_tags);
-  console.log(obj);
   const [year, month, day] = result.user_birth
     ? result.user_birth.split("-")
     : "";
@@ -229,12 +228,16 @@ router.get("/getUserInfo", [auth], async (req, res) => {
     user_gender: result.user_gender,
     user_relationship: result.user_relationship,
     user_birth_day: day,
-    user_tags: obj,
+    user_tags: [],
     user_birth_month: month,
     user_gender_interest: result.user_gender_interest,
     user_birth_year: year,
     user_city: "",
     user_biography: "",
+    location: {
+      lat: 32.879101,
+      lng: -6.91118
+    }
   };
   return res.json({
     success: true,
@@ -242,15 +245,15 @@ router.get("/getUserInfo", [auth], async (req, res) => {
   });
 });
 
-// @route   Post api/profle/updateUserInfo
+// @route   Post api/profle/updateSettingInfo
 // @desc    update user info
 // @access  Private
 
-router.post("/updateUserInfo", [auth], async (req, res) => {
+router.post("/updateSettingInfo", [auth], async (req, res) => {
   try {
     const { data } = req.body;
     const id = req.user.id;
-    const result = await profileModel.updateUserInfo(data, id);
+    const result = await profileModel.updateSettingInfo(data, id);
     if (result) {
       // that mean that there is a change
     } else {
