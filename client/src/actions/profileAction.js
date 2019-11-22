@@ -149,7 +149,7 @@ export const getUserInfo = async (dispatch, id = null) => {
   }
 };
 
-export const updateSettingInfo = async (mydata, dispatch) => {
+export const updateUserInfo = async (mydata, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -157,7 +157,7 @@ export const updateSettingInfo = async (mydata, dispatch) => {
   };
   try {
     const res = await axios.post(
-      "api/profile/updateSettingInfo",
+      "api/profile/updateUserInfo",
       {
         data: mydata
       },

@@ -22,8 +22,8 @@ export const profileInitState = {
     user_current_occupancy: "",
     user_biography: "",
     user_location: {
-      lat: 32.879101,
-      lng: -6.91118
+      lat: '',
+      lng: ''
     }
   }
 };
