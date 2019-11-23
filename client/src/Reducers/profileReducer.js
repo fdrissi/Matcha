@@ -11,6 +11,7 @@ export const profileInitState = {
     fourth_Image: ""
   },
   info: {
+    id: "",
     user_gender: "",
     user_relationship: "",
     user_birth_day: "",
@@ -22,8 +23,8 @@ export const profileInitState = {
     user_current_occupancy: "",
     user_biography: "",
     user_location: {
-      lat: '',
-      lng: ''
+      lat: "",
+      lng: ""
     }
   }
 };

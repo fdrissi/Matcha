@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import { login } from "../../actions/userAction";
@@ -50,6 +50,7 @@ const useStyles = makeStyles(theme => ({
 const SignIn = () => {
   const classes = useStyles();
   const [state, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -68,11 +69,11 @@ const SignIn = () => {
 
   useEffect(() => {
     return () => {
-      dispatch({
+      stableDispatch({
         type: REMOVE_ALERT
       });
     };
-  }, []);
+  }, [stableDispatch]);
 
   if (state.auth.isAuthenticated) {
     return <Redirect to="/setting" />;

@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const middleware = require("../../middleware/midlleware");
 const profileModel = require("../../models/Profile");
+const userModel = require("../../models/User");
 const fs = require("file-system");
 const { promisify } = require("util");
 var Jimp = require("jimp");
@@ -94,7 +95,10 @@ router.post(
 // @desc    Get user images
 // @access  Private
 router.get("/getImage", [middleware.auth], async (req, res) => {
-  const id = req.query.id ? req.query.id : req.user.id;
+  const id =
+    req.query.id && (await userModel.findById(req.query.id))
+      ? req.query.id
+      : req.user.id;
   const result = await profileModel.getImage(id);
   if (result) {
     delete result.id;
@@ -218,13 +222,17 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
 // @desc    get user info
 // @access  Private
 router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
-  const id = req.query.id ? req.query.id : req.user.id;
+  const id =
+    req.query.id && (await userModel.findById(req.query.id))
+      ? req.query.id
+      : req.user.id;
   const result = await profileModel.getUserInfo(id);
   var obj = JSON.parse(result.user_tags);
   const [year, month, day] = result.user_birth
     ? result.user_birth.split("-")
     : "";
   const my_info = {
+    id,
     user_gender: result.user_gender,
     user_relationship: result.user_relationship,
     user_birth_day: day,
