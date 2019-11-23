@@ -4,7 +4,7 @@ const userModel = require("../models/User");
 const escapeSpecialChars = require("../helpers/escapeSpecialChars");
 const bcrypt = require("bcryptjs");
 const predefined = require("../routes/globals");
-
+const moment = require("moment");
 async function validateEmail(req) {
   req.body.email = req.body.email.toLowerCase().trim();
   const user = await userModel.findById(req.user.id);
@@ -233,7 +233,7 @@ module.exports = middleware = {
       return res.json({
         success: false,
         errors,
-        errorMsg: "Register unsuccess"
+        errorMsg: "Unsuccessful Registration"
       });
     next();
   },
@@ -245,7 +245,9 @@ module.exports = middleware = {
       birth_month: "",
       birth_year: "",
       biography: "",
-      tags: ""
+      relationship: "",
+      tags: "",
+      birthday: ""
     };
     const { data } = req.body;
     console.log(data);
@@ -262,12 +264,9 @@ module.exports = middleware = {
         "Married"
       ])
     ) {
-      return res.json({
-        success: false,
-        errorMsg: "Relationship Not Existe 🤥"
-      });
+      errors.relationship = "RelationShip Value Doesn't Exist";
     }
-    // check user_current_occupancy value
+    // check user INTERESTS value
     if (
       !arrayContains(data.user_gender_interest, ["Bisexual", "Female", "Male"])
     ) {
@@ -284,15 +283,65 @@ module.exports = middleware = {
         "None"
       ])
     ) {
-      errors.current_occupancy = "invalid choice";
+      errors.current_occupancy = "Current Occupancy Doesn't Exist";
     }
     // check user_city
-    const found = predefined[0].some(item => item.value === data.user_city);
-    if (!found) {
-      errors.city = "The City Name is Not Valide ";
+    if (data.user_city) {
+      const found = predefined[0].some(item => item.value === data.user_city);
+      if (!found) {
+        errors.city = "The City Name is Not Valide ";
+      }
     }
-    console.log(errors);
-    return 0;
+    errors.city = "The City Name is Not Valide ";
+
+    // Check user Birth values
+    if (data.user_birth_day || data.user_birth_month || data.user_birth_year) {
+      if (
+        data.user_birth_day &&
+        data.user_birth_month &&
+        data.user_birth_year
+      ) {
+        const dateFormat = "DD/MM/YYYY";
+        const date = moment(
+          `${data.user_birth_day}-${data.user_birth_month}-${data.user_birth_year}`,
+          dateFormat
+        );
+        if (!date.isValid()) {
+          errors.birthday = "Not Valide";
+        }
+      }
+      if (!data.user_birth_day) {
+        errors.birth_day = "Require";
+      }
+      if (!data.user_birth_month) {
+        errors.birth_month = "Require";
+      }
+      if (!data.user_birth_year) {
+        errors.birth_year = "Require";
+      }
+    }
+    // validate user Biographie Value
+    if (data.user_biography) {
+      let regex = /^[a-zA-Z]{10,100}$/;
+      if (!regex.test(data.user_biography))
+        errors.biography =
+          "Your biography should be between 15 and 100 character";
+    }
+    // check user tags valuse
+    if (data.user_tags.length > 0) {
+      let regex = /^[a-zA-Z]{3,14}$/;
+      data.user_tags.map(function(word) {
+        if (!regex.test(word)) {
+          errors.tags = "Every tag should be between 3 and 14 character";
+        }
+      });
+    }
+    if (!checkProperties(errors))
+      return res.json({
+        success: false,
+        errors,
+        errorMsg: "Unsuccessful Update 😬"
+      });
     // check user_birth value
     next();
   }
