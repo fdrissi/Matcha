@@ -224,6 +224,7 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
   const [year, month, day] = result.user_birth
     ? result.user_birth.split("-")
     : "";
+  console.log(result);
   const my_info = {
     user_gender: result.user_gender,
     user_relationship: result.user_relationship,
@@ -233,11 +234,11 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
     user_current_occupancy: result.user_current_occupancy,
     user_gender_interest: result.user_gender_interest,
     user_birth_year: year,
-    user_city: "",
-    user_biography: "",
+    user_city: result.user_city,
+    user_biography: result.user_biography,
     user_location: {
-      lat: 32.879101,
-      lng: -6.91118
+      lat: parseFloat(result.user_lat, 10),
+      lng: parseFloat(result.user_lng, 10)
     }
   };
   let get_info = JSON.stringify(my_info, function(key, value) {

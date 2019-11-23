@@ -17,10 +17,12 @@ user_tags varchar
 user_country VARCHAR
 (10) NOT NULL DEFAULT 'MOROCCO',
 user_city VARCHAR
-(15),
-user_lat VARCHAR (15)  DEFAULT '32.879101'
+(15) DEFAULT 'Khouribga',
+user_lat VARCHAR
+(15)  DEFAULT '32.879101'
 ,
-user_lng VARCHAR (15) DEFAULT '-6.91118'
+user_lng VARCHAR
+(15) DEFAULT '-6.91118'
 ,
  user_current_occupancy ENUM
 ('Student', 'Employer', 'None') DEFAULT 'None',

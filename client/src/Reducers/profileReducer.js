@@ -14,16 +14,16 @@ export const profileInitState = {
     user_gender: "",
     user_relationship: "",
     user_birth_day: "",
-    user_birth_month: "",
+    user_birth_month: "1",
     user_gender_interest: "",
     user_birth_year: "",
-    user_tags: [],
+    user_tags: "",
     user_city: "",
     user_current_occupancy: "",
     user_biography: "",
     user_location: {
-      lat: '',
-      lng: ''
+      lat: "",
+      lng: ""
     }
   }
 };
