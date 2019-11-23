@@ -1,5 +1,10 @@
 import axios from "axios";
-import { PHOTO_SUCCESS, SET_ALERT, INFO_SUCCESS } from "./actionTypes";
+import {
+  PHOTO_SUCCESS,
+  SET_ALERT,
+  INFO_SUCCESS,
+  FAILIED_UPDATE_USER
+} from "./actionTypes";
 
 export const setUserImages = async (formData, row, dispatch) => {
   const config = {
@@ -169,6 +174,10 @@ export const updateUserInfo = async (mydata, dispatch) => {
     );
     if (res.data.success) {
     } else {
+      dispatch({
+        type: FAILIED_UPDATE_USER,
+        payload: res.data
+      });
       dispatch({
         type: SET_ALERT,
         payload: {

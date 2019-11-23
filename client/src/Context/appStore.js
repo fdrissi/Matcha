@@ -18,7 +18,7 @@ export const UserProvider = ({ children }) => {
   const globalReducers = useCombinedReducers({
     alert: useReducer(alertReducer, alertInitState),
     auth: useReducer(authReducer, authInitState),
-    errors: useReducer(operationsReducer, errorsInitState),
+    operations: useReducer(operationsReducer, errorsInitState),
     profile: useReducer(profileReducer, profileInitState),
     token: useReducer(passeditReducer, tokenvalidationInitState)
   });

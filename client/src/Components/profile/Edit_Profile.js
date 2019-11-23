@@ -40,6 +40,7 @@ import GoogleApiWrapper from "../inc/MapContainer";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Alert from "../inc/Alert";
+import { FormHelperText } from "@material-ui/core";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -119,14 +120,16 @@ const useStyles = makeStyles(theme => ({
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`
   },
+  helperText: {
+    color: "#F32013",
+    fontWeight: "fontWeightBold"
+  },
   divider: {
     margin: theme.spacing(4, 0)
   }
 }));
 
 function EditProfile() {
-  
-
   const classes = useStyles();
   const theme = useTheme();
   const [index, setIndex] = useState(0);
@@ -136,7 +139,7 @@ function EditProfile() {
   const [predefined_rlationship, setRelation] = useState([]);
   const isFirstRun = useRef(true);
   const [isLoading, setisLoading] = useState(true);
-  const [{ alert, profile, auth }, dispatch] = useUserStore();
+  const [{ alert, profile, auth, operations }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
 
   const [myPhoto, setPhoto] = useState({
@@ -180,7 +183,6 @@ function EditProfile() {
     update();
   };
 
-  
   const handleIndexChange = (event, newValue) => {
     setIndex(newValue);
   };
@@ -208,6 +210,7 @@ function EditProfile() {
   const handleClick = (photo, filed) => {
     removeUserImage(photo, filed, dispatch);
   };
+  console.log(operations);
 
   const handleAddChip = chip => {
     setData(previousData => ({
@@ -369,6 +372,7 @@ function EditProfile() {
                 </Typography>
               </Grid>
               <TextField
+                error={operations.errors.relationship ? true : false}
                 className={classes.input}
                 select
                 variant="outlined"
@@ -390,6 +394,12 @@ function EditProfile() {
                   </option>
                 ))}
               </TextField>
+              {operations.errors.relationship && (
+                <FormHelperText className={classes.helperText}>
+                  <sup>*</sup>
+                  {operations.errors.relationship}
+                </FormHelperText>
+              )}
               {/* Next Gride */}
               <Divider className={classes.divider} />
               <Grid xs={12} container item justify="center" pt={2}>
@@ -433,101 +443,24 @@ function EditProfile() {
                 </FormControl>
               </Grid>
               {/* Next Gride */}
-              <Grid xs={12} container item justify="center">
-                <Typography
-                  variant="overline"
-                  gutterBottom
-                  className={classes.Typography}
-                >
-                  Current Occupancy:
-                </Typography>
-              </Grid>
-              <TextField
-                className={classes.input}
-                select
-                variant="outlined"
-                value={mydata.user_current_occupancy}
-                name="user_current_occupancy"
-                size="medium"
-                onChange={handleChange}
-                SelectProps={{
-                  native: true,
-                  MenuProps: {
-                    className: classes.menu
-                  }
-                }}
-              >
-                {predefined_occupancy.map(option => (
-                  <option key={option.id} value={option.value}>
-                    {option.value}
-                  </option>
-                ))}
-              </TextField>
-
-              {/* Next Gride */}
-              <Grid xs={12} container item justify="center">
-                <Typography
-                  variant="overline"
-                  gutterBottom
-                  className={classes.Typography}
-                >
-                  City:
-                </Typography>
-              </Grid>
-              <TextField
-                className={classes.input}
-                select
-                variant="outlined"
-                label="Your City"
-                value={""}
-                name="user_city"
-                size="medium"
-                onChange={handleChange}
-                SelectProps={{
-                  native: true,
-                  MenuProps: {
-                    className: classes.menu
-                  }
-                }}
-              >
-                {predefined_cities.map(option => (
-                  <option key={option.id} value={option.value}>
-                    {option.value}
-                  </option>
-                ))}
-              </TextField>
-
-              {/* Next Gride */}
-              <Grid xs={12} container item justify="center">
-                <Typography
-                  variant="overline"
-                  gutterBottom
-                  className={classes.Typography}
-                >
-                  Birthday:
-                </Typography>
-              </Grid>
-              <Grid item xs={12} container direction="row" justify="center">
-                <Grid item xs={2}>
-                  <TextField
-                    name="user_birth_day"
-                    variant="outlined"
-                    fullWidth
-                    value={mydata.user_birth_day}
-                    onChange={handleChange}
-                    label="Day"
-                    inputProps={{maxLength: 2}}
-                  />
+              <Grid container alignItems="center" justify="center">
+                <Grid item xs={12}>
+                  <Typography
+                    variant="overline"
+                    gutterBottom
+                    className={classes.Typography}
+                  >
+                    Current Occupancy:
+                  </Typography>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={12}>
                   <TextField
                     className={classes.input}
                     select
                     variant="outlined"
-                    label="Month"
-                    value={mydata.user_birth_month}
-                    name="user_birth_month"
-                    fullWidth
+                    value={mydata.user_current_occupancy}
+                    name="user_current_occupancy"
+                    size="medium"
                     onChange={handleChange}
                     SelectProps={{
                       native: true,
@@ -536,24 +469,128 @@ function EditProfile() {
                       }
                     }}
                   >
-                    {predefined_months.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
+                    {predefined_occupancy.map(option => (
+                      <option key={option.id} value={option.value}>
+                        {option.value}
                       </option>
                     ))}
                   </TextField>
                 </Grid>
-                <Grid item xs={5}>
-                  <TextField
-                    name="user_birth_year"
-                    variant="outlined"
-                    value={mydata.user_birth_year}
-                    fullWidth
-                    onChange={handleChange}
-                    label="YYYY"
-                    inputProps={{maxLength: 4}}
-                  />
+                {operations.errors.current_occupancy && (
+                  <FormHelperText className={classes.helperText}>
+                    <sup>*</sup> {operations.errors.current_occupancy}
+                  </FormHelperText>
+                )}
+              </Grid>
+              {/* Next Gride */}
+              <Grid container alignItems="center" justify="center">
+                <Grid xs={12} item>
+                  <Typography
+                    variant="overline"
+                    gutterBottom
+                    className={classes.Typography}
+                  >
+                    City:
+                  </Typography>
                 </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    error={operations.errors.city ? true : false}
+                    className={classes.input}
+                    select
+                    variant="outlined"
+                    label="Your City"
+                    value={""}
+                    name="user_city"
+                    size="medium"
+                    onChange={handleChange}
+                    SelectProps={{
+                      native: true,
+                      MenuProps: {
+                        className: classes.menu
+                      }
+                    }}
+                  >
+                    {predefined_cities.map(option => (
+                      <option key={option.id} value={option.value}>
+                        {option.value}
+                      </option>
+                    ))}
+                  </TextField>
+                </Grid>
+                {operations.errors.city && (
+                  <FormHelperText className={classes.helperText}>
+                    <sup>*</sup> {operations.errors.city}
+                  </FormHelperText>
+                )}
+              </Grid>
+              {/* Next Gride */}
+              <Grid container alignItems="center" justify="center">
+                <Grid xs={12} item>
+                  <Typography
+                    variant="overline"
+                    gutterBottom
+                    className={classes.Typography}
+                  >
+                    Birthday:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} container direction="row" justify="center">
+                  <Grid item xs={2}>
+                    <TextField
+                      error={operations.birth_day ? true : false}
+                      name="user_birth_day"
+                      variant="outlined"
+                      fullWidth
+                      value={mydata.user_birth_day}
+                      onChange={handleChange}
+                      label="Day"
+                      inputProps={{ maxLength: 2 }}
+                    />
+                  </Grid>
+                  <Grid item xs={3}>
+                    <TextField
+                      error={operations.birth_month ? true : false}
+                      className={classes.input}
+                      select
+                      variant="outlined"
+                      label="Month"
+                      value={mydata.user_birth_month}
+                      name="user_birth_month"
+                      fullWidth
+                      onChange={handleChange}
+                      SelectProps={{
+                        native: true,
+                        MenuProps: {
+                          className: classes.menu
+                        }
+                      }}
+                    >
+                      {predefined_months.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={5}>
+                    <TextField
+                      error={operations.birth_year ? true : false}
+                      name="user_birth_year"
+                      variant="outlined"
+                      value={mydata.user_birth_year}
+                      fullWidth
+                      onChange={handleChange}
+                      label="YYYY"
+                      inputProps={{ maxLength: 4 }}
+                    />
+                  </Grid>
+                </Grid>
+                {operations.errors.bit && (
+                  <FormHelperText className={classes.helperText}>
+                    <sup>*</sup> {operations.errors.city}
+                  </FormHelperText>
+                )}
               </Grid>
               {/* Next Gride */}
               {/* Next Gride */}
