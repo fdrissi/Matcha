@@ -61,6 +61,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function SignUp() {
+  const [toLogin, setToHome] = useState(false);
+  const [{ alert, operations }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
+
   const classes = useStyles();
 
   const [MyForm, setMyFormData] = useState({
@@ -73,10 +77,6 @@ function SignUp() {
     showPassword: false,
     showConfPassword: false
   });
-
-  const [toLogin, setToHome] = useState(false);
-  const [state, dispatch] = useUserStore();
-  const stableDispatch = useCallback(dispatch, []);
 
   const submitForm = async form => {
     form.preventDefault();
@@ -127,7 +127,7 @@ function SignUp() {
       });
     };
   }, [stableDispatch]);
-  if (state.register.success) {
+  if (operations.success) {
     let time = setTimeout(() => test(time), 5000);
     const payload = {};
     dispatch({
@@ -149,9 +149,7 @@ function SignUp() {
         <Container component="main" maxWidth="xs">
           <CssBaseline />
           <div className={classes.paper}>
-            {state.alert.msg && (
-              <Alert message={state.alert.msg} type={state.alert.alertType} />
-            )}
+            {alert.msg && <Alert message={alert.msg} type={alert.alertType} />}
             <Avatar className={classes.avatar}>
               <AccountCircle />
             </Avatar>
@@ -162,9 +160,7 @@ function SignUp() {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
-                    error={
-                      state.register.errors.userName.length > 0 ? true : false
-                    }
+                    error={operations.errors.userName ? true : false}
                     className={classes.input}
                     variant="outlined"
                     required
@@ -175,17 +171,15 @@ function SignUp() {
                     value={userName}
                     autoFocus
                   />
-                  {state.register.errors.userName.length > 0 && (
+                  {operations.errors.userName && (
                     <FormHelperText className={classes.helperText}>
-                      <sup>*</sup> {state.register.errors.userName}
+                      <sup>*</sup> {operations.errors.userName}
                     </FormHelperText>
                   )}
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    error={
-                      state.register.errors.firstName.length > 0 ? true : false
-                    }
+                    error={operations.errors.firstName ? true : false}
                     name="firstName"
                     variant="outlined"
                     required
@@ -194,18 +188,16 @@ function SignUp() {
                     value={firstName}
                     label="First Name"
                   />
-                  {state.register.errors.firstName.length > 0 && (
+                  {operations.errors.firstName && (
                     <FormHelperText className={classes.helperText}>
                       <sup>*</sup>
-                      {state.register.errors.firstName}
+                      {operations.errors.firstName}
                     </FormHelperText>
                   )}
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    error={
-                      state.register.errors.lastName.length > 0 ? true : false
-                    }
+                    error={operations.errors.lastName ? true : false}
                     variant="outlined"
                     required
                     fullWidth
@@ -215,17 +207,15 @@ function SignUp() {
                     onChange={handleInputChange}
                     value={lastName}
                   />
-                  {state.register.errors.lastName.length > 0 && (
+                  {operations.errors.lastName && (
                     <FormHelperText className={classes.helperText}>
-                      <sup>*</sup> {state.register.errors.lastName}
+                      <sup>*</sup> {operations.errors.lastName}
                     </FormHelperText>
                   )}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    error={
-                      state.register.errors.email.length > 0 ? true : false
-                    }
+                    error={operations.errors.email ? true : false}
                     variant="outlined"
                     required
                     fullWidth
@@ -235,17 +225,15 @@ function SignUp() {
                     onChange={handleInputChange}
                     value={email}
                   />
-                  {state.register.errors.email.length > 0 && (
+                  {operations.errors.email && (
                     <FormHelperText className={classes.helperText}>
-                      <sup>*</sup> {state.register.errors.email}
+                      <sup>*</sup> {operations.errors.email}
                     </FormHelperText>
                   )}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    error={
-                      state.register.errors.password.length > 0 ? true : false
-                    }
+                    error={operations.errors.password ? true : false}
                     variant="outlined"
                     required
                     fullWidth
@@ -273,19 +261,15 @@ function SignUp() {
                       )
                     }}
                   />
-                  {state.register.errors.password.length > 0 && (
+                  {operations.errors.password && (
                     <FormHelperText className={classes.helperText}>
-                      <sup>*</sup> {state.register.errors.password}
+                      <sup>*</sup> {operations.errors.password}
                     </FormHelperText>
                   )}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    error={
-                      state.register.errors.confirmPassword.length > 0
-                        ? true
-                        : false
-                    }
+                    error={operations.errors.confirmPassword ? true : false}
                     variant="outlined"
                     required
                     fullWidth
@@ -313,9 +297,9 @@ function SignUp() {
                       )
                     }}
                   />
-                  {state.register.errors.confirmPassword.length > 0 && (
+                  {operations.errors.confirmPassword && (
                     <FormHelperText className={classes.helperText}>
-                      <sup>*</sup> {state.register.errors.confirmPassword}
+                      <sup>*</sup> {operations.errors.confirmPassword}
                     </FormHelperText>
                   )}
                 </Grid>

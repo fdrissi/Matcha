@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Form = () => {
-  const [{ auth, alert, errors }, dispatch] = useUserStore();
+  const [{ auth, alert, operations }, dispatch] = useUserStore();
   const classes = useStyles();
 
   const [formData, setFormData] = useState({
@@ -152,8 +152,8 @@ const Form = () => {
         <Grid container spacing={2}>
           <Grid item sx={12} sm={6}>
             <TextField
-              error={errors.errors.firstName ? true : false}
-              helperText={errors.errors.firstName}
+              error={operations.errors.firstName ? true : false}
+              helperText={operations.errors.firstName}
               variant="standard"
               margin="normal"
               fullWidth
@@ -168,8 +168,8 @@ const Form = () => {
 
           <Grid item sx={12} sm={6}>
             <TextField
-              error={errors.errors.lastName ? true : false}
-              helperText={errors.errors.lastName}
+              error={operations.errors.lastName ? true : false}
+              helperText={operations.errors.lastName}
               variant="standard"
               margin="normal"
               fullWidth
@@ -183,8 +183,8 @@ const Form = () => {
 
           <Grid item xs={12}>
             <TextField
-              error={errors.errors.userName ? true : false}
-              helperText={errors.errors.userName}
+              error={operations.errors.userName ? true : false}
+              helperText={operations.errors.userName}
               variant="standard"
               margin="normal"
               fullWidth
@@ -199,8 +199,8 @@ const Form = () => {
 
           <Grid item xs={12}>
             <TextField
-              error={errors.errors.email ? true : false}
-              helperText={errors.errors.email}
+              error={operations.errors.email ? true : false}
+              helperText={operations.errors.email}
               variant="standard"
               margin="normal"
               fullWidth
@@ -215,8 +215,8 @@ const Form = () => {
 
           <Grid item xs={12}>
             <TextField
-              error={errors.errors.newPassword ? true : false}
-              helperText={errors.errors.newPassword}
+              error={operations.errors.newPassword ? true : false}
+              helperText={operations.errors.newPassword}
               variant="standard"
               margin="normal"
               fullWidth
@@ -231,8 +231,8 @@ const Form = () => {
 
           <Grid item xs={12}>
             <TextField
-              error={errors.errors.confirmPassword ? true : false}
-              helperText={errors.errors.confirmPassword}
+              error={operations.errors.confirmPassword ? true : false}
+              helperText={operations.errors.confirmPassword}
               variant="standard"
               margin="normal"
               fullWidth

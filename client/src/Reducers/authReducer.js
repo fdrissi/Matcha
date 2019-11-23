@@ -71,7 +71,16 @@ export const errorsInitState = {
     lastName: "",
     password: "",
     newPassword: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    current_occupancy: "",
+    city: "",
+    birth_day: "",
+    birth_month: "",
+    birth_year: "",
+    biography: "",
+    relationship: "",
+    birthday: "",
+    tags: ""
   }
 };
 
