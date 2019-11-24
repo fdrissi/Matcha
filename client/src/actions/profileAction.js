@@ -3,7 +3,8 @@ import {
   PHOTO_SUCCESS,
   SET_ALERT,
   INFO_SUCCESS,
-  FAILIED_UPDATE_USER
+  FAILIED_UPDATE_USER,
+  REMOVE_ERRORS
 } from "./actionTypes";
 
 export const setUserImages = async (formData, row, dispatch) => {
@@ -173,6 +174,20 @@ export const updateUserInfo = async (mydata, dispatch) => {
       config
     );
     if (res.data.success) {
+      dispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "success",
+          msg: res.data.errorMsg
+        }
+      });
+      dispatch({
+        type: INFO_SUCCESS,
+        payload: res.data.my_info
+      });
+      dispatch({
+        type: REMOVE_ERRORS
+      });
     } else {
       dispatch({
         type: FAILIED_UPDATE_USER,

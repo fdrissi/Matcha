@@ -14,7 +14,7 @@ export const profileInitState = {
     user_gender: "",
     user_relationship: "",
     user_birth_day: "",
-    user_birth_month: "1",
+    user_birth_month: "",
     user_gender_interest: "",
     user_birth_year: "",
     user_tags: "",

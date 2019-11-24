@@ -162,20 +162,34 @@ async function getUserInfo(id) {
 async function updateUserInfo(data, id) {
   const {
     user_gender,
-    user_tags,
+    user_gender_interest,
     user_relationship,
-    user_gender_interest
+    user_tags,
+    user_birth_day,
+    user_birth_year,
+    user_birth_month,
+    user_current_occupancy,
+    user_city,
+    user_biography,
+    user_location
   } = data;
-  const stringObj = JSON.stringify(user_tags);
-  console.log(stringObj);
-
+  const tags = JSON.stringify(user_tags);
+  if (user_birth_year && user_birth_month && user_birth_year)
+    user_bith = `${user_birth_year}-${user_birth_month}-${user_birth_month}`;
+  else user_bith = null;
   let sql =
-    "update user_info SET user_gender = ? , user_tags = ?,user_relationship = ? ,user_gender_interest = ? WHERE id = ?";
+    "update user_info SET user_gender = ?  ,user_gender_interest = ? ,user_relationship = ? , user_tags = ? , user_birth = ?, user_city = ?, user_lat = ?, user_lng = ? , user_current_occupancy = ?, user_biography = ?   WHERE id = ?";
   const [result] = await pool.query(sql, [
     user_gender,
-    stringObj,
-    user_relationship,
     user_gender_interest,
+    user_relationship,
+    tags,
+    user_bith,
+    user_city,
+    user_location.lat,
+    user_location.lng,
+    user_current_occupancy,
+    user_biography,
     id
   ]);
   if (result.changedRows) {

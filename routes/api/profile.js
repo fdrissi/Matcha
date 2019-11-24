@@ -117,7 +117,6 @@ router.post("/setCover", [middleware.auth], async (req, res) => {
     const { filed } = req.body.data;
     const id = req.user.id;
     const result = await profileModel.getImageByRow(id, filed);
-    console.log(result);
     if (result === "photo_holder.png") {
       return res.json({
         success: false,
@@ -224,7 +223,6 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
   const [year, month, day] = result.user_birth
     ? result.user_birth.split("-")
     : "";
-  console.log(result);
   const my_info = {
     user_gender: result.user_gender,
     user_relationship: result.user_relationship,
@@ -261,14 +259,41 @@ router.post(
     try {
       const { data } = req.body;
       const id = req.user.id;
-      //const result = await profileModel.updateUserInfo(data, id);
-      if (result) {
+      const check = await profileModel.updateUserInfo(data, id);
+      const result = await profileModel.getUserInfo(id);
+      const [year, month, day] = result.user_birth
+        ? result.user_birth.split("-")
+        : "";
+      var obj = JSON.parse(result.user_tags);
+      const my_info = {
+        user_gender: result.user_gender,
+        user_relationship: result.user_relationship,
+        user_birth_day: day,
+        user_tags: obj ? obj : [],
+        user_birth_month: month,
+        user_current_occupancy: result.user_current_occupancy,
+        user_gender_interest: result.user_gender_interest,
+        user_birth_year: year,
+        user_city: result.user_city,
+        user_biography: result.user_biography,
+        user_location: {
+          lat: parseFloat(result.user_lat, 10),
+          lng: parseFloat(result.user_lng, 10)
+        }
+      };
+      if (check) {
         // that mean that there is a change
+        return res.json({
+          success: true,
+          errorMsg: "UPDATE SUCCESS 😎",
+          my_info
+        });
       } else {
         // mean taht there is no change
         return res.json({
-          success: false,
-          errorMsg: "Nothing To be Update"
+          success: true,
+          errorMsg: "Nothing To be Update 😏",
+          my_info
         });
       }
     } catch (error) {

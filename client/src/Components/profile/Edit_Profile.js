@@ -141,6 +141,7 @@ function EditProfile() {
   const [isLoading, setisLoading] = useState(true);
   const [{ alert, profile, auth, operations }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
+  const htmlElRef = useRef(null);
 
   const [myPhoto, setPhoto] = useState({
     id: "",
@@ -163,8 +164,8 @@ function EditProfile() {
     user_current_occupancy: "",
     user_biography: "",
     user_location: {
-      lat: 32.879101,
-      lng: -6.91118
+      lat: "",
+      lng: ""
     }
   });
 
@@ -181,6 +182,7 @@ function EditProfile() {
       await updateUserInfo(mydata, stableDispatch);
     }
     update();
+    window.scrollTo({ top: 300, behavior: "smooth" });
   };
 
   const handleIndexChange = (event, newValue) => {
@@ -210,7 +212,6 @@ function EditProfile() {
   const handleClick = (photo, filed) => {
     removeUserImage(photo, filed, dispatch);
   };
-  console.log(mydata);
 
   const handleAddChip = chip => {
     setData(previousData => ({
@@ -229,6 +230,7 @@ function EditProfile() {
       }));
     }
   };
+  console.log(operations);
 
   if (alert.msg !== "")
     setTimeout(() => {
@@ -255,6 +257,7 @@ function EditProfile() {
   }, [stableDispatch, auth]);
 
   useEffect(() => {
+    console.log("wassap");
     setData(profile.info);
   }, [profile.info]);
 
@@ -481,6 +484,28 @@ function EditProfile() {
                     <sup>*</sup> {operations.errors.current_occupancy}
                   </FormHelperText>
                 )}
+              </Grid>
+              {/* Next Gride */}
+              <Grid container alignItems="center" justify="center">
+                <Grid item xs={12}>
+                  <Typography
+                    variant="overline"
+                    gutterBottom
+                    className={classes.Typography}
+                  >
+                    Country:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    className={classes.input}
+                    disabled
+                    variant="outlined"
+                    label="Country"
+                    value="Morocco"
+                    size="small"
+                  ></TextField>
+                </Grid>
               </Grid>
               {/* Next Gride */}
               <Grid container alignItems="center" justify="center">
