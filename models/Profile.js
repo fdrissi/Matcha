@@ -184,6 +184,81 @@ async function updateUserInfo(data, id) {
     return false;
   }
 }
+
+async function getUserLikeProfileRow(userId, profileId) {
+  try {
+    let sql =
+      "SELECT * FROM user_likes WHERE id_user_one = ? AND id_user_two = ?";
+    let result = await pool.query(sql, [userId, profileId]);
+    if (result[0].length > 0) return [result[0][0].id, true];
+    sql = "SELECT * FROM user_likes WHERE id_user_one = ? AND id_user_two = ?";
+    result = await pool.query(sql, [profileId, userId]);
+    if (result[0].length > 0) return [result[0][0].id, false];
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function isUserLikeProfile(data) {
+  let sql;
+  if (data && data[1]) {
+    sql = "SELECT * FROM user_likes WHERE user1_liked_user2 = ? AND id = ?";
+  } else if (data && !data[1]) {
+    sql = "SELECT * FROM user_likes WHERE user2_liked_user1 = ? AND id = ?";
+  } else return userLikeProfile(data, userId, profileId);
+  let [result] = await pool.query(sql, [true, data[0]]);
+  return result[0] ? true : false;
+}
+
+async function userLikeProfileById(userId, profileId) {
+  const data = await getUserLikeProfileRow(userId, profileId);
+  let sql;
+  if (data && data[1]) {
+    sql = "UPDATE user_likes SET user1_liked_user2 = ? where id = ?";
+  } else if (data && !data[1]) {
+    sql = "UPDATE user_likes SET user2_liked_user1 = ? where id = ?";
+  } else return userLikeProfile(data, userId, profileId);
+  let [result] = await pool.query(sql, [true, data[0]]);
+  await checkMatch(data[0]);
+  return result;
+}
+
+async function userLikeProfile(userId, profileId) {
+  let sql =
+    "INSERT INTO user_likes (`id_user_one`, `id_user_two`, `user1_liked_user2`, `user2_liked_user1`) VALUES(?, ?, ?, ?)";
+  const [result] = await pool.query(sql, [userId, profileId, true, false]);
+  return result;
+}
+
+async function userUnlikeProfile(data) {
+  let sql;
+  if (data && data[1]) {
+    sql =
+      "UPDATE user_likes SET user1_liked_user2 = ?, matched = ? WHERE id = ? AND user1_liked_user2 = ?";
+  } else if (data && !data[1]) {
+    sql =
+      "UPDATE user_likes SET user2_liked_user1 = ?, matched = ? WHERE id = ? AND user2_liked_user1 = ?";
+  } else return false;
+  let [result] = await pool.query(sql, [false, false, data[0], true]);
+  return result.changedRows;
+}
+
+async function checkMatch(rowId) {
+  let sql = "SELECT * FROM user_likes WHERE id = ?";
+  let [result] = await pool.query(sql, [rowId]);
+  if (result[0].user1_liked_user2 && result[0].user2_liked_user1) {
+    sql = "UPDATE user_likes SET matched = ?";
+    [result] = await pool.query(sql, [true]);
+  }
+}
+
+async function areMatched(rowId) {
+  let sql = "SELECT * FROM user_likes WHERE id = ?";
+  let [result] = await pool.query(sql, [rowId]);
+  return result[0].matched;
+}
+
 module.exports = {
   SetImage,
   getImage,
@@ -197,5 +272,11 @@ module.exports = {
   getImageByRow,
   setImageCover,
   getUserInfo,
-  updateUserInfo
+  updateUserInfo,
+  getUserLikeProfileRow,
+  userLikeProfile,
+  userLikeProfileById,
+  userUnlikeProfile,
+  areMatched,
+  isUserLikeProfile
 };

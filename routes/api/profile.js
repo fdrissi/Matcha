@@ -299,4 +299,75 @@ router.get("/getpreedefined", async (req, res) => {
   }
 });
 
+// @route   Post api/profle/likeUser
+// @desc    Like, unlike profile
+// @access  Private
+router.post("/userLikeProfile", middleware.auth, async (req, res) => {
+  const { profile } = req.body;
+  const id = req.user.id;
+  if (id === profile.id)
+    return res.json({
+      success: false
+    });
+  try {
+    //if user already liked this profile, unlike it, else like
+    let result = await profileModel.getUserLikeProfileRow(id, profile.id);
+    if (result) result = await profileModel.userUnlikeProfile(result);
+    if (!result)
+      result = await profileModel.userLikeProfileById(id, profile.id);
+
+    if (result)
+      return res.json({
+        success: true
+      });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Post api/profle/isUserLikeProfile
+// @desc    is user already liked specific profile
+// @access  Private
+router.post("/isUserLikedProfile", middleware.auth, async (req, res) => {
+  const { profile } = req.body;
+  const id = req.user.id;
+  if (id === profile.id)
+    return res.json({
+      success: false
+    });
+  try {
+    //return true if user already liked profile
+    let result = await profileModel.getUserLikeProfileRow(id, profile.id);
+    result = result ? await profileModel.isUserLikeProfile(result) : false;
+    //console.log(result);
+    return res.json({
+      success: result
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Post api/profle/areMatched
+// @desc    is user already liked specific profile
+// @access  Private
+router.post("/areMatched", middleware.auth, async (req, res) => {
+  const { profile } = req.body;
+  const id = req.user.id;
+  if (id === profile.id)
+    return res.json({
+      success: false
+    });
+  try {
+    //return true if user already liked profile
+    let result = await profileModel.getUserLikeProfileRow(id, profile.id);
+    result = result[0] && (await profileModel.areMatched(result[0]));
+    return res.json({
+      success: result
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = router;

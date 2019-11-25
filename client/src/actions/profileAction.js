@@ -196,3 +196,34 @@ export const getpreedefined = async () => {
     return res.data.predefined;
   }
 };
+
+export const likeProfile = async (profileId, dispatch) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    const res = await axios.post(
+      "api/profile/likeUser",
+      {
+        profile: { id: profileId }
+      },
+      config
+    );
+    if (res.data.success) {
+    } else {
+      dispatch({
+        type: FAILIED_UPDATE_USER,
+        payload: res.data
+      });
+      dispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "danger",
+          msg: res.data.errorMsg
+        }
+      });
+    }
+  } catch (error) {}
+};

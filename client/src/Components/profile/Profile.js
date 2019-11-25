@@ -221,7 +221,11 @@ export const Cover = ({ children, img = "/img/banner-brwose.jpg" }) => {
   return (
     <div
       className={classes.cover}
-      style={{ backgroundImage: `url(${img})`, backgroundSize: "cover" }}
+      style={{
+        backgroundImage: `url(${img})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center center"
+      }}
     >
       {children}
     </div>
