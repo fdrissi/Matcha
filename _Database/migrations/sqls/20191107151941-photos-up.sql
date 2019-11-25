@@ -1,4 +1,3 @@
-/* Replace with your SQL commands */
 CREATE TABLE photos
 (
     id int PRIMARY Key AUTO_INCREMENT,

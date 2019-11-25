@@ -1,6 +1,3 @@
-/* Replace with your SQL commands */
-
-/* TABLE users */
 CREATE TABLE users (
     id int PRIMARY KEY AUTO_INCREMENT,
     username varchar
