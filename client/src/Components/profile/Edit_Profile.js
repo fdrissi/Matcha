@@ -5,7 +5,8 @@ import {
   setUserCover,
   getUserInfo,
   updateUserInfo,
-  getpreedefined
+  getpreedefined,
+  setUserLocation
 } from "../../actions/profileAction";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
@@ -41,6 +42,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Alert from "../inc/Alert";
 import { FormHelperText } from "@material-ui/core";
+import { usePosition } from "../inc/usePosition";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -141,6 +143,7 @@ function EditProfile() {
   const [isLoading, setisLoading] = useState(true);
   const [{ alert, profile, auth, operations }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
+  const { latitude, longitude, error } = usePosition();
 
   const [myPhoto, setPhoto] = useState({
     id: "",
@@ -162,9 +165,10 @@ function EditProfile() {
     user_city: "",
     user_current_occupancy: "",
     user_biography: "",
+    user_set_from_map: "",
     user_location: {
-      lat: 32.879101,
-      lng: -6.91118
+      lat: "",
+      lng: ""
     }
   });
 
@@ -181,6 +185,7 @@ function EditProfile() {
       await updateUserInfo(mydata, stableDispatch);
     }
     update();
+    window.scrollTo({ top: 300, behavior: "smooth" });
   };
 
   const handleIndexChange = (event, newValue) => {
@@ -210,7 +215,6 @@ function EditProfile() {
   const handleClick = (photo, filed) => {
     removeUserImage(photo, filed, dispatch);
   };
-  console.log(operations);
 
   const handleAddChip = chip => {
     setData(previousData => ({
@@ -266,6 +270,12 @@ function EditProfile() {
     }
     isFirstRun.current = false;
   }, [myPhoto.file, myPhoto.id, stableDispatch]);
+
+  useEffect(() => {
+    if (latitude || longitude || error) {
+      setUserLocation(latitude, longitude, error);
+    }
+  }, [latitude, longitude, error]);
   if (isLoading)
     return (
       <Container component="main" maxWidth="md">
@@ -484,6 +494,28 @@ function EditProfile() {
               </Grid>
               {/* Next Gride */}
               <Grid container alignItems="center" justify="center">
+                <Grid item xs={12}>
+                  <Typography
+                    variant="overline"
+                    gutterBottom
+                    className={classes.Typography}
+                  >
+                    Country:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    className={classes.input}
+                    disabled
+                    variant="outlined"
+                    label="Country"
+                    value="Morocco"
+                    size="small"
+                  ></TextField>
+                </Grid>
+              </Grid>
+              {/* Next Gride */}
+              <Grid container alignItems="center" justify="center">
                 <Grid xs={12} item>
                   <Typography
                     variant="overline"
@@ -500,7 +532,7 @@ function EditProfile() {
                     select
                     variant="outlined"
                     label="Your City"
-                    value={""}
+                    value={mydata.user_city}
                     name="user_city"
                     size="medium"
                     onChange={handleChange}
@@ -535,63 +567,64 @@ function EditProfile() {
                     Birthday:
                   </Typography>
                 </Grid>
-                <Grid item xs={12} container direction="row" justify="center">
-                  <Grid item xs={2}>
-                    <TextField
-                      error={operations.birth_day ? true : false}
-                      name="user_birth_day"
-                      variant="outlined"
-                      fullWidth
-                      value={mydata.user_birth_day}
-                      onChange={handleChange}
-                      label="Day"
-                      inputProps={{ maxLength: 2 }}
-                    />
-                  </Grid>
-                  <Grid item xs={3}>
-                    <TextField
-                      error={operations.birth_month ? true : false}
-                      className={classes.input}
-                      select
-                      variant="outlined"
-                      label="Month"
-                      value={mydata.user_birth_month}
-                      name="user_birth_month"
-                      fullWidth
-                      onChange={handleChange}
-                      SelectProps={{
-                        native: true,
-                        MenuProps: {
-                          className: classes.menu
-                        }
-                      }}
-                    >
-                      {predefined_months.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={5}>
-                    <TextField
-                      error={operations.birth_year ? true : false}
-                      name="user_birth_year"
-                      variant="outlined"
-                      value={mydata.user_birth_year}
-                      fullWidth
-                      onChange={handleChange}
-                      label="YYYY"
-                      inputProps={{ maxLength: 4 }}
-                    />
-                  </Grid>
+                <Grid item xs={2}>
+                  <TextField
+                    error={operations.errors.birth_day ? true : false}
+                    name="user_birth_day"
+                    variant="outlined"
+                    fullWidth
+                    value={mydata.user_birth_day}
+                    onChange={handleChange}
+                    label="Day"
+                    inputProps={{ maxLength: 2 }}
+                  />
                 </Grid>
-                {operations.errors.bit && (
-                  <FormHelperText className={classes.helperText}>
-                    <sup>*</sup> {operations.errors.city}
-                  </FormHelperText>
-                )}
+                <Grid item xs={3}>
+                  <TextField
+                    error={operations.errors.birth_month ? true : false}
+                    className={classes.input}
+                    select
+                    variant="outlined"
+                    label="Month"
+                    value={mydata.user_birth_month}
+                    name="user_birth_month"
+                    fullWidth
+                    onChange={handleChange}
+                    SelectProps={{
+                      native: true,
+                      MenuProps: {
+                        className: classes.menu
+                      }
+                    }}
+                  >
+                    {predefined_months.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs={5}>
+                  <TextField
+                    error={operations.errors.birth_year ? true : false}
+                    name="user_birth_year"
+                    variant="outlined"
+                    value={mydata.user_birth_year}
+                    fullWidth
+                    onChange={handleChange}
+                    label="YYYY"
+                    inputProps={{ maxLength: 4 }}
+                  />
+                </Grid>
               </Grid>
+              {operations.errors.birthday && (
+                <Grid xs={12} container item justify="center">
+                  <FormHelperText className={classes.helperText}>
+                    <sup>*</sup> {operations.errors.birthday}
+                  </FormHelperText>
+                </Grid>
+              )}
+
               {/* Next Gride */}
               {/* Next Gride */}
               <Grid xs={12} container item justify="center">
@@ -603,9 +636,10 @@ function EditProfile() {
                   biography:
                 </Typography>
               </Grid>
-              <Grid item xs={12} container direction="row" justify="center">
+              <Grid container direction="row" justify="center">
                 <Grid item xs={12}>
                   <TextField
+                    error={operations.errors.biography ? true : false}
                     id="outlined-multiline-static"
                     label="Your Biography"
                     multiline
@@ -617,20 +651,35 @@ function EditProfile() {
                     className={classes.textField}
                     margin="normal"
                     variant="outlined"
+                    inputProps={{ maxLength: 200 }}
                   />
                 </Grid>
+                {operations.errors.biography && (
+                  <FormHelperText className={classes.helperText}>
+                    <sup>*</sup> {operations.errors.biography}
+                  </FormHelperText>
+                )}
               </Grid>
               {/* Next Gride */}
-              <Grid xs={12} container item justify="center">
-                <Typography variant="subtitle1" gutterBottom>
-                  Tags:
-                </Typography>
+              <Grid container alignItems="center" justify="center">
+                <Grid xs={12} item>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Tags:
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <ChipInput
+                    value={mydata.user_tags}
+                    onAdd={chip => handleAddChip(chip)}
+                    onDelete={(chip, index) => handleDeleteChip(chip, index)}
+                  />
+                </Grid>
+                {operations.errors.tags && (
+                  <FormHelperText className={classes.helperText}>
+                    <sup>*</sup> {operations.errors.tags}
+                  </FormHelperText>
+                )}
               </Grid>
-              <ChipInput
-                value={mydata.user_tags}
-                onAdd={chip => handleAddChip(chip)}
-                onDelete={(chip, index) => handleDeleteChip(chip, index)}
-              />
               {/* Next Gride */}
               {/* {next Gride } */}
               <Grid xs={12} container item justify="center">

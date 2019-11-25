@@ -9,23 +9,26 @@ import {
 const MyMapComponent = withScriptjs(
   withGoogleMap(({ isMarkerShown, data, setData }) => {
     const { lat, lng } = data.user_location;
-    console.log(lat, lng)
+    const { user_set_from_map } = data;
 
     const handleLocationChange = e => {
       const user_location = {
         lat: e.latLng.lat(),
         lng: e.latLng.lng()
       };
-      setData({ ...data, user_location });
+      const user_set_from_map = true;
+      setData({ ...data, user_location, user_set_from_map });
     };
 
     return (
       <GoogleMap
-        defaultZoom={8}
-        defaultCenter={{ lat, lng }}
+        defaultZoom={lat && lng && user_set_from_map ? 8 : 2}
+        defaultCenter={
+          lat && lng ? { lat, lng } : { lat: 32.8821167, lng: -6.8978511 }
+        }
         onClick={e => handleLocationChange(e)}
       >
-        {isMarkerShown && (
+        {isMarkerShown && lat && lng && user_set_from_map && (
           <Marker
             position={{ lat, lng }}
             icon={{
