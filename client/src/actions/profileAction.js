@@ -204,6 +204,21 @@ export const updateUserInfo = async (mydata, dispatch) => {
   } catch (error) {}
 };
 
+export const setUserLocation = async (latitude, longitude, error) => {
+  console.log("test");
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+
+  const res = await axios.post(
+    "api/profile/setUserLocation",
+    { data: { latitude, longitude, error } },
+    config
+  );
+};
+
 export const getpreedefined = async () => {
   const res = await axios.get("api/profile/getpreedefined");
   if (res.data.success) {

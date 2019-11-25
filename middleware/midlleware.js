@@ -340,7 +340,7 @@ module.exports = middleware = {
     }
     // validate user Biographie Value
     if (data.user_biography) {
-      let regex = /^(?=.{15,200}$).*/;
+      let regex = /^(?=[\s\S]{15,200}$).*/;
       if (!regex.test(data.user_biography))
         errors.biography =
           "Your biography should be between 15 and 200 character";

@@ -173,12 +173,13 @@ async function updateUserInfo(data, id) {
     user_biography,
     user_location
   } = data;
+  const set_from_map = user_location.lat && user_location.lng ? true : false;
   const tags = JSON.stringify(user_tags);
-  if (user_birth_year && user_birth_month && user_birth_year)
-    user_bith = `${user_birth_year}-${user_birth_month}-${user_birth_month}`;
+  if (user_birth_day && user_birth_month && user_birth_day)
+    user_bith = `${user_birth_year}-${user_birth_month}-${user_birth_day}`;
   else user_bith = null;
   let sql =
-    "update user_info SET user_gender = ?  ,user_gender_interest = ? ,user_relationship = ? , user_tags = ? , user_birth = ?, user_city = ?, user_lat = ?, user_lng = ? , user_current_occupancy = ?, user_biography = ?   WHERE id = ?";
+    "update user_info SET user_gender = ?  ,user_gender_interest = ? ,user_relationship = ? , user_tags = ? , user_birth = ?, user_city = ?, user_lat = ?, user_lng = ? , user_current_occupancy = ?, user_biography = ? , set_from_map = ?   WHERE id = ?";
   const [result] = await pool.query(sql, [
     user_gender,
     user_gender_interest,
@@ -190,6 +191,7 @@ async function updateUserInfo(data, id) {
     user_location.lng,
     user_current_occupancy,
     user_biography,
+    set_from_map,
     id
   ]);
   if (result.changedRows) {
@@ -198,6 +200,18 @@ async function updateUserInfo(data, id) {
     return false;
   }
 }
+async function getResultByRow(row, id) {
+  let sql = `SELECT ${row} from user_info WHERE id = ?`;
+  const [result] = await pool.query(sql, [id]);
+  return result[0][row];
+}
+
+async function updateGeoLocation(latitude, longitude, id) {
+  let sql = "UPDATE user_info SET user_lat = ?, user_lng = ? WHERE id = ?";
+  await pool.query(sql, [latitude, longitude, id]);
+  return true;
+}
+
 module.exports = {
   SetImage,
   getImage,
@@ -211,5 +225,7 @@ module.exports = {
   getImageByRow,
   setImageCover,
   getUserInfo,
-  updateUserInfo
+  updateUserInfo,
+  getResultByRow,
+  updateGeoLocation
 };

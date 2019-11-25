@@ -6,9 +6,10 @@ const middleware = require("../../middleware/midlleware");
 const profileModel = require("../../models/Profile");
 const fs = require("file-system");
 const { promisify } = require("util");
-var Jimp = require("jimp");
+const Jimp = require("jimp");
 const publicIp = require("public-ip");
 const predefined = require("../globals");
+const iplocation = require("iplocation").default;
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -48,7 +49,6 @@ router.post(
     const { row } = req.params;
     const id = req.user.id;
     const image = new Jimp(file.path, async function(err, image) {
-      console.log(await publicIp.v4());
       if (!err && file) {
         let filename = id + "/" + file.filename;
         const remove = await profileModel.removeOnUpload(id, row);
@@ -129,8 +129,6 @@ router.post("/setCover", [middleware.auth], async (req, res) => {
           if (!err) {
             var w = image.bitmap.width; //  width of the image
             var h = image.bitmap.height; // height of the image
-            console.log(w);
-            console.log(h);
             if (w < 850 || h < 315) {
               return res.json({
                 success: false,
@@ -223,6 +221,7 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
   const [year, month, day] = result.user_birth
     ? result.user_birth.split("-")
     : "";
+  console.log(result);
   const my_info = {
     user_gender: result.user_gender,
     user_relationship: result.user_relationship,
@@ -237,7 +236,8 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
     user_location: {
       lat: parseFloat(result.user_lat, 10),
       lng: parseFloat(result.user_lng, 10)
-    }
+    },
+    user_set_from_map: result.set_from_map
   };
   let get_info = JSON.stringify(my_info, function(key, value) {
     return value === undefined ? "" : value;
@@ -301,6 +301,44 @@ router.post(
     }
   }
 );
+
+// @route   Get api/profle/setUserLocation
+// @desc    set userLocation Value
+// @access  private
+router.post("/setUserLocation", [middleware.auth], async (req, res) => {
+  const id = req.user.id;
+  const { latitude, longitude, error } = req.body.data;
+  const result = await profileModel.getResultByRow("set_from_map", id);
+  if (error) {
+    if (error && !result) {
+      const ipAddress = await publicIp.v4();
+      iplocation(ipAddress, [], async (error, resp) => {
+        if (!error) {
+          if (
+            await profileModel.updateGeoLocation(
+              resp.latitude,
+              resp.longitude,
+              id
+            )
+          )
+            return res.status(200).send("user didn't accepte set location");
+        } else {
+          res.status(200).send("error in getting ip address");
+        }
+      });
+    } else {
+      return res.status(200).send("set_from_map TRUE");
+    }
+  } else {
+    if (!result) {
+      if (await profileModel.updateGeoLocation(latitude, longitude, id)) {
+        return res.status(200).send("USER ACCEPTE");
+      }
+    } else {
+      return res.status(200).send("set_from_map TRUE ");
+    }
+  }
+});
 
 // @route   Get api/profle/getpreedefined
 // @desc    get preedefined data

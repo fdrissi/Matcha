@@ -5,7 +5,8 @@ import {
   setUserCover,
   getUserInfo,
   updateUserInfo,
-  getpreedefined
+  getpreedefined,
+  setUserLocation
 } from "../../actions/profileAction";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
@@ -41,6 +42,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Alert from "../inc/Alert";
 import { FormHelperText } from "@material-ui/core";
+import { usePosition } from "../inc/usePosition";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -141,7 +143,7 @@ function EditProfile() {
   const [isLoading, setisLoading] = useState(true);
   const [{ alert, profile, auth, operations }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
-  const htmlElRef = useRef(null);
+  const { latitude, longitude, error } = usePosition();
 
   const [myPhoto, setPhoto] = useState({
     id: "",
@@ -163,6 +165,7 @@ function EditProfile() {
     user_city: "",
     user_current_occupancy: "",
     user_biography: "",
+    user_set_from_map: "",
     user_location: {
       lat: "",
       lng: ""
@@ -230,7 +233,6 @@ function EditProfile() {
       }));
     }
   };
-  console.log(operations);
 
   if (alert.msg !== "")
     setTimeout(() => {
@@ -257,7 +259,6 @@ function EditProfile() {
   }, [stableDispatch, auth]);
 
   useEffect(() => {
-    console.log("wassap");
     setData(profile.info);
   }, [profile.info]);
 
@@ -269,6 +270,12 @@ function EditProfile() {
     }
     isFirstRun.current = false;
   }, [myPhoto.file, myPhoto.id, stableDispatch]);
+
+  useEffect(() => {
+    if (latitude || longitude || error) {
+      setUserLocation(latitude, longitude, error);
+    }
+  }, [latitude, longitude, error]);
   if (isLoading)
     return (
       <Container component="main" maxWidth="md">

@@ -17,15 +17,14 @@ user_country VARCHAR
 user_city VARCHAR
 (100) DEFAULT 'Khouribga',
 user_lat VARCHAR
-(20)  DEFAULT '32.879101'
-,
+(20),
 user_lng VARCHAR
-(20) DEFAULT '-6.91118'
-,
+(20),
  user_current_occupancy ENUM
 ('Student', 'Employer', 'None') DEFAULT 'None',
 user_biography VARCHAR
 (255),
+set_from_map boolean DEFAULT FALSE,
 info_verified boolean DEFAULT FALSE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
