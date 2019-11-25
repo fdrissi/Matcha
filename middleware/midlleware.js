@@ -250,10 +250,23 @@ module.exports = middleware = {
       birthday: ""
     };
     const { data } = req.body;
-    console.log(data);
     // check user_gender value
-    if (!arrayContains(data.user_gender, ["Famel", "Male"])) {
-      return res.json({ success: false, errorMsg: "Gender Not Existe 🤥" });
+    if (!arrayContains(data.user_gender, ["Female", "Male"])) {
+      return res.json({
+        success: false,
+        errorMsg: "Gender Not Existe 🤥",
+        errors
+      });
+    }
+    // check user INTERESTS value
+    if (
+      !arrayContains(data.user_gender_interest, ["Bisexual", "Female", "Male"])
+    ) {
+      return res.json({
+        success: false,
+        errorMsg: "Gender Interest Not Existe 🤥",
+        errors
+      });
     }
     // check user_relationship value
     if (
@@ -266,15 +279,7 @@ module.exports = middleware = {
     ) {
       errors.relationship = "RelationShip Value Doesn't Exist";
     }
-    // check user INTERESTS value
-    if (
-      !arrayContains(data.user_gender_interest, ["Bisexual", "Female", "Male"])
-    ) {
-      return res.json({
-        success: false,
-        errorMsg: "Gender Interest Not Existe 🤥"
-      });
-    }
+
     // check user_current_occupancy value
     if (
       !arrayContains(data.user_current_occupancy, [
@@ -292,10 +297,12 @@ module.exports = middleware = {
         errors.city = "The City Name is Not Valide ";
       }
     }
-    errors.city = "The City Name is Not Valide ";
 
     // Check user Birth values
+
     if (data.user_birth_day || data.user_birth_month || data.user_birth_year) {
+      if (data.user_birth_day && !data.user_birth_month && data.user_birth_year)
+        data.user_birth_month = "01";
       if (
         data.user_birth_day &&
         data.user_birth_month &&
@@ -309,6 +316,12 @@ module.exports = middleware = {
         if (!date.isValid()) {
           errors.birthday = "Not Valide";
         }
+        const found = predefined[1].some(
+          item => item.value === data.user_birth_month
+        );
+        if (!found) {
+          errors.birth_month = "Month Value Not Existe";
+        }
       }
       if (!data.user_birth_day) {
         errors.birth_day = "Require";
@@ -318,15 +331,21 @@ module.exports = middleware = {
       }
       if (!data.user_birth_year) {
         errors.birth_year = "Require";
+      } else {
+        let regex = /^(190[5-9]|19[0-9]\d|200\d|201[0-6])$/;
+        if (!regex.test(data.user_birth_year))
+          errors.birth_year = "13 is the minimum age";
+        errors.birthday = errors.birth_year;
       }
     }
     // validate user Biographie Value
     if (data.user_biography) {
-      let regex = /^[a-zA-Z]{10,100}$/;
+      let regex = /^(?=[\s\S]{15,200}$).*/;
       if (!regex.test(data.user_biography))
         errors.biography =
-          "Your biography should be between 15 and 100 character";
+          "Your biography should be between 15 and 200 character";
     }
+
     // check user tags valuse
     if (data.user_tags.length > 0) {
       let regex = /^[a-zA-Z]{3,14}$/;
@@ -340,7 +359,7 @@ module.exports = middleware = {
       return res.json({
         success: false,
         errors,
-        errorMsg: "Unsuccessful Update 😬"
+        errorMsg: "Unsuccessful Update 🤕"
       });
     // check user_birth value
     next();

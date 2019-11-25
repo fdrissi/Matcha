@@ -17,13 +17,14 @@ export const profileInitState = {
     user_birth_month: "",
     user_gender_interest: "",
     user_birth_year: "",
-    user_tags: [],
+    user_tags: "",
     user_city: "",
     user_current_occupancy: "",
     user_biography: "",
+    user_set_from_map: null,
     user_location: {
-      lat: '',
-      lng: ''
+      lat: "",
+      lng: ""
     }
   }
 };

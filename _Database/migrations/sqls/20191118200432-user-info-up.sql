@@ -12,20 +12,19 @@ user_gender_interest ENUM
 user_tags varchar
 (255),
     user_birth date,
-    user_interests varchar
-(255),
 user_country VARCHAR
 (10) NOT NULL DEFAULT 'MOROCCO',
 user_city VARCHAR
-(15),
-user_lat VARCHAR (15)  DEFAULT '32.879101'
-,
-user_lng VARCHAR (15) DEFAULT '-6.91118'
-,
+(100) DEFAULT 'Khouribga',
+user_lat VARCHAR
+(20),
+user_lng VARCHAR
+(20),
  user_current_occupancy ENUM
 ('Student', 'Employer', 'None') DEFAULT 'None',
 user_biography VARCHAR
 (255),
+set_from_map boolean DEFAULT FALSE,
 info_verified boolean DEFAULT FALSE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
