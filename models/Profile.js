@@ -201,78 +201,95 @@ async function updateUserInfo(data, id) {
   }
 }
 
-async function getUserLikeProfileRow(userId, profileId) {
+async function isUserLikedProfile(userId, profileId) {
   try {
     let sql =
-      "SELECT * FROM user_likes WHERE id_user_one = ? AND id_user_two = ?";
-    let result = await pool.query(sql, [userId, profileId]);
-    if (result[0].length > 0) return [result[0][0].id, true];
-    sql = "SELECT * FROM user_likes WHERE id_user_one = ? AND id_user_two = ?";
-    result = await pool.query(sql, [profileId, userId]);
-    if (result[0].length > 0) return [result[0][0].id, false];
-    return false;
+      "SELECT * FROM user_likes WHERE id_user_one = ? AND id_user_two = ? OR id_user_two = ? AND id_user_one = ?";
+    let result = await pool.query(sql, [userId, profileId, userId, profileId]);
+    return result[0].length > 0 ? true : false;
   } catch (error) {
     return false;
   }
 }
 
-async function isUserLikeProfile(data) {
-  let sql;
-  if (data && data[1]) {
-    sql = "SELECT * FROM user_likes WHERE user1_liked_user2 = ? AND id = ?";
-  } else if (data && !data[1]) {
-    sql = "SELECT * FROM user_likes WHERE user2_liked_user1 = ? AND id = ?";
-  } else return userLikeProfile(data, userId, profileId);
-  let [result] = await pool.query(sql, [true, data[0]]);
-  return result[0] ? true : false;
+async function likeStatus(userId, profileId) {
+  try {
+    let sql =
+      "SELECT * FROM user_likes WHERE id_user_one = ? AND id_user_two = ? OR id_user_two = ? AND id_user_one = ?";
+    let [result] = await pool.query(sql, [
+      userId,
+      profileId,
+      userId,
+      profileId
+    ]);
+    if (result[0].id_user_one === userId && result[0].id_user_two === profileId)
+      return !!result[0].user1_liked_user2;
+    return !!result[0].user2_liked_user1;
+  } catch (error) {
+    return false;
+  }
 }
 
-async function userLikeProfileById(userId, profileId) {
-  const data = await getUserLikeProfileRow(userId, profileId);
-  let sql;
-  if (data && data[1]) {
-    sql = "UPDATE user_likes SET user1_liked_user2 = ? where id = ?";
-  } else if (data && !data[1]) {
-    sql = "UPDATE user_likes SET user2_liked_user1 = ? where id = ?";
-  } else return userLikeProfile(data, userId, profileId);
-  let [result] = await pool.query(sql, [true, data[0]]);
-  await checkMatch(data[0]);
-  return result;
+async function likeUnlikeProfile(userId, profileId) {
+  try {
+    let sql =
+      "UPDATE  user_likes\
+    SET     user1_liked_user2 = IF(`id_user_one` = ? AND `id_user_two` = ?, NOT user1_liked_user2, user1_liked_user2),\
+            user2_liked_user1 = IF(`id_user_one` = ? AND `id_user_two` = ?, NOT user2_liked_user1, user2_liked_user1)\
+    WHERE   `id_user_one` = ? AND `id_user_two` = ? OR `id_user_one` = ? AND `id_user_two` = ?";
+    let result = await pool.query(sql, [
+      userId,
+      profileId,
+      profileId,
+      userId,
+      userId,
+      profileId,
+      profileId,
+      userId
+    ]);
+    checkMatch(userId, profileId);
+    return result ? true : false;
+  } catch (error) {
+    return false;
+  }
 }
 
 async function userLikeProfile(userId, profileId) {
   let sql =
     "INSERT INTO user_likes (`id_user_one`, `id_user_two`, `user1_liked_user2`, `user2_liked_user1`) VALUES(?, ?, ?, ?)";
   const [result] = await pool.query(sql, [userId, profileId, true, false]);
+  await checkMatch(userId, profileId);
   return result;
 }
 
-async function userUnlikeProfile(data) {
-  let sql;
-  if (data && data[1]) {
-    sql =
-      "UPDATE user_likes SET user1_liked_user2 = ?, matched = ? WHERE id = ? AND user1_liked_user2 = ?";
-  } else if (data && !data[1]) {
-    sql =
-      "UPDATE user_likes SET user2_liked_user1 = ?, matched = ? WHERE id = ? AND user2_liked_user1 = ?";
-  } else return false;
-  let [result] = await pool.query(sql, [false, false, data[0], true]);
-  return result.changedRows;
-}
+async function checkMatch(userId, profileId) {
+  try {
+    let sql =
+      "SELECT * FROM user_likes WHERE `id_user_one` = ? AND `id_user_two` = ? OR `id_user_one` = ? AND `id_user_two` = ?";
+    let [result] = await pool.query(sql, [
+      userId,
+      profileId,
+      profileId,
+      userId
+    ]);
 
-async function checkMatch(rowId) {
-  let sql = "SELECT * FROM user_likes WHERE id = ?";
-  let [result] = await pool.query(sql, [rowId]);
-  if (result[0].user1_liked_user2 && result[0].user2_liked_user1) {
-    sql = "UPDATE user_likes SET matched = ?";
-    [result] = await pool.query(sql, [true]);
+    if (result[0].user1_liked_user2 && result[0].user2_liked_user1) {
+      sql = "UPDATE user_likes SET matched = ?";
+      [result] = await pool.query(sql, [true]);
+    } else {
+      sql = "UPDATE user_likes SET matched = ?";
+      [result] = await pool.query(sql, [false]);
+    }
+  } catch (error) {
+    return false;
   }
 }
 
-async function areMatched(rowId) {
-  let sql = "SELECT * FROM user_likes WHERE id = ?";
-  let [result] = await pool.query(sql, [rowId]);
-  return result[0].matched;
+async function areMatched(userId, profileId) {
+  let sql =
+    "SELECT * FROM user_likes WHERE `id_user_one` = ? AND `id_user_two` = ? OR `id_user_one` = ? AND `id_user_two` = ?";
+  let [result] = await pool.query(sql, [userId, profileId, profileId, userId]);
+  return result.length > 0 ? !!result[0].matched : false;
 }
 
 async function getResultByRow(row, id) {
@@ -285,6 +302,53 @@ async function updateGeoLocation(latitude, longitude, id) {
   let sql = "UPDATE user_info SET user_lat = ?, user_lng = ? WHERE id = ?";
   await pool.query(sql, [latitude, longitude, id]);
   return true;
+}
+
+async function isUserBlockedProfile(userId, profileId) {
+  let sql = "SELECT * FROM user_block WHERE id_user = ? AND id_profile = ?";
+  const [result] = await pool.query(sql, [userId, profileId]);
+  return result.length > 0 ? !!result[0].blocked : false;
+}
+
+async function getBlockedProfileRow(userId, profileId) {
+  let sql = "SELECT * FROM user_block WHERE id_user = ? AND id_profile = ?";
+  const [result] = await pool.query(sql, [userId, profileId]);
+  return result[0] ? result[0].id : 0;
+}
+
+async function blockProfile(userId, profileId) {
+  let sql =
+    "INSERT INTO user_block (`id_user`, `id_profile`, `blocked`) VALUES (?, ?, ?)";
+  const [result] = await pool.query(sql, [userId, profileId, true]);
+  return result ? true : false;
+}
+
+async function blockProfileById(id, userId, profileId) {
+  const blocked = await isUserBlockedProfile(userId, profileId);
+  if (blocked) return await unblockProfile(id);
+  let sql = "UPDATE user_block SET blocked = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [true, id]);
+  return result ? true : false;
+}
+
+async function unblockProfile(id) {
+  let sql = "UPDATE user_block SET blocked = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [false, id]);
+  return result ? true : false;
+}
+
+async function reported(userId, profileId) {
+  let sql = "SELECT * FROM user_reports WHERE id_user = ? AND id_profile = ?";
+  const [result] = await pool.query(sql, [userId, profileId]);
+  return result.length > 0 ? true : false;
+}
+
+async function reportProfile(userId, profileId) {
+  if (await reported(userId, profileId)) return false;
+  let sql =
+    "INSERT INTO `user_reports` (`id_user`, `id_profile`) VALUES (?, ?)";
+  const [result] = await pool.query(sql, [userId, profileId]);
+  return result ? true : false;
 }
 
 module.exports = {
@@ -301,12 +365,17 @@ module.exports = {
   setImageCover,
   getUserInfo,
   updateUserInfo,
-  getUserLikeProfileRow,
+  isUserLikedProfile,
+  likeStatus,
+  likeUnlikeProfile,
   userLikeProfile,
-  userLikeProfileById,
-  userUnlikeProfile,
   areMatched,
-  isUserLikeProfile,
   getResultByRow,
-  updateGeoLocation
+  updateGeoLocation,
+  isUserBlockedProfile,
+  getBlockedProfileRow,
+  blockProfileById,
+  blockProfile,
+  unblockProfile,
+  reportProfile
 };

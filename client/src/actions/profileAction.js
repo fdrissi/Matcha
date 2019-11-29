@@ -205,14 +205,13 @@ export const updateUserInfo = async (mydata, dispatch) => {
 };
 
 export const setUserLocation = async (latitude, longitude, error) => {
-  console.log("test");
   const config = {
     header: {
       "Content-Type": "application/json"
     }
   };
 
-  const res = await axios.post(
+  await axios.post(
     "api/profile/setUserLocation",
     { data: { latitude, longitude, error } },
     config
@@ -222,12 +221,12 @@ export const setUserLocation = async (latitude, longitude, error) => {
 export const getpreedefined = async () => {
   const res = await axios.get("api/profile/getpreedefined");
   if (res.data.success) {
-    console.log(res.data.predefined);
+    //console.log(res.data.predefined);
     return res.data.predefined;
   }
 };
 
-export const likeProfile = async (profileId, dispatch) => {
+export const likeProfile = async profileId => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -235,25 +234,94 @@ export const likeProfile = async (profileId, dispatch) => {
   };
   try {
     const res = await axios.post(
-      "api/profile/likeUser",
+      "/api/profile/userLikeProfile",
       {
         profile: { id: profileId }
       },
       config
     );
-    if (res.data.success) {
-    } else {
-      dispatch({
-        type: FAILIED_UPDATE_USER,
-        payload: res.data
-      });
-      dispatch({
-        type: SET_ALERT,
-        payload: {
-          alertType: "danger",
-          msg: res.data.errorMsg
-        }
-      });
+    return res.data.success;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const likedProfile = async profileId => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
     }
-  } catch (error) {}
+  };
+  try {
+    const res = await axios.post(
+      "/api/profile/isUserLikedProfile",
+      {
+        profile: { id: profileId }
+      },
+      config
+    );
+    return res.data.success;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const blockProfile = async profileId => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    const res = await axios.post(
+      "/api/profile/userBlockProfile",
+      {
+        profile: { id: profileId }
+      },
+      config
+    );
+    return res.data.success;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const isProfileBlocked = async profileId => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    const res = await axios.post(
+      "/api/profile/isUserBlockedProfile",
+      {
+        profile: { id: profileId }
+      },
+      config
+    );
+    return res.data.success;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const reportProfile = async profileId => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    const res = await axios.post(
+      "/api/profile/reportProfile",
+      {
+        profile: { id: profileId }
+      },
+      config
+    );
+    return res.data.success;
+  } catch (error) {
+    return false;
+  }
 };

@@ -1,6 +1,11 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useUserStore } from "../../Context/appStore";
-import { getUserInfo, getUserImages } from "../../actions/profileAction";
+import {
+  getUserInfo,
+  getUserImages,
+  likeProfile,
+  likedProfile
+} from "../../actions/profileAction";
 import Moment from "react-moment";
 import {
   makeStyles,
@@ -18,8 +23,11 @@ import {
 } from "@material-ui/core";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
+import ThumbDownAltIcon from "@material-ui/icons/ThumbDownAlt";
 import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
 import Image from "material-ui-image";
+import io from "socket.io-client";
+const socket = io("http://localhost:5000");
 
 const useStyles = makeStyles(() => ({
   cover: {
@@ -126,24 +134,42 @@ const UserInfo = () => {
 const ProfileImage = () => {
   const classes = useStyles();
   const [{ profile }] = useUserStore();
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    const getBlocked = async () => {
+      const result = await likedProfile(profile.info.id);
+      setBlocked(result);
+    };
+    getBlocked();
+  }, [profile]);
+
   return (
     <>
       <Avatar
         alt="Profile"
         src={`/uploads/${profile.photo.profile_Image}`}
         className={classes.avatar}
+        style={{ border: blocked && "red 5px solid" }}
       />
     </>
   );
 };
-
-const options = ["Block", "Report"];
 
 const ITEM_HEIGHT = 48;
 
 const LongMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const [{ profile }] = useUserStore();
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    const getBlocked = async () => {
+      setBlocked(await likedProfile(profile.info.id));
+    };
+    getBlocked();
+  }, [profile]);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -178,11 +204,10 @@ const LongMenu = () => {
           }
         }}
       >
-        {options.map(option => (
-          <MenuItem key={option} onClick={handleClose}>
-            {option}
-          </MenuItem>
-        ))}
+        <MenuItem onClick={handleClose}>
+          {blocked ? "Unblock" : "Block"}
+        </MenuItem>
+        <MenuItem onClick={handleClose}>{"Report"}</MenuItem>
       </Menu>
     </>
   );
@@ -234,6 +259,17 @@ export const Cover = ({ children, img = "/img/banner-brwose.jpg" }) => {
 
 const ProfileHeader = () => {
   const [{ auth, profile }] = useUserStore();
+  const [liked, setLiked] = useState(false);
+
+  const handleClick = async () => setLiked(await likeProfile(profile.info.id));
+
+  useEffect(() => {
+    (async () => {
+      const result = await likedProfile(profile.info.id);
+      setLiked(result);
+    })();
+  }, [profile]);
+
   return (
     <Cover img={"/uploads/" + profile.photo.cover_Image}>
       <UserAllInfoContainer>
@@ -253,7 +289,15 @@ const ProfileHeader = () => {
               <InfoContainer>
                 {auth.userInfo.id === parseInt(profile.info.id) && (
                   <>
-                    <ButtonRed icon={<ThumbUpAltIcon />} />
+                    <ButtonRed
+                      icon={
+                        liked ? (
+                          <ThumbDownAltIcon onClick={handleClick} />
+                        ) : (
+                          <ThumbUpAltIcon onClick={handleClick} />
+                        )
+                      }
+                    />
                     <ButtonRed icon={<QuestionAnswerIcon />} />
                     <LongMenu />
                   </>
@@ -413,12 +457,15 @@ export const Profile = ({ match }) => {
   let id = match.params.id;
 
   useEffect(() => {
-    console.log(profile, auth);
+    socket.emit("login", profile.info.id);
+    socket.on("login", data => console.log("user", data));
   }, [profile]);
 
   useEffect(() => {
-    getUserInfo(stableDispatch, id);
-    getUserImages(stableDispatch, id);
+    (async () => {
+      await getUserInfo(stableDispatch, id);
+      await getUserImages(stableDispatch, id);
+    })();
   }, [stableDispatch, id]);
 
   const imgs = [
@@ -440,6 +487,7 @@ export const Profile = ({ match }) => {
     }
   ];
 
+  if (profile.photo.loading || profile.info.loading) return null;
   return (
     <div style={{ flex: 1 }}>
       <CssBaseline />

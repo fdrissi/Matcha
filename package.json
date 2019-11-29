@@ -41,6 +41,7 @@
     "nodemailer": "^6.3.1",
     "public-ip": "^3.2.0",
     "react-history": "^0.18.2",
+    "socket.io": "^2.3.0",
     "use-combined-reducers": "^1.0.4",
     "uuid": "^3.3.3"
   },
