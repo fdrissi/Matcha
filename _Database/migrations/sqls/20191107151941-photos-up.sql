@@ -1,4 +1,3 @@
-/* Replace with your SQL commands */
 CREATE TABLE photos
 (
     id int PRIMARY Key AUTO_INCREMENT,
@@ -13,7 +12,7 @@ CREATE TABLE photos
     fourth_Image varchar
 (255) NOT NULL DEFAULT 'photo_holder.png',
     cover_Image varchar
-(255) NOT NULL DEFAULT 'cover_holder.png',
+(255) NOT NULL DEFAULT 'cover_holder.jpg',
     `counter` int
 (11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

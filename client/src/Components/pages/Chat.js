@@ -13,7 +13,7 @@ const LoadChat = () => {
 const SubmitBox = () => {
   const [message, setMessage] = useState("");
   const onChange = e => setMessage(e.target.value);
-  const onSubmit = form => {};
+  //const onSubmit = form => {};
   return (
     <form>
       <Box display="flex" flexWrap="wrap" alignItems="center">

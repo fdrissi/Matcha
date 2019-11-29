@@ -1,6 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useUserStore } from "../../Context/appStore";
-import { getUserInfo, getUserImages } from "../../actions/profileAction";
+import {
+  getUserInfo,
+  getUserImages,
+  likeProfile,
+  likedProfile
+} from "../../actions/profileAction";
+import Moment from "react-moment";
 import {
   makeStyles,
   Avatar,
@@ -17,8 +23,11 @@ import {
 } from "@material-ui/core";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
+import ThumbDownAltIcon from "@material-ui/icons/ThumbDownAlt";
 import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
 import Image from "material-ui-image";
+import io from "socket.io-client";
+const socket = io("http://localhost:5000");
 
 const useStyles = makeStyles(() => ({
   cover: {
@@ -88,19 +97,34 @@ const useStyles = makeStyles(() => ({
     fontWeight: "bold",
     fontSize: "16px",
     color: "##334249"
+  },
+  title: {
+    fontWeight: "bold",
+    color: "#2e3c43",
+    fontSize: "30px",
+    paddingBottom: "10px"
   }
 }));
 
 const UserInfo = () => {
   const classes = useStyles();
   const [{ auth, profile }] = useUserStore();
+  let date =
+    profile.info.user_birth_year &&
+    `${profile.info.user_birth_year}-${profile.info.user_birth_month}-${profile.info.user_birth_day}`;
   return (
     <>
       <h3 className={classes.name}>{auth.userInfo.first_name}</h3>
-      <h4 className={classes.info}>Age</h4>
+      <h4 className={classes.info}>
+        {date && (
+          <Moment format="YYYY-MM-DD" fromNow ago>
+            {date}
+          </Moment>
+        )}
+      </h4>
       <br />
       <h4 className={classes.info} style={{ marginRight: "5%" }}>
-        Country, City
+        Morocco, {profile.info.user_city}
       </h4>
       <h4 className={classes.info}>FameRate</h4>
     </>
@@ -110,24 +134,42 @@ const UserInfo = () => {
 const ProfileImage = () => {
   const classes = useStyles();
   const [{ profile }] = useUserStore();
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    const getBlocked = async () => {
+      const result = await likedProfile(profile.info.id);
+      setBlocked(result);
+    };
+    getBlocked();
+  }, [profile]);
+
   return (
     <>
       <Avatar
         alt="Profile"
         src={`/uploads/${profile.photo.profile_Image}`}
         className={classes.avatar}
+        style={{ border: blocked && "red 5px solid" }}
       />
     </>
   );
 };
-
-const options = ["Block", "Report"];
 
 const ITEM_HEIGHT = 48;
 
 const LongMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const [{ profile }] = useUserStore();
+  const [blocked, setBlocked] = useState(false);
+
+  useEffect(() => {
+    const getBlocked = async () => {
+      setBlocked(await likedProfile(profile.info.id));
+    };
+    getBlocked();
+  }, [profile]);
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -162,11 +204,10 @@ const LongMenu = () => {
           }
         }}
       >
-        {options.map(option => (
-          <MenuItem key={option} onClick={handleClose}>
-            {option}
-          </MenuItem>
-        ))}
+        <MenuItem onClick={handleClose}>
+          {blocked ? "Unblock" : "Block"}
+        </MenuItem>
+        <MenuItem onClick={handleClose}>{"Report"}</MenuItem>
       </Menu>
     </>
   );
@@ -203,15 +244,34 @@ const UserAllInfoContainer = ({ children }) => {
 export const Cover = ({ children, img = "/img/banner-brwose.jpg" }) => {
   const classes = useStyles();
   return (
-    <div className={classes.cover} style={{ backgroundImage: `url(${img})` }}>
+    <div
+      className={classes.cover}
+      style={{
+        backgroundImage: `url(${img})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center center"
+      }}
+    >
       {children}
     </div>
   );
 };
 
 const ProfileHeader = () => {
+  const [{ auth, profile }] = useUserStore();
+  const [liked, setLiked] = useState(false);
+
+  const handleClick = async () => setLiked(await likeProfile(profile.info.id));
+
+  useEffect(() => {
+    (async () => {
+      const result = await likedProfile(profile.info.id);
+      setLiked(result);
+    })();
+  }, [profile]);
+
   return (
-    <Cover>
+    <Cover img={"/uploads/" + profile.photo.cover_Image}>
       <UserAllInfoContainer>
         <Container>
           <Box display="flex" flexWrap="wrap" alignItems="center">
@@ -227,9 +287,21 @@ const ProfileHeader = () => {
             </Box>
             <Box flexGrow={1}>
               <InfoContainer>
-                <ButtonRed icon={<ThumbUpAltIcon />} />
-                <ButtonRed icon={<QuestionAnswerIcon />} />
-                <LongMenu />
+                {auth.userInfo.id === parseInt(profile.info.id) && (
+                  <>
+                    <ButtonRed
+                      icon={
+                        liked ? (
+                          <ThumbDownAltIcon onClick={handleClick} />
+                        ) : (
+                          <ThumbUpAltIcon onClick={handleClick} />
+                        )
+                      }
+                    />
+                    <ButtonRed icon={<QuestionAnswerIcon />} />
+                    <LongMenu />
+                  </>
+                )}
               </InfoContainer>
             </Box>
           </Box>
@@ -253,15 +325,26 @@ const Parameters = ({ values = [], liClassName }) => {
 };
 
 const ProfileContent = ({ classes }) => {
+  const [{ profile }] = useUserStore();
+  const {
+    user_gender,
+    user_city,
+    user_relationship,
+    user_gender_interest,
+    user_current_occupancy,
+    user_tags
+  } = profile.info;
+
   const values = [
-    "Male",
+    user_gender,
     "Morocco",
-    "Khouribga",
-    "Single",
-    "Women",
-    "Student",
-    "#Surfing #Computer"
+    user_city,
+    user_relationship,
+    user_gender_interest,
+    user_current_occupancy,
+    user_tags
   ];
+
   const params = [
     "Gender",
     "Country",
@@ -271,6 +354,7 @@ const ProfileContent = ({ classes }) => {
     "Occupancy",
     "Tags"
   ];
+
   return (
     <Grid container className={classes.border}>
       <ProfileContentContainer>
@@ -308,20 +392,11 @@ const ProfileContentContainer = ({ children }) => {
 const AboutMe = ({ classes, text }) => {
   return (
     <div className={classes.border}>
-      <h4
-        style={{
-          fontWeight: "bold",
-          color: "#2e3c43",
-          fontSize: "30px",
-          paddingBottom: "10px"
-        }}
-      >
-        About Me
-      </h4>
+      <h4 className={classes.title}>About Me</h4>
       <img
         src={"/img/widget-title-border.png"}
         alt="wrap"
-        style={{ display: "block", marginBottom: "5%" }}
+        style={{ display: "block", marginBottom: "1%" }}
       />
       <p>{text}</p>
     </div>
@@ -330,8 +405,10 @@ const AboutMe = ({ classes, text }) => {
 
 const Gallery = ({ images }) => {
   const [open, setOpen] = React.useState(false);
+  const [src, setSrc] = React.useState(null);
 
-  const handleOpen = () => {
+  const handleOpen = e => {
+    setSrc(e.target.src);
     setOpen(true);
   };
 
@@ -340,12 +417,12 @@ const Gallery = ({ images }) => {
   };
 
   return (
-    <div style={{ margin: "0 auto 5%", width: "100%" }}>
+    <div style={{ margin: "4% auto 5%", width: "100%" }}>
       <h3>Photo</h3>
       <img
         src={"/img/widget-title-border.png"}
         alt="wrap"
-        style={{ display: "block" }}
+        style={{ display: "block", marginBottom: "2%" }}
       />
       {images.map(img => {
         return (
@@ -358,11 +435,11 @@ const Gallery = ({ images }) => {
               marginRight: "16%"
             }}
           >
-            <Image src={img.src} alt="Gallery" onClick={handleOpen} />
+            <Image src={img.src} alt="Gallery" onClick={e => handleOpen(e)} />
             {open && (
               <Dialog open={open} onClose={handleClose} fullWidth>
                 <DialogContent>
-                  <Image src={img.src} alt="Show Image" />
+                  <Image src={src} alt="Show Image" />
                 </DialogContent>
               </Dialog>
             )}
@@ -375,15 +452,21 @@ const Gallery = ({ images }) => {
 
 export const Profile = ({ match }) => {
   const classes = useStyles();
-  const [{ auth, alert, profile }, dispatch] = useUserStore();
+  const [{ auth, profile }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
   let id = match.params.id;
+
   useEffect(() => {
-    console.log(profile);
+    socket.emit("login", profile.info.id);
+    socket.on("login", data => console.log("user", data));
   }, [profile]);
+
   useEffect(() => {
-    getUserInfo(dispatch, id);
-    getUserImages(dispatch, id);
-  }, []);
+    (async () => {
+      await getUserInfo(stableDispatch, id);
+      await getUserImages(stableDispatch, id);
+    })();
+  }, [stableDispatch, id]);
 
   const imgs = [
     {
@@ -403,6 +486,8 @@ export const Profile = ({ match }) => {
       src: `/uploads/${profile.photo.third_Image}`
     }
   ];
+
+  if (profile.photo.loading || profile.info.loading) return null;
   return (
     <div style={{ flex: 1 }}>
       <CssBaseline />
@@ -412,13 +497,16 @@ export const Profile = ({ match }) => {
       <Container>
         <Grid container spacing={2}>
           <Grid item lg={8} sm={12}>
-            <ProfileContent classes={classes} />
-            <AboutMe
-              classes={classes}
-              text={
-                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
-              }
+            <h4 className={classes.title}>Profile Info</h4>
+            <img
+              src={"/img/widget-title-border.png"}
+              alt="wrap"
+              style={{ display: "block", marginBottom: "1%" }}
             />
+            <ProfileContent classes={classes} />
+            {profile.info.user_biography && (
+              <AboutMe classes={classes} text={profile.info.user_biography} />
+            )}
           </Grid>
           <Grid item lg={4} xs={12}>
             <Gallery images={imgs} />

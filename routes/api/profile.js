@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const middleware = require("../../middleware/midlleware");
 const profileModel = require("../../models/Profile");
+const userModel = require("../../models/User");
 const fs = require("file-system");
 const { promisify } = require("util");
 const Jimp = require("jimp");
@@ -94,11 +95,15 @@ router.post(
 // @desc    Get user images
 // @access  Private
 router.get("/getImage", [middleware.auth], async (req, res) => {
-  const id = req.query.id ? req.query.id : req.user.id;
+  const id =
+    req.query.id && (await userModel.findById(req.query.id))
+      ? req.query.id
+      : req.user.id;
   const result = await profileModel.getImage(id);
   if (result) {
     delete result.id;
     delete result.counter;
+    result.loading = false;
     // for (var k in result) payload[k] = result[k];
     return res.json({
       success: true,
@@ -215,14 +220,19 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
 // @desc    get user info
 // @access  Private
 router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
-  const id = req.query.id ? req.query.id : req.user.id;
+  const id =
+    req.query.id && (await userModel.findById(req.query.id))
+      ? req.query.id
+      : req.user.id;
   const result = await profileModel.getUserInfo(id);
   var obj = JSON.parse(result.user_tags);
   const [year, month, day] = result.user_birth
     ? result.user_birth.split("-")
     : "";
-  console.log(result);
+
   const my_info = {
+    loading: false,
+    id,
     user_gender: result.user_gender,
     user_relationship: result.user_relationship,
     user_birth_day: day,
@@ -237,6 +247,7 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
       lat: parseFloat(result.user_lat, 10),
       lng: parseFloat(result.user_lng, 10)
     },
+    user_online: result.online,
     user_set_from_map: result.set_from_map
   };
   let get_info = JSON.stringify(my_info, function(key, value) {
@@ -349,6 +360,148 @@ router.get("/getpreedefined", async (req, res) => {
     res.json({
       success: true,
       predefined
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Post api/profle/likeUser
+// @desc    Like, unlike profile
+// @access  Private
+router.post("/userLikeProfile", middleware.auth, async (req, res) => {
+  const { profile } = req.body;
+  const id = req.user.id;
+  if (id === parseInt(profile.id))
+    return res.json({
+      success: false
+    });
+  try {
+    //if user already liked this profile, unlike it, else like
+    let result = await profileModel.isUserLikedProfile(id, profile.id);
+    console.log(result);
+    result = result
+      ? await profileModel.likeUnlikeProfile(id, profile.id)
+      : await profileModel.userLikeProfile(id, profile.id);
+
+    if (result)
+      return res.json({
+        success: true
+      });
+    return res.json({
+      success: false
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Post api/profle/isUserLikeProfile
+// @desc    is user already liked specific profile
+// @access  Private
+router.post("/isUserLikedProfile", middleware.auth, async (req, res) => {
+  const { profile } = req.body;
+  const id = req.user.id;
+  if (id === parseInt(profile.id))
+    return res.json({
+      success: false
+    });
+  try {
+    //return true if user already liked profile
+    let result = await profileModel.isUserLikedProfile(id, profile.id);
+    result = result && (await profileModel.likeStatus(id, profile.id));
+
+    return res.json({
+      success: result
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Post api/profle/areMatched
+// @desc    is user already liked specific profile
+// @access  Private
+router.post("/areMatched", middleware.auth, async (req, res) => {
+  const { profile } = req.body;
+  const id = req.user.id;
+  if (id === parseInt(profile.id))
+    return res.json({
+      success: false
+    });
+  try {
+    //return true if user already liked profile
+    let result = await profileModel.areMatched(id, profile.id);
+    return res.json({
+      success: result
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Post api/profle/areMatched
+// @desc    is user already liked specific profile
+// @access  Private
+router.post("/userBlockProfile", middleware.auth, async (req, res) => {
+  const { profile } = req.body;
+  const id = req.user.id;
+  if (id === parseInt(profile.id))
+    return res.json({
+      success: false
+    });
+  try {
+    //If user already blocked profile, ublock, else block it
+    let result = await profileModel.getBlockedProfileRow(id, profile.id);
+    result = result
+      ? await profileModel.blockProfileById(result, id, profile.id)
+      : await profileModel.blockProfile(id, profile.id);
+    return res.json({
+      success: result
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Post api/profle/isUserBlockedProfile
+// @desc    is user already Blocked a specific profile
+// @access  Private
+router.post("/isUserBlockedProfile", middleware.auth, async (req, res) => {
+  const { profile } = req.body;
+  const id = req.user.id;
+  if (id === parseInt(profile.id))
+    return res.json({
+      success: false
+    });
+  try {
+    //return true if user already blocked profile
+    let result = await profileModel.isUserBlockedProfile(id, profile.id);
+
+    return res.json({
+      success: result
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Post api/profle/isUserBlockedProfile
+// @desc    Report a specific profile
+// @access  Private
+router.post("/reportProfile", middleware.auth, async (req, res) => {
+  const { profile } = req.body;
+  const id = req.user.id;
+  if (id === parseInt(profile.id))
+    return res.json({
+      success: false
+    });
+  try {
+    //if profile not already reported, report it
+    let result = await profileModel.reportProfile(id, profile.id);
+
+    return res.json({
+      success: result
     });
   } catch (error) {
     console.log(error);

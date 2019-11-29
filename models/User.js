@@ -28,7 +28,7 @@ async function register(data) {
       hash,
       token
     ]);
-    console.log(result);
+    //console.log(result);
     if (result.affectedRows) {
       sendActivation(data.email, data.userName, token);
       return result.affectedRows;
@@ -51,9 +51,13 @@ async function findByUsername(name) {
 }
 
 async function findById(id) {
-  let sql = `SELECT * FROM users WHERE id='${id}'`;
-  const [rows] = await pool.query(sql);
-  return rows[0];
+  try {
+    let sql = `SELECT * FROM users WHERE id='${id}'`;
+    const [rows] = await pool.query(sql);
+    return rows[0];
+  } catch (error) {
+    return false;
+  }
 }
 
 // check if the user alreay validate his account

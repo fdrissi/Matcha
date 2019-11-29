@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useUserStore } from "../../Context/appStore";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -55,6 +55,7 @@ const useStyles = makeStyles(theme => ({
 
 const Form = () => {
   const [{ auth, alert, operations }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
   const classes = useStyles();
 
   const [formData, setFormData] = useState({
@@ -113,7 +114,7 @@ const Form = () => {
         email: auth.userInfo.email || ""
       }));
     }
-  }, [auth]);
+  }, [auth, email, userName, lastName, firstName]);
 
   useEffect(() => {
     setFormData(formData => ({
@@ -122,19 +123,19 @@ const Form = () => {
       confirmPassword: "",
       oldPassword: ""
     }));
-    loadUser(dispatch);
-  }, [alert.msg]);
+    loadUser(stableDispatch);
+  }, [alert.msg, stableDispatch]);
 
   useEffect(() => {
     return () => {
-      dispatch({
+      stableDispatch({
         type: REMOVE_ALERT
       });
-      dispatch({
+      stableDispatch({
         type: REMOVE_ERRORS
       });
     };
-  }, []);
+  }, [stableDispatch]);
 
   if (auth.loading) return null;
   return auth.loading ? null : (

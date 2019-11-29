@@ -3,6 +3,7 @@ import { INFO_SUCCESS } from "../actions/actionTypes";
 
 export const profileInitState = {
   photo: {
+    loading: true,
     profile_Image: "",
     cover_Image: "",
     first_Image: "",
@@ -11,6 +12,8 @@ export const profileInitState = {
     fourth_Image: ""
   },
   info: {
+    loading: true,
+    id: "",
     user_gender: "",
     user_relationship: "",
     user_birth_day: "",
@@ -22,6 +25,7 @@ export const profileInitState = {
     user_current_occupancy: "",
     user_biography: "",
     user_set_from_map: null,
+    user_online: false,
     user_location: {
       lat: "",
       lng: ""
