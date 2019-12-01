@@ -221,10 +221,15 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
 // @access  Private
 router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
   const id =
-    req.query.id && (await userModel.findById(req.query.id))
+    req.query.id && (await userModel.findById(+req.query.id))
       ? req.query.id
       : req.user.id;
-  const result = await profileModel.getUserInfo(id);
+  console.log("treeee", req.user.id, id);
+  const result = await profileModel.getUserInfo(+id);
+  const liked = await profileModel.likeStatus(+req.user.id, +id);
+  const blocked = await profileModel.isUserBlockedProfile(+req.user.id, id);
+  const matched = await profileModel.areMatched(+req.user.id, +id);
+  console.log(liked, blocked, matched);
   var obj = JSON.parse(result.user_tags);
   const [year, month, day] = result.user_birth
     ? result.user_birth.split("-")
@@ -232,7 +237,12 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
 
   const my_info = {
     loading: false,
+    liked,
+    matched,
+    blocked,
     id,
+    user_first_name: result.first_name,
+    user_last_name: result.last_name,
     user_gender: result.user_gender,
     user_relationship: result.user_relationship,
     user_birth_day: day,
@@ -378,11 +388,11 @@ router.post("/userLikeProfile", middleware.auth, async (req, res) => {
     });
   try {
     //if user already liked this profile, unlike it, else like
-    let result = await profileModel.isUserLikedProfile(id, profile.id);
+    let result = await profileModel.isUserLikedProfile(+id, +profile.id);
     console.log(result);
     result = result
-      ? await profileModel.likeUnlikeProfile(id, profile.id)
-      : await profileModel.userLikeProfile(id, profile.id);
+      ? await profileModel.likeUnlikeProfile(+id, +profile.id)
+      : await profileModel.userLikeProfile(+id, +profile.id);
 
     if (result)
       return res.json({
@@ -408,8 +418,8 @@ router.post("/isUserLikedProfile", middleware.auth, async (req, res) => {
     });
   try {
     //return true if user already liked profile
-    let result = await profileModel.isUserLikedProfile(id, profile.id);
-    result = result && (await profileModel.likeStatus(id, profile.id));
+    let result = await profileModel.isUserLikedProfile(+id, +profile.id);
+    result = result && (await profileModel.likeStatus(+id, +profile.id));
 
     return res.json({
       success: result
@@ -499,6 +509,40 @@ router.post("/reportProfile", middleware.auth, async (req, res) => {
   try {
     //if profile not already reported, report it
     let result = await profileModel.reportProfile(id, profile.id);
+
+    return res.json({
+      success: result
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Get api/profle/setUserOnline
+// @desc    set User Online
+// @access  private
+router.get("/setUserOnline", [middleware.auth], async (req, res) => {
+  const id = req.user.id;
+  try {
+    //if profile not already reported, report it
+    let result = await profileModel.setUserOnline(id);
+
+    return res.json({
+      success: result
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// @route   Get api/profle/setUserOffline
+// @desc    set User offline
+// @access  private
+router.get("/setUserOffline", [middleware.auth], async (req, res) => {
+  const id = req.user.id;
+  try {
+    //if profile not already reported, report it
+    let result = await profileModel.setUserOffline(id);
 
     return res.json({
       success: result

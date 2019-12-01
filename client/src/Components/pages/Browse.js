@@ -252,7 +252,7 @@ const Profile = ({ infos }) => {
             key={inf.id}
             style={{ margin: "0 4%" }}
             flexGrow={1}
-            onMouseEnter={handleClickOpen}
+            onClick={handleClickOpen}
           >
             <Avatar src={inf.img} alt={inf.name} className={classes.avatar} />
             <h5 style={{ textAlign: "center" }}>{inf.name}</h5>

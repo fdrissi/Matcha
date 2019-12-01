@@ -4,7 +4,11 @@ import {
   SET_ALERT,
   INFO_SUCCESS,
   FAILIED_UPDATE_USER,
-  REMOVE_ERRORS
+  REMOVE_ERRORS,
+  PROFILE_BLOCKED,
+  PROFILE_LIKED,
+  PROFILE_MATCHED,
+  PROFILE_REPORTED
 } from "./actionTypes";
 
 export const setUserImages = async (formData, row, dispatch) => {
@@ -142,6 +146,7 @@ export const getUserInfo = async (dispatch, id = null) => {
       "Content-Type": "application/json"
     }
   };
+  console.log("id action", id);
   try {
     const res = await axios.get(
       "/api/profile/getUserInfo",
@@ -226,7 +231,7 @@ export const getpreedefined = async () => {
   }
 };
 
-export const likeProfile = async profileId => {
+export const likeProfile = async (profileId, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -240,13 +245,13 @@ export const likeProfile = async profileId => {
       },
       config
     );
-    return res.data.success;
+    await isUserLikedProfile(profileId, dispatch);
   } catch (error) {
     return false;
   }
 };
 
-export const likedProfile = async profileId => {
+export const isUserLikedProfile = async (profileId, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -260,13 +265,17 @@ export const likedProfile = async profileId => {
       },
       config
     );
-    return res.data.success;
+    console.log("success", res.data.success);
+    dispatch({
+      type: PROFILE_LIKED,
+      payload: res.data.success
+    });
   } catch (error) {
     return false;
   }
 };
 
-export const blockProfile = async profileId => {
+export const blockProfile = async (profileId, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -280,13 +289,13 @@ export const blockProfile = async profileId => {
       },
       config
     );
-    return res.data.success;
+    await isProfileBlocked(profileId, dispatch);
   } catch (error) {
     return false;
   }
 };
 
-export const isProfileBlocked = async profileId => {
+export const isProfileBlocked = async (profileId, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -300,7 +309,11 @@ export const isProfileBlocked = async profileId => {
       },
       config
     );
-    return res.data.success;
+
+    dispatch({
+      type: PROFILE_BLOCKED,
+      payload: res.data.success
+    });
   } catch (error) {
     return false;
   }
@@ -320,6 +333,34 @@ export const reportProfile = async profileId => {
       },
       config
     );
+    return res.data.success;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const setUserOnline = async () => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    const res = await axios.get("/api/profile/setUserOnline", config);
+    return res.data.success;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const setUserOffline = async () => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    const res = await axios.get("/api/profile/setUserOffline", config);
     return res.data.success;
   } catch (error) {
     return false;

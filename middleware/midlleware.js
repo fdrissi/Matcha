@@ -5,6 +5,7 @@ const escapeSpecialChars = require("../helpers/escapeSpecialChars");
 const bcrypt = require("bcryptjs");
 const predefined = require("../routes/globals");
 const moment = require("moment");
+
 async function validateEmail(req) {
   req.body.email = req.body.email.toLowerCase().trim();
   const user = await userModel.findById(req.user.id);
