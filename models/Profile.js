@@ -154,7 +154,7 @@ async function fixPosition(id, row) {
 
 async function getUserInfo(id) {
   let sql =
-    "SELECT * , DATE_FORMAT(user_birth, '%Y-%m-%d') as user_birth FROM user_info WHERE id = ?";
+    "SELECT t2.first_name, t2.last_name, t1.* , DATE_FORMAT(t1.user_birth, '%Y-%m-%d') as user_birth FROM user_info t1 INNER JOIN users t2 ON t1.id = t2.id WHERE t1.id = ?";
   const [result] = await pool.query(sql, [id]);
   return result[0];
 }
@@ -222,8 +222,14 @@ async function likeStatus(userId, profileId) {
       userId,
       profileId
     ]);
-    if (result[0].id_user_one === userId && result[0].id_user_two === profileId)
+    if (
+      result[0].id_user_one === userId &&
+      result[0].id_user_two === profileId
+    ) {
+      console.log("model1", !!result[0].user1_liked_user2);
       return !!result[0].user1_liked_user2;
+    }
+    console.log("model2", !!result[0].user2_liked_user1);
     return !!result[0].user2_liked_user1;
   } catch (error) {
     return false;
@@ -351,6 +357,18 @@ async function reportProfile(userId, profileId) {
   return result ? true : false;
 }
 
+async function setUserOnline(userId) {
+  let sql = "UPDATE `user_info` SET `online` = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [true, userId]);
+  return result ? true : false;
+}
+
+async function setUserOffline(userId) {
+  let sql = "UPDATE `user_info` SET `online` = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [false, userId]);
+  return result ? true : false;
+}
+
 module.exports = {
   SetImage,
   getImage,
@@ -377,5 +395,7 @@ module.exports = {
   blockProfileById,
   blockProfile,
   unblockProfile,
-  reportProfile
+  reportProfile,
+  setUserOnline,
+  setUserOffline
 };

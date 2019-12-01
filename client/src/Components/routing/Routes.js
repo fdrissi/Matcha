@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
 import Login from "../auth/Login";
 import Register from "../auth/Register";
@@ -13,9 +13,18 @@ import Chat from "../pages/Chat";
 import Edit_Profile from "../profile/Edit_Profile";
 import PrivateRoute from "./PrivateRoute";
 import { useUserStore } from "../../Context/appStore";
+import { setUserOnline } from "../../actions/profileAction";
+import io from "socket.io-client";
+const socket = io("http://localhost:5000");
 
 const Routes = () => {
   const [{ auth }] = useUserStore();
+
+  useEffect(() => {
+    socket.emit("login", auth.userInfo.id);
+    //socket.on("login", data => data.users.length > 0 && setUserOnline());
+  }, [auth]);
+
   return (
     <div style={{ flex: 1 }}>
       <Switch>
