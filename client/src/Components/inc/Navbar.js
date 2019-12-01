@@ -84,9 +84,10 @@ const NavBtn = ({ text, link }) => (
   </Link>
 );
 
-const NavCircle = ({ user }) => {
+const NavCircle = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const [{ auth }] = useUserStore();
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -95,6 +96,8 @@ const NavCircle = ({ user }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  if (auth.loading) return null;
   return (
     <div>
       <IconButton
@@ -122,7 +125,7 @@ const NavCircle = ({ user }) => {
         open={open}
         onClose={handleClose}
       >
-        <Link to={`/profile/`}>
+        <Link to={`/profile/${auth.userInfo.id}`}>
           <MenuItem onClick={handleClose}>Profile</MenuItem>
         </Link>
         <MenuItem onClick={handleClose}>My account</MenuItem>

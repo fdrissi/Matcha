@@ -4,7 +4,8 @@ import {
   getUserInfo,
   getUserImages,
   likeProfile,
-  likedProfile
+  isUserLikedProfile,
+  blockProfile
 } from "../../actions/profileAction";
 import Moment from "react-moment";
 import {
@@ -108,13 +109,16 @@ const useStyles = makeStyles(() => ({
 
 const UserInfo = () => {
   const classes = useStyles();
-  const [{ auth, profile }] = useUserStore();
+  const [{ profile }] = useUserStore();
+
   let date =
     profile.info.user_birth_year &&
     `${profile.info.user_birth_year}-${profile.info.user_birth_month}-${profile.info.user_birth_day}`;
   return (
     <>
-      <h3 className={classes.name}>{auth.userInfo.first_name}</h3>
+      <h3 className={classes.name}>
+        {profile.info.user_first_name + " " + profile.info.user_last_name}
+      </h3>
       <h4 className={classes.info}>
         {date && (
           <Moment format="YYYY-MM-DD" fromNow ago>
@@ -133,24 +137,27 @@ const UserInfo = () => {
 
 const ProfileImage = () => {
   const classes = useStyles();
-  const [{ profile }] = useUserStore();
-  const [blocked, setBlocked] = useState(false);
+  const [{ auth, profile }] = useUserStore();
+  const [online, setOnline] = useState(false);
 
   useEffect(() => {
-    const getBlocked = async () => {
-      const result = await likedProfile(profile.info.id);
-      setBlocked(result);
-    };
-    getBlocked();
-  }, [profile]);
-
+    socket.on("login", data => {
+      data.users.indexOf(parseInt(profile.info.id)) > -1 && setOnline(true);
+    });
+  }, [profile, auth]);
   return (
     <>
       <Avatar
         alt="Profile"
         src={`/uploads/${profile.photo.profile_Image}`}
         className={classes.avatar}
-        style={{ border: blocked && "red 5px solid" }}
+        style={{
+          border: profile.info.blocked
+            ? "red 5px solid"
+            : online
+            ? "green 5px solid"
+            : "gray 5px solid"
+        }}
       />
     </>
   );
@@ -161,15 +168,7 @@ const ITEM_HEIGHT = 48;
 const LongMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const [{ profile }] = useUserStore();
-  const [blocked, setBlocked] = useState(false);
-
-  useEffect(() => {
-    const getBlocked = async () => {
-      setBlocked(await likedProfile(profile.info.id));
-    };
-    getBlocked();
-  }, [profile]);
+  const [{ profile }, dispatch] = useUserStore();
 
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
@@ -177,6 +176,11 @@ const LongMenu = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleBlock = async () => {
+    handleClose();
+    await blockProfile(profile.info.id, dispatch);
   };
 
   return (
@@ -204,8 +208,8 @@ const LongMenu = () => {
           }
         }}
       >
-        <MenuItem onClick={handleClose}>
-          {blocked ? "Unblock" : "Block"}
+        <MenuItem onClick={handleBlock}>
+          {profile.info.blocked ? "Unblock" : "Block"}
         </MenuItem>
         <MenuItem onClick={handleClose}>{"Report"}</MenuItem>
       </Menu>
@@ -258,18 +262,15 @@ export const Cover = ({ children, img = "/img/banner-brwose.jpg" }) => {
 };
 
 const ProfileHeader = () => {
-  const [{ auth, profile }] = useUserStore();
-  const [liked, setLiked] = useState(false);
+  const [{ auth, profile }, dispatch] = useUserStore();
 
-  const handleClick = async () => setLiked(await likeProfile(profile.info.id));
-
+  const handleClick = async () => {
+    await likeProfile(profile.info.id, dispatch);
+  };
   useEffect(() => {
-    (async () => {
-      const result = await likedProfile(profile.info.id);
-      setLiked(result);
-    })();
+    console.log("object", profile.info);
   }, [profile]);
-
+  console.log("liked", profile.info.liked);
   return (
     <Cover img={"/uploads/" + profile.photo.cover_Image}>
       <UserAllInfoContainer>
@@ -287,14 +288,14 @@ const ProfileHeader = () => {
             </Box>
             <Box flexGrow={1}>
               <InfoContainer>
-                {auth.userInfo.id === parseInt(profile.info.id) && (
+                {auth.userInfo.id !== parseInt(profile.info.id) && (
                   <>
                     <ButtonRed
                       icon={
-                        liked ? (
-                          <ThumbDownAltIcon onClick={handleClick} />
+                        profile.info.liked ? (
+                          <ThumbDownAltIcon onClick={() => handleClick()} />
                         ) : (
-                          <ThumbUpAltIcon onClick={handleClick} />
+                          <ThumbUpAltIcon onClick={() => handleClick()} />
                         )
                       }
                     />
@@ -454,18 +455,18 @@ export const Profile = ({ match }) => {
   const classes = useStyles();
   const [{ auth, profile }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
-  let id = match.params.id;
+  const id = match.params.id;
 
   useEffect(() => {
-    socket.emit("login", profile.info.id);
-    socket.on("login", data => console.log("user", data));
-  }, [profile]);
+    console.log(auth);
+  }, [auth]);
 
   useEffect(() => {
-    (async () => {
+    const info = async () => {
       await getUserInfo(stableDispatch, id);
       await getUserImages(stableDispatch, id);
-    })();
+    };
+    info();
   }, [stableDispatch, id]);
 
   const imgs = [
