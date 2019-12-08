@@ -457,9 +457,16 @@ const Header = () => {
       <Cover img={"/img/banner-brwose.jpg"}>
         <Grid xs={12} container item justify="center">
           <div>
-            <img src="./img/t-left-img.png" alt="left" />
-            <Title text={"Browse"} color="#FFF" classes={classes.title} />
-            <img src="./img/t-right-img.png" alt="right" />
+            <Typography
+              variant="h5"
+              id="range-slider"
+              gutterBottom
+              classes={classes.title}
+            >
+              <img src="./img/t-left-img.png" alt="left" />
+              Browse
+              <img src="./img/t-right-img.png" alt="right" />
+            </Typography>
           </div>
         </Grid>
       </Cover>
