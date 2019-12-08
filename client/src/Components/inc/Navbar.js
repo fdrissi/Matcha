@@ -226,37 +226,30 @@ export default function PrimarySearchAppBar() {
   const mobileMenuId = "primary-search-account-menu-mobile";
   const renderMobileMenu = (
     <>
-      {auth.isAuthenticated ? (
-        <Menu
-          anchorEl={mobileMoreAnchorEl}
-          anchorOrigin={{ vertical: "top", horizontal: "right" }}
-          id={mobileMenuId}
-          keepMounted
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
-          open={isMobileMenuOpen}
-          onClose={handleMobileMenuClose}
-        >
-          <MenuItem>
-            <NavNotifications />
-            <p>Notifications</p>
-          </MenuItem>
+      <Menu
+        anchorEl={mobileMoreAnchorEl}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        id={mobileMenuId}
+        keepMounted
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        open={isMobileMenuOpen}
+        onClose={handleMobileMenuClose}
+      >
+        <MenuItem>
+          <NavNotifications />
+          <p>Notifications</p>
+        </MenuItem>
 
-          <MenuItem>
-            <NavMessage />
-            <p>Messages</p>
-          </MenuItem>
+        <MenuItem>
+          <NavMessage />
+          <p>Messages</p>
+        </MenuItem>
 
-          <MenuItem>
-            <NavCircle user={auth.userInfo.username} />
-            <p>Profile</p>
-          </MenuItem>
-        </Menu>
-      ) : (
-        <Route>
-          <NavBtn text="Login" link="/Login" />
-          <NavBtn text="Register" link="/register" />
-        </Route>
-      )}
+        <MenuItem>
+          <NavCircle user={auth.userInfo.username} />
+          <p>Profile</p>
+        </MenuItem>
+      </Menu>
     </>
   );
 
