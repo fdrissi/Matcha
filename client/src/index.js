@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { UserProvider, useUserStore } from "./Context/appStore";
@@ -10,6 +10,8 @@ import Routes from "./Components/routing/Routes";
 import Footer from "./Components/inc/Footer";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
+import io from "socket.io-client";
+const socket = io("http://localhost:5000");
 
 const theme = createMuiTheme({
   typography: {
@@ -24,7 +26,12 @@ const theme = createMuiTheme({
 });
 
 function App() {
-  const [, dispatch] = useUserStore();
+  const [{ auth }, dispatch] = useUserStore();
+
+  useEffect(() => {
+    if (socket.listeners("login").length <= 1)
+      socket.emit("login", auth.userInfo.id);
+  }, [auth.userInfo.id]);
 
   return (
     <div

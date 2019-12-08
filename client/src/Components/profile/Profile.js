@@ -4,10 +4,10 @@ import {
   getUserInfo,
   getUserImages,
   likeProfile,
-  isUserLikedProfile,
-  blockProfile
+  blockProfile,
+  reportProfile,
+  recordVisitedProfiles
 } from "../../actions/profileAction";
-import Moment from "react-moment";
 import {
   makeStyles,
   Avatar,
@@ -20,7 +20,8 @@ import {
   Fab,
   Box,
   Dialog,
-  DialogContent
+  DialogContent,
+  CircularProgress
 } from "@material-ui/core";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
@@ -110,27 +111,33 @@ const useStyles = makeStyles(() => ({
 const UserInfo = () => {
   const classes = useStyles();
   const [{ profile }] = useUserStore();
-
-  let date =
-    profile.info.user_birth_year &&
-    `${profile.info.user_birth_year}-${profile.info.user_birth_month}-${profile.info.user_birth_day}`;
+  let circle =
+    profile.info.user_fame_rate === 0 ? 100 : profile.info.user_fame_rate;
+  let color = "#e74c3c";
+  if (profile.info.user_fame_rate >= 75) color = "#008000";
+  else if (profile.info.user_fame_rate >= 50) color = "#00FF00";
   return (
     <>
       <h3 className={classes.name}>
         {profile.info.user_first_name + " " + profile.info.user_last_name}
       </h3>
-      <h4 className={classes.info}>
-        {date && (
-          <Moment format="YYYY-MM-DD" fromNow ago>
-            {date}
-          </Moment>
-        )}
-      </h4>
+      <h4 className={classes.info}>{profile.info.user_age}</h4>
       <br />
       <h4 className={classes.info} style={{ marginRight: "5%" }}>
         Morocco, {profile.info.user_city}
       </h4>
-      <h4 className={classes.info}>FameRate</h4>
+      <h4 className={classes.info}>
+        <CircularProgress
+          variant="static"
+          thickness={7}
+          value={circle}
+          size={30}
+          style={{
+            color: color,
+            verticalAlign: "middle"
+          }}
+        />
+      </h4>
     </>
   );
 };
@@ -141,10 +148,23 @@ const ProfileImage = () => {
   const [online, setOnline] = useState(false);
 
   useEffect(() => {
-    socket.on("login", data => {
-      data.users.indexOf(parseInt(profile.info.id)) > -1 && setOnline(true);
-    });
-  }, [profile, auth]);
+    let unmounted = false;
+    // Check if user logged in
+    if (socket.listeners("login").length <= 1) {
+      socket.on("login", data => {
+        const exist = data.users.find(x => {
+          return x.id === profile.info.id;
+        });
+        if (exist && !unmounted) setOnline(true);
+      });
+    }
+    // if is the owner profile, set online true
+    if (auth.userInfo.id === profile.info.id) setOnline(true);
+    return () => {
+      unmounted = true;
+    };
+  }, [profile.info.id, auth.userInfo.id]);
+
   return (
     <>
       <Avatar
@@ -183,6 +203,11 @@ const LongMenu = () => {
     await blockProfile(profile.info.id, dispatch);
   };
 
+  const handleReport = async () => {
+    handleClose();
+    await reportProfile(profile.info.id);
+  };
+
   return (
     <>
       <IconButton
@@ -211,7 +236,7 @@ const LongMenu = () => {
         <MenuItem onClick={handleBlock}>
           {profile.info.blocked ? "Unblock" : "Block"}
         </MenuItem>
-        <MenuItem onClick={handleClose}>{"Report"}</MenuItem>
+        <MenuItem onClick={handleReport}>{"Report"}</MenuItem>
       </Menu>
     </>
   );
@@ -265,12 +290,13 @@ const ProfileHeader = () => {
   const [{ auth, profile }, dispatch] = useUserStore();
 
   const handleClick = async () => {
-    await likeProfile(profile.info.id, dispatch);
+    const result = await likeProfile(profile.info.id, dispatch);
+    if (result) {
+      socket.emit("notification", { id: profile.info.id });
+    }
   };
-  useEffect(() => {
-    console.log("object", profile.info);
-  }, [profile]);
-  console.log("liked", profile.info.liked);
+
+  if (profile.info.loading) return null;
   return (
     <Cover img={"/uploads/" + profile.photo.cover_Image}>
       <UserAllInfoContainer>
@@ -343,7 +369,7 @@ const ProfileContent = ({ classes }) => {
     user_relationship,
     user_gender_interest,
     user_current_occupancy,
-    user_tags
+    user_tags + ""
   ];
 
   const params = [
@@ -458,10 +484,6 @@ export const Profile = ({ match }) => {
   const id = match.params.id;
 
   useEffect(() => {
-    console.log(auth);
-  }, [auth]);
-
-  useEffect(() => {
     const info = async () => {
       await getUserInfo(stableDispatch, id);
       await getUserImages(stableDispatch, id);
@@ -469,22 +491,35 @@ export const Profile = ({ match }) => {
     info();
   }, [stableDispatch, id]);
 
+  useEffect(() => {
+    if (+profile.info.id !== 0 && auth.userInfo.id !== 0) {
+      console.log("ids", +profile.info.id, auth.userInfo.id);
+      recordVisitedProfiles(+profile.info.id);
+      if (
+        socket.listeners("notification").length === 0 &&
+        +profile.info.id !== auth.userInfo.id
+      ) {
+        socket.emit("notification", { id: profile.info.id });
+      }
+    }
+  }, [profile.info.id, auth.userInfo.id]);
+
   const imgs = [
     {
       id: 1,
-      src: `/uploads/${profile.photo.cover_Image}`
-    },
-    {
-      id: 2,
       src: `/uploads/${profile.photo.first_Image}`
     },
     {
-      id: 3,
+      id: 2,
       src: `/uploads/${profile.photo.second_Image}`
     },
     {
-      id: 4,
+      id: 3,
       src: `/uploads/${profile.photo.third_Image}`
+    },
+    {
+      id: 4,
+      src: `/uploads/${profile.photo.fourth_Image}`
     }
   ];
 

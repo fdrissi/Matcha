@@ -201,103 +201,6 @@ async function updateUserInfo(data, id) {
   }
 }
 
-async function isUserLikedProfile(userId, profileId) {
-  try {
-    let sql =
-      "SELECT * FROM user_likes WHERE id_user_one = ? AND id_user_two = ? OR id_user_two = ? AND id_user_one = ?";
-    let result = await pool.query(sql, [userId, profileId, userId, profileId]);
-    return result[0].length > 0 ? true : false;
-  } catch (error) {
-    return false;
-  }
-}
-
-async function likeStatus(userId, profileId) {
-  try {
-    let sql =
-      "SELECT * FROM user_likes WHERE id_user_one = ? AND id_user_two = ? OR id_user_two = ? AND id_user_one = ?";
-    let [result] = await pool.query(sql, [
-      userId,
-      profileId,
-      userId,
-      profileId
-    ]);
-    if (
-      result[0].id_user_one === userId &&
-      result[0].id_user_two === profileId
-    ) {
-      console.log("model1", !!result[0].user1_liked_user2);
-      return !!result[0].user1_liked_user2;
-    }
-    console.log("model2", !!result[0].user2_liked_user1);
-    return !!result[0].user2_liked_user1;
-  } catch (error) {
-    return false;
-  }
-}
-
-async function likeUnlikeProfile(userId, profileId) {
-  try {
-    let sql =
-      "UPDATE  user_likes\
-    SET     user1_liked_user2 = IF(`id_user_one` = ? AND `id_user_two` = ?, NOT user1_liked_user2, user1_liked_user2),\
-            user2_liked_user1 = IF(`id_user_one` = ? AND `id_user_two` = ?, NOT user2_liked_user1, user2_liked_user1)\
-    WHERE   `id_user_one` = ? AND `id_user_two` = ? OR `id_user_one` = ? AND `id_user_two` = ?";
-    let result = await pool.query(sql, [
-      userId,
-      profileId,
-      profileId,
-      userId,
-      userId,
-      profileId,
-      profileId,
-      userId
-    ]);
-    checkMatch(userId, profileId);
-    return result ? true : false;
-  } catch (error) {
-    return false;
-  }
-}
-
-async function userLikeProfile(userId, profileId) {
-  let sql =
-    "INSERT INTO user_likes (`id_user_one`, `id_user_two`, `user1_liked_user2`, `user2_liked_user1`) VALUES(?, ?, ?, ?)";
-  const [result] = await pool.query(sql, [userId, profileId, true, false]);
-  await checkMatch(userId, profileId);
-  return result;
-}
-
-async function checkMatch(userId, profileId) {
-  try {
-    let sql =
-      "SELECT * FROM user_likes WHERE `id_user_one` = ? AND `id_user_two` = ? OR `id_user_one` = ? AND `id_user_two` = ?";
-    let [result] = await pool.query(sql, [
-      userId,
-      profileId,
-      profileId,
-      userId
-    ]);
-
-    if (result[0].user1_liked_user2 && result[0].user2_liked_user1) {
-      sql = "UPDATE user_likes SET matched = ?";
-      [result] = await pool.query(sql, [true]);
-    } else {
-      sql = "UPDATE user_likes SET matched = ?";
-      [result] = await pool.query(sql, [false]);
-    }
-  } catch (error) {
-    return false;
-  }
-}
-
-async function areMatched(userId, profileId) {
-  let sql =
-    "SELECT * FROM user_likes WHERE `id_user_one` = ? AND `id_user_two` = ? OR `id_user_one` = ? AND `id_user_two` = ?";
-  let [result] = await pool.query(sql, [userId, profileId, profileId, userId]);
-  return result.length > 0 ? !!result[0].matched : false;
-}
-
 async function getResultByRow(row, id) {
   let sql = `SELECT ${row} from user_info WHERE id = ?`;
   const [result] = await pool.query(sql, [id]);
@@ -310,63 +213,286 @@ async function updateGeoLocation(latitude, longitude, id) {
   return true;
 }
 
-async function isUserBlockedProfile(userId, profileId) {
-  let sql = "SELECT * FROM user_block WHERE id_user = ? AND id_profile = ?";
-  const [result] = await pool.query(sql, [userId, profileId]);
-  return result.length > 0 ? !!result[0].blocked : false;
+async function likeProfile(userId, profileId) {
+  const blocked = await isUserBlockedProfile(userId, profileId);
+  if (blocked) return false;
+  try {
+    const sql =
+      "INSERT INTO `user_likes` (`id_user`, `id_profile`) VALUES(?, ?)";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    const matched = await match(userId, profileId);
+    if (!matched) await setNotification(profileId, userId, "like");
+    await fameRate(profileId, "like");
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
 }
 
-async function getBlockedProfileRow(userId, profileId) {
-  let sql = "SELECT * FROM user_block WHERE id_user = ? AND id_profile = ?";
-  const [result] = await pool.query(sql, [userId, profileId]);
-  return result[0] ? result[0].id : 0;
+async function unlikeProfile(userId, profileId) {
+  try {
+    const sql =
+      "DELETE FROM `user_likes` WHERE `id_user` = ? AND `id_profile` = ?";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    await unmatch(userId, profileId);
+    await fameRate(profileId, "unlike");
+    await setNotification(profileId, userId, "unlike");
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function isUserLikedProfile(userId, profileId) {
+  try {
+    const sql =
+      "SELECT * FROM `user_likes` WHERE `id_user` = ? AND `id_profile` = ?";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    return result.length > 0 ? true : false;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function match(userId, profileId) {
+  try {
+    if (
+      (await isUserLikedProfile(userId, profileId)) &&
+      (await isUserLikedProfile(profileId, userId)) &&
+      !(await areMatched(userId, profileId))
+    ) {
+      const sql =
+        "INSERT INTO `user_match` (`id_user`, `id_profile`) VALUES(?, ?)";
+      const [result] = await pool.query(sql, [userId, profileId]);
+      await setNotification(profileId, userId, "likeBack");
+      return !!result.affectedRows;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function unmatch(userId, profileId) {
+  try {
+    if (
+      !(await isUserLikedProfile(userId, profileId)) ||
+      !(await isUserLikedProfile(profileId, userId))
+    ) {
+      const sql =
+        "DELETE FROM `user_match` WHERE `id_user` = ? AND `id_profile` = ? OR `id_user` = ? AND `id_profile`";
+      const [result] = await pool.query(sql, [
+        userId,
+        profileId,
+        profileId,
+        userId
+      ]);
+      return result[0];
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function areMatched(userId, profileId) {
+  try {
+    const sql =
+      "SELECT * FROM `user_match` WHERE `id_user` = ? AND `id_profile` = ?";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    return result.length > 0 ? true : false;
+  } catch (error) {
+    return false;
+  }
 }
 
 async function blockProfile(userId, profileId) {
-  let sql =
-    "INSERT INTO user_block (`id_user`, `id_profile`, `blocked`) VALUES (?, ?, ?)";
-  const [result] = await pool.query(sql, [userId, profileId, true]);
-  return result ? true : false;
+  const liked = await isUserLikedProfile(userId, profileId);
+  if (liked) await unlikeProfile(userId, profileId);
+  try {
+    const sql =
+      "INSERT INTO `user_block` (`id_user`, `id_profile`) VALUES(?, ?)";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
 }
 
-async function blockProfileById(id, userId, profileId) {
-  const blocked = await isUserBlockedProfile(userId, profileId);
-  if (blocked) return await unblockProfile(id);
-  let sql = "UPDATE user_block SET blocked = ? WHERE id = ?";
-  const [result] = await pool.query(sql, [true, id]);
-  return result ? true : false;
+async function unblockProfile(userId, profileId) {
+  try {
+    const sql =
+      "DELETE FROM `user_block` WHERE `id_user` = ? AND `id_profile` = ?";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
 }
 
-async function unblockProfile(id) {
-  let sql = "UPDATE user_block SET blocked = ? WHERE id = ?";
-  const [result] = await pool.query(sql, [false, id]);
-  return result ? true : false;
-}
-
-async function reported(userId, profileId) {
-  let sql = "SELECT * FROM user_reports WHERE id_user = ? AND id_profile = ?";
-  const [result] = await pool.query(sql, [userId, profileId]);
-  return result.length > 0 ? true : false;
+async function isUserBlockedProfile(userId, profileId) {
+  try {
+    const sql =
+      "SELECT * FROM `user_block` WHERE `id_user` = ? AND `id_profile` = ?";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    return result.length > 0 ? true : false;
+  } catch (error) {
+    return false;
+  }
 }
 
 async function reportProfile(userId, profileId) {
-  if (await reported(userId, profileId)) return false;
-  let sql =
-    "INSERT INTO `user_reports` (`id_user`, `id_profile`) VALUES (?, ?)";
-  const [result] = await pool.query(sql, [userId, profileId]);
-  return result ? true : false;
+  try {
+    if (await isUserReportedProfile(userId, profileId)) return false;
+    const sql =
+      "INSERT INTO `user_reports` (`id_user`, `id_profile`) VALUES(?, ?)";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
 }
 
-async function setUserOnline(userId) {
-  let sql = "UPDATE `user_info` SET `online` = ? WHERE id = ?";
-  const [result] = await pool.query(sql, [true, userId]);
-  return result ? true : false;
+async function isUserReportedProfile(userId, profileId) {
+  try {
+    const sql =
+      "SELECT * FROM `user_reports` WHERE `id_user` = ? AND `id_profile` = ?";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    return result.length > 0 ? true : false;
+  } catch (error) {
+    return false;
+  }
 }
 
-async function setUserOffline(userId) {
-  let sql = "UPDATE `user_info` SET `online` = ? WHERE id = ?";
-  const [result] = await pool.query(sql, [false, userId]);
-  return result ? true : false;
+async function fameRate(userId, type) {
+  try {
+    let sql;
+    switch (type) {
+      case "like":
+        sql = "UPDATE `user_fame_rate` SET liked = liked + 1 WHERE id = ?";
+        break;
+      case "unlike":
+        sql = "UPDATE `user_fame_rate` SET unliked = unliked + 1 WHERE id = ?";
+        break;
+
+      default:
+        break;
+    }
+
+    const [result] = await pool.query(sql, [userId]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function getFameRate(userId) {
+  try {
+    const sql = "SELECT * FROM `user_fame_rate` WHERE id = ?";
+    const [result] = await pool.query(sql, [userId]);
+    const fame = (result[0].unliked * 100) / result[0].liked;
+    return 100 - fame;
+  } catch (error) {
+    return 0;
+  }
+}
+
+async function recordVisitedProfiles(userId, profileId) {
+  try {
+    if (await isAlreadyVisited(userId, profileId)) return false;
+    const sql =
+      "INSERT INTO `user_history` (`id_user`, `id_profile`) VALUES(?, ?)";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function isAlreadyVisited(userId, profileId) {
+  try {
+    const sql =
+      "SELECT * FROM `user_history` WHERE `id_user` = ? AND `id_profile` = ? ";
+    const [result] = await pool.query(sql, [userId, profileId]);
+    return result.length > 0 ? true : false;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function clearHistory(userId) {
+  try {
+    const sql = "DELETE FROM `user_history` WHERE `id_user` = ?";
+    const [result] = await pool.query(sql, [userId]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function getHistory(userId) {
+  try {
+    const sql =
+      "SELECT photos.profile_image, users.first_name, users.last_name, user_history.*, DATE_FORMAT(user_history.visit_date, '%Y-%m-%d') as date FROM `user_history` INNER JOIN users ON users.id = user_history.id_profile INNER JOIN photos ON photos.id = user_history.id_profile WHERE `id_user` = ? ORDER BY date DESC";
+    const [result] = await pool.query(sql, [userId]);
+    return result;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function setNotification(userId, profileId, type) {
+  try {
+    const sql =
+      "INSERT INTO user_notifications (`id_user`, `id_profile`, `notification`) VALUES (?, ?, ?)";
+    const [result] = await pool.query(sql, [userId, profileId, type]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function getUserNotifications(userId) {
+  try {
+    const sql =
+      "SELECT photos.profile_image, users.first_name, users.last_name, user_notifications.*, DATE_FORMAT(user_notifications.date_notification, '%Y-%m-%d %H:%i') as date FROM user_notifications INNER JOIN users ON users.id = user_notifications.id_profile INNER JOIN photos ON photos.id = user_notifications.id_profile WHERE `id_user` = ? ORDER BY date DESC";
+    const [result] = await pool.query(sql, [userId]);
+    return result;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function clearUserNotifications(userId) {
+  try {
+    const sql = "DELETE FROM `user_notifications` WHERE `id_user` = ?";
+    const [result] = await pool.query(sql, [userId]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function updateNotifications(userId) {
+  try {
+    const sql =
+      "UPDATE `user_notifications` SET `seen` = ? WHERE `id_user` = ?";
+    const [result] = await pool.query(sql, [true, userId]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function getUnseenNotificationsCount(userId) {
+  try {
+    const sql =
+      "SELECT count(*) as count FROM `user_notifications` WHERE `id_user` = ? AND `seen` = ?";
+    const [result] = await pool.query(sql, [userId, false]);
+    return result[0].count;
+  } catch (error) {
+    return false;
+  }
 }
 
 module.exports = {
@@ -383,19 +509,23 @@ module.exports = {
   setImageCover,
   getUserInfo,
   updateUserInfo,
-  isUserLikedProfile,
-  likeStatus,
-  likeUnlikeProfile,
-  userLikeProfile,
-  areMatched,
   getResultByRow,
   updateGeoLocation,
-  isUserBlockedProfile,
-  getBlockedProfileRow,
-  blockProfileById,
+  likeProfile,
+  unlikeProfile,
+  isUserLikedProfile,
+  areMatched,
   blockProfile,
   unblockProfile,
+  isUserBlockedProfile,
   reportProfile,
-  setUserOnline,
-  setUserOffline
+  getFameRate,
+  recordVisitedProfiles,
+  getHistory,
+  clearHistory,
+  setNotification,
+  getUserNotifications,
+  clearUserNotifications,
+  updateNotifications,
+  getUnseenNotificationsCount
 };

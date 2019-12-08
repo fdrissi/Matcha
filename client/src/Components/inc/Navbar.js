@@ -15,7 +15,9 @@ import {
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-//import MoreIcon from "@material-ui/icons/MoreVert";
+import io from "socket.io-client";
+import axios from "axios";
+const socket = io("http://localhost:5000");
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -30,10 +32,7 @@ const useStyles = makeStyles(theme => ({
   },
   actions: {
     fontSize: "25px"
-  }
-}));
-
-const style = {
+  },
   bar: {
     backgroundColor: "rgba(0, 0, 0, 0.68)",
     borderBottom: "1px solid #e74c3c",
@@ -46,25 +45,43 @@ const style = {
   brand: {
     color: "#e74c3c"
   }
-};
+}));
 
 const NavActions = () => {
   const classes = useStyles();
+  const [dbNotif, setDbNotif] = useState(0);
+
+  if (socket.listeners("notification").length <= 1) {
+    socket.on("notification", data => {
+      (async () => {
+        const result = await axios.get("/api/profile/unseenNotificationsCount");
+        if (result.data.success) {
+          setDbNotif(result.data.count);
+        }
+      })();
+    });
+  }
+
   return (
     <>
       <MenuItem>
         <IconButton aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="secondary">
+          <Badge badgeContent={0} color="secondary">
             <MailIcon className={classes.actions} />
           </Badge>
         </IconButton>
       </MenuItem>
       <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
-            <NotificationsIcon className={classes.actions} />
-          </Badge>
-        </IconButton>
+        <Link
+          to={"/notifications"}
+          style={{ color: "white", textDecoration: "none" }}
+        >
+          <IconButton aria-label="show 11 new notifications" color="inherit">
+            <Badge badgeContent={dbNotif} color="secondary">
+              <NotificationsIcon className={classes.actions} />
+            </Badge>
+          </IconButton>
+        </Link>
       </MenuItem>
     </>
   );
@@ -140,11 +157,11 @@ export default function Navbar() {
   if (auth.loading) return null;
   return (
     <>
-      <AppBar position="static" style={style.bar}>
+      <AppBar position="static" className={classes.bar}>
         <div className="container">
           <Toolbar>
             <NavBrand style={classes.title}>
-              <span style={style.brand}>Mat</span>Cha
+              <span className={classes.brand}>Mat</span>Cha
             </NavBrand>
             <Route>
               {auth.isAuthenticated ? (
