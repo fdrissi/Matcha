@@ -12,17 +12,15 @@ import {
   MenuItem,
   Badge
 } from "@material-ui/core";
-import AccountCircle from "@material-ui/icons/AccountCircle";
+import { AccountCircle } from "@material-ui/icons/";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
+import MoreIcon from "@material-ui/icons/MoreVert";
 import io from "socket.io-client";
 import axios from "axios";
 const socket = io("http://localhost:5000");
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1
-  },
   menuButton: {
     marginRight: theme.spacing(2)
   },
@@ -30,8 +28,16 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
     fontWeight: 600
   },
+  brand: {
+    color: "#e74c3c"
+  },
   actions: {
-    fontSize: "25px"
+    fontSize: "25px",
+    color: "white",
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "25px",
+      color: "black"
+    }
   },
   bar: {
     backgroundColor: "rgba(0, 0, 0, 0.68)",
@@ -42,12 +48,22 @@ const useStyles = makeStyles(theme => ({
     color: "white",
     textDecoration: "none"
   },
-  brand: {
-    color: "#e74c3c"
+  sectionDesktop: {
+    display: "none",
+    [theme.breakpoints.up("md")]: {
+      display: "flex",
+      verticalAlign: "middle"
+    }
+  },
+  sectionMobile: {
+    display: "flex",
+    [theme.breakpoints.up("md")]: {
+      display: "none"
+    }
   }
 }));
 
-const NavActions = () => {
+const NavNotifications = () => {
   const classes = useStyles();
   const [dbNotif, setDbNotif] = useState(0);
 
@@ -64,25 +80,43 @@ const NavActions = () => {
 
   return (
     <>
-      <MenuItem>
-        <IconButton aria-label="show 4 new mails" color="inherit">
+      <Link
+        to={"/notifications"}
+        style={{ color: "white", textDecoration: "none" }}
+      >
+        <IconButton
+          aria-label="show 11 new notifications"
+          color="inherit"
+          style={{ height: "100%" }}
+        >
+          <Badge badgeContent={dbNotif} color="secondary">
+            <NotificationsIcon className={classes.actions} />
+          </Badge>
+        </IconButton>
+      </Link>
+    </>
+  );
+};
+
+const NavMessage = () => {
+  const classes = useStyles();
+
+  return (
+    <>
+      <Link
+        to={"/notifications"}
+        style={{ color: "white", textDecoration: "none" }}
+      >
+        <IconButton
+          aria-label="show 4 new mails"
+          color="inherit"
+          style={{ height: "100%" }}
+        >
           <Badge badgeContent={0} color="secondary">
             <MailIcon className={classes.actions} />
           </Badge>
         </IconButton>
-      </MenuItem>
-      <MenuItem>
-        <Link
-          to={"/notifications"}
-          style={{ color: "white", textDecoration: "none" }}
-        >
-          <IconButton aria-label="show 11 new notifications" color="inherit">
-            <Badge badgeContent={dbNotif} color="secondary">
-              <NotificationsIcon className={classes.actions} />
-            </Badge>
-          </IconButton>
-        </Link>
-      </MenuItem>
+      </Link>
     </>
   );
 };
@@ -151,34 +185,120 @@ const NavCircle = () => {
   );
 };
 
-export default function Navbar() {
+export default function PrimarySearchAppBar() {
   const classes = useStyles();
   const [{ auth }] = useUserStore();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
+
+  const handleMobileMenuOpen = event => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
+
+  const menuId = "primary-search-account-menu";
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+    </Menu>
+  );
+
+  const mobileMenuId = "primary-search-account-menu-mobile";
+  const renderMobileMenu = (
+    <>
+      {auth.isAuthenticated ? (
+        <Menu
+          anchorEl={mobileMoreAnchorEl}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          id={mobileMenuId}
+          keepMounted
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          open={isMobileMenuOpen}
+          onClose={handleMobileMenuClose}
+        >
+          <MenuItem>
+            <NavNotifications />
+            <p>Notifications</p>
+          </MenuItem>
+
+          <MenuItem>
+            <NavMessage />
+            <p>Messages</p>
+          </MenuItem>
+
+          <MenuItem>
+            <NavCircle user={auth.userInfo.username} />
+            <p>Profile</p>
+          </MenuItem>
+        </Menu>
+      ) : (
+        <Route>
+          <NavBtn text="Login" link="/Login" />
+          <NavBtn text="Register" link="/register" />
+        </Route>
+      )}
+    </>
+  );
+
   if (auth.loading) return null;
   return (
-    <>
+    <div>
       <AppBar position="static" className={classes.bar}>
-        <div className="container">
-          <Toolbar>
-            <NavBrand style={classes.title}>
-              <span className={classes.brand}>Mat</span>Cha
-            </NavBrand>
-            <Route>
-              {auth.isAuthenticated ? (
-                <>
-                  <NavActions />
-                  <NavCircle user={auth.userInfo.username} />
-                </>
-              ) : (
-                <>
+        <Toolbar>
+          <NavBrand style={classes.title}>
+            <span className={classes.brand}>Mat</span>Cha
+          </NavBrand>
+          <div className={classes.sectionDesktop}>
+            {auth.isAuthenticated ? (
+              <>
+                <NavNotifications />
+                <NavMessage />
+                <NavCircle user={auth.userInfo.username} />
+              </>
+            ) : (
+              <>
+                <Route>
                   <NavBtn text="Login" link="/Login" />
                   <NavBtn text="Register" link="/register" />
-                </>
-              )}
-            </Route>
-          </Toolbar>
-        </div>
+                </Route>
+              </>
+            )}
+          </div>
+          <div className={classes.sectionMobile}>
+            <IconButton
+              aria-label="show more"
+              aria-controls={mobileMenuId}
+              aria-haspopup="true"
+              onClick={handleMobileMenuOpen}
+              color="inherit"
+            >
+              <MoreIcon />
+            </IconButton>
+          </div>
+        </Toolbar>
       </AppBar>
-    </>
+      {renderMobileMenu}
+      {renderMenu}
+    </div>
   );
 }
