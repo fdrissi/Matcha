@@ -31,7 +31,7 @@ import Image from "material-ui-image";
 import io from "socket.io-client";
 const socket = io("http://localhost:5000");
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   cover: {
     width: "100%",
     minHeight: "421px",
@@ -87,18 +87,38 @@ const useStyles = makeStyles(() => ({
   border: {
     border: "2px solid #e0e0e0",
     borderRadius: "5px",
-    padding: "30px 22px",
+    padding: "20px 10px",
     marginBottom: "5%"
+  },
+  list: {
+    listStyle: "none",
+    wordBreak: "break-all",
+    padding: "0px 0px 0px 40px",
+    [theme.breakpoints.down("sm")]: {
+      listStyle: "none",
+      wordBreak: "break-all",
+      padding: "0px 0px 0px 10px"
+    }
   },
   normalli: {
     fontWeight: "normal",
     fontSize: "16px",
-    color: "#000"
+    color: "#000",
+    [theme.breakpoints.down("sm")]: {
+      fontWeight: "normal",
+      fontSize: "12px",
+      color: "#334249"
+    }
   },
   boldli: {
     fontWeight: "bold",
     fontSize: "16px",
-    color: "##334249"
+    color: "#334249",
+    [theme.breakpoints.down("sm")]: {
+      fontWeight: "bold",
+      fontSize: "12px",
+      color: "#334249"
+    }
   },
   title: {
     fontWeight: "bold",
@@ -338,10 +358,10 @@ const ProfileHeader = () => {
   );
 };
 
-const Parameters = ({ values = [], liClassName }) => {
+const Parameters = ({ values = [], liClassName, lstClass }) => {
   return (
     <div style={{ display: "inline-block" }}>
-      <ul style={{ listStyle: "none" }}>
+      <ul className={lstClass}>
         <li className={liClassName}>{values[0]}</li>
         <li className={liClassName}>{values[1]}</li>
         <li className={liClassName}>{values[2]}</li>
@@ -369,14 +389,14 @@ const ProfileContent = ({ classes }) => {
     user_relationship,
     user_gender_interest,
     user_current_occupancy,
-    user_tags + ""
+    user_tags.slice(0, 3) + ""
   ];
 
   const params = [
     "Gender",
     "Country",
     "City",
-    "relationship",
+    "Relationship",
     "Interest",
     "Occupancy",
     "Tags"
@@ -388,19 +408,29 @@ const ProfileContent = ({ classes }) => {
         <Parameters
           values={params.slice(0, 4)}
           liClassName={classes.normalli}
+          lstClass={classes.list}
         />
       </ProfileContentContainer>
       <ProfileContentContainer>
-        <Parameters values={values.slice(0, 4)} liClassName={classes.boldli} />
+        <Parameters
+          values={values.slice(0, 4)}
+          liClassName={classes.boldli}
+          lstClass={classes.list}
+        />
       </ProfileContentContainer>
       <ProfileContentContainer>
         <Parameters
           values={params.slice(4, 8)}
           liClassName={classes.normalli}
+          lstClass={classes.list}
         />
       </ProfileContentContainer>
       <ProfileContentContainer>
-        <Parameters values={values.slice(4, 8)} liClassName={classes.boldli} />
+        <Parameters
+          values={values.slice(4, 8)}
+          liClassName={classes.boldli}
+          lstClass={classes.list}
+        />
       </ProfileContentContainer>
     </Grid>
   );
