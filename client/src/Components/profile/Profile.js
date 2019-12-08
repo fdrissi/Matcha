@@ -87,7 +87,7 @@ const useStyles = makeStyles(theme => ({
   border: {
     border: "2px solid #e0e0e0",
     borderRadius: "5px",
-    padding: "20px 0px",
+    padding: "20px 10px",
     marginBottom: "5%"
   },
   list: {

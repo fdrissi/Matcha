@@ -369,10 +369,12 @@ async function fameRate(userId, type) {
     let sql;
     switch (type) {
       case "like":
-        sql = "UPDATE `user_fame_rate` SET liked = liked + 1 WHERE id = ?";
+        sql =
+          "UPDATE `user_fame_rate` SET liked = liked + 1, fame_rate = 100 - (unliked * 100) / liked WHERE id = ?";
         break;
       case "unlike":
-        sql = "UPDATE `user_fame_rate` SET unliked = unliked + 1 WHERE id = ?";
+        sql =
+          "UPDATE `user_fame_rate` SET unliked = unliked + 1, fame_rate = 100 - (unliked * 100) / liked WHERE id = ?";
         break;
 
       default:
