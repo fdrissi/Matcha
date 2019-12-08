@@ -289,12 +289,12 @@ router.post(
       const my_info = {
         user_gender: result.user_gender,
         user_relationship: result.user_relationship,
-        user_birth_day: day,
+        user_birth_day: day ? day : "",
         user_tags: obj ? obj : [],
-        user_birth_month: month,
+        user_birth_month: month ? month : "01",
         user_current_occupancy: result.user_current_occupancy,
         user_gender_interest: result.user_gender_interest,
-        user_birth_year: year,
+        user_birth_year: year ? year : "",
         user_city: result.user_city,
         user_biography: result.user_biography,
         user_location: {
@@ -302,6 +302,7 @@ router.post(
           lng: parseFloat(result.user_lng, 10)
         }
       };
+      console.log(my_info);
       if (check) {
         // that mean that there is a change
         return res.json({

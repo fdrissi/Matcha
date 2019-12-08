@@ -16,6 +16,12 @@ import {
   Fab
 } from "@material-ui/core";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
+import Card from "@material-ui/core/Card";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import TextField from "@material-ui/core/TextField";
 
 const useStyles = makeStyles(() => ({
   avatar: {
@@ -32,6 +38,11 @@ const useStyles = makeStyles(() => ({
     fontWeight: "bolder",
     letterSpacing: "2px",
     display: "inline-block"
+  },
+  card: {
+    width: "200px",
+    marginLeft: "40%",
+    backgroundColor: "transparent"
   }
 }));
 
@@ -287,7 +298,66 @@ const ProfilesContainer = ({ children }) => {
 };
 
 const Filter = () => {
-  return <div>Filter By Age, Locations, FameRate, Common Tags</div>;
+  const classes = useStyles();
+  return (
+    <Grid
+      container
+      direction="row"
+      justify="space-around"
+      alignItems="flex-end"
+    >
+      <Grid item xs={2}>
+        <TextField
+          name="user_birth_day"
+          variant="outlined"
+          fullWidth
+          value="test"
+          label="Day"
+          inputProps={{ maxLength: 2 }}
+        />
+      </Grid>
+      <Grid item xs={2}>
+        <TextField
+          name="user_birth_day"
+          variant="outlined"
+          fullWidth
+          value="test"
+          label="Day"
+          inputProps={{ maxLength: 2 }}
+        />
+      </Grid>
+      <Grid item xs={2}>
+        <TextField
+          name="user_birth_day"
+          variant="outlined"
+          fullWidth
+          value="test"
+          label="Day"
+          inputProps={{ maxLength: 2 }}
+        />
+      </Grid>
+      <Grid item xs={2}>
+        <TextField
+          name="user_birth_day"
+          variant="outlined"
+          fullWidth
+          value="test"
+          label="Day"
+          inputProps={{ maxLength: 2 }}
+        />
+      </Grid>
+      <Grid item xs={2}>
+        <TextField
+          name="user_birth_day"
+          variant="outlined"
+          fullWidth
+          value="test"
+          label="Day"
+          inputProps={{ maxLength: 2 }}
+        />
+      </Grid>
+    </Grid>
+  );
 };
 
 const Sort = () => {
