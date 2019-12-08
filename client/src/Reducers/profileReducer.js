@@ -3,7 +3,8 @@ import {
   INFO_SUCCESS,
   PROFILE_BLOCKED,
   PROFILE_LIKED,
-  PROFILE_MATCHED
+  PROFILE_MATCHED,
+  BROWSER_RETURN
 } from "../actions/actionTypes";
 
 export const profileInitState = {
@@ -41,6 +42,10 @@ export const profileInitState = {
       lat: "",
       lng: ""
     }
+  },
+  browser: {
+    result: [],
+    sort_by: ""
   }
 };
 
@@ -57,6 +62,8 @@ export const profileReducer = (state, action) => {
       return { ...state, info: { ...state.info, liked: payload } };
     case PROFILE_MATCHED:
       return { ...state, info: { ...state.info, matched: payload } };
+    case BROWSER_RETURN:
+      return { ...state, browser: { ...state.browser, result: payload } };
     default:
       return state;
   }

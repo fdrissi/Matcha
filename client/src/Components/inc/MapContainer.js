@@ -12,6 +12,9 @@ const MyMapComponent = withScriptjs(
     const { user_set_from_map } = data;
 
     const handleLocationChange = e => {
+      console.log(e.latLng.lat());
+      console.log(e.latLng.lng());
+
       const user_location = {
         lat: e.latLng.lat(),
         lng: e.latLng.lng()

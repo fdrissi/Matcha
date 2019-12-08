@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Cover } from "../profile/Profile";
 import { Title } from "./Notifications";
+import { getBrowser, filterBrowser } from "../../actions/profileAction";
+
 import {
   Box,
   Container,
@@ -15,15 +17,22 @@ import {
   Grid,
   Fab
 } from "@material-ui/core";
-import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
+import Divider from "@material-ui/core/Divider";
+import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
+import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Radio from "@material-ui/core/Radio";
+import Slider from "@material-ui/core/Slider";
+import Rating from "@material-ui/lab/Rating";
+import { useUserStore } from "../../Context/appStore";
+import axios from "axios";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   avatar: {
     margin: "0 auto",
     width: "125px",
@@ -33,6 +42,12 @@ const useStyles = makeStyles(() => ({
       opacity: 0.8
     }
   },
+  slider: {
+    color: "rgb(231, 76, 60)"
+  },
+  divider: {
+    margin: theme.spacing(3, 0)
+  },
   title: {
     fontSize: "30px",
     fontWeight: "bolder",
@@ -40,128 +55,18 @@ const useStyles = makeStyles(() => ({
     display: "inline-block"
   },
   card: {
-    width: "200px",
-    marginLeft: "40%",
     backgroundColor: "transparent"
+  },
+  submit: {
+    background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
   }
 }));
-
-const info = [
-  {
-    id: "1",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "2",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "3",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "4",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "5",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "6",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "7",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "8",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "9",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "10",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "11",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  },
-  {
-    id: "12",
-    name: "Fadel Drissi",
-    age: "27",
-    img: "./img/profiletest.png",
-    fameRate: "90%",
-    city: "Khouribga",
-    tags: "#shopping, #traveling"
-  }
-];
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const ProfileDialog = ({ open, handleClose, inf, classes }) => {
+const ProfileDialog = ({ open, handleClose, info, classes }) => {
   return (
     <>
       {open && (
@@ -176,21 +81,26 @@ const ProfileDialog = ({ open, handleClose, inf, classes }) => {
           >
             <DialogTitle
               id="alert-dialog-slide-title"
-              style={{ backgroundColor: "#e74c3c", height: "70px" }}
+              style={{
+                backgroundColor: "#e74c3c",
+                height: "70px",
+                textAlign: "center"
+              }}
             >
-              <Grid container>
+              <Grid
+                container
+                direction="row"
+                justify="center"
+                alignItems="center"
+              >
                 <Grid item xs={12}>
                   <div>
                     <h5
                       style={{
-                        display: "inline-block",
-                        marginRight: "30%",
-                        color: "#FFF",
-                        fontSize: "24px",
-                        fontWeight: "700"
+                        color: "#FFF"
                       }}
                     >
-                      {inf.name}
+                      {info.first_name} {info.last_name}
                     </h5>
                     <p
                       style={{
@@ -200,39 +110,55 @@ const ProfileDialog = ({ open, handleClose, inf, classes }) => {
                         fontWeight: "700"
                       }}
                     >
-                      {inf.fameRate}
+                      {info.fameRate}
                     </p>
                   </div>
                 </Grid>
               </Grid>
             </DialogTitle>
             <DialogContent>
-              <Grid container>
+              <Grid container justify="center" alignItems="center">
                 <Grid item xs={12}>
-                  <Grid container>
-                    <Grid item xs={6}>
-                      <Avatar
-                        src={inf.img}
-                        alt={inf.name}
-                        className={classes.avatar}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <p style={{ textAlign: "center", fontWeight: "700" }}>
-                        {inf.age} years old
-                      </p>
-                      <p style={{ textAlign: "center", fontWeight: "700" }}>
-                        {inf.city}
-                      </p>
-                      <p style={{ textAlign: "center", fontWeight: "700" }}>
-                        {inf.tags}
-                      </p>
-                    </Grid>
-                  </Grid>
+                  <Avatar
+                    src={`./uploads/${info.id}/profile.jpg`}
+                    alt={info.first_name}
+                    className={classes.avatar}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <p style={{ textAlign: "center", fontWeight: "700" }}>
+                    {info.user_birth} years old
+                  </p>
+                </Grid>
+              </Grid>
+              <Grid
+                container
+                direction="row"
+                justify="space-between"
+                alignItems="center"
+              >
+                <Grid item xs={4}>
+                  <p style={{ textAlign: "center", fontWeight: "700" }}>
+                    {info.user_city}
+                  </p>
+                </Grid>
+                {/* <Grid item xs={4}>
+                  <p style={{ textAlign: "center", fontWeight: "700" }}>
+                    {JSON.parse(inf.user_tags).map((tag, index) => {
+                      if (index === 0) return tag;
+                    })}
+                  </p>
+                </Grid> */}
+                <Grid item xs={4}>
+                  <p style={{ textAlign: "center", fontWeight: "700" }}>
+                    {info.destination} KM
+                  </p>
                 </Grid>
               </Grid>
             </DialogContent>
-            <DialogActions style={{ justifyContent: "flex-start" }}>
+            <DialogActions
+              style={{ justifyContent: "center", backgroundColor: "#e74c3c" }}
+            >
               <Fab style={{ color: "#e74c3c" }}>
                 <ThumbUpAltIcon />
               </Fab>
@@ -244,34 +170,44 @@ const ProfileDialog = ({ open, handleClose, inf, classes }) => {
   );
 };
 
-const Profile = ({ infos }) => {
+const Profile = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
+  const [{ profile }] = useUserStore();
 
-  const handleClickOpen = () => {
+  const [showCard, setShowCard] = React.useState({
+    myinfo: {}
+  });
+
+  const handleClickOpen = e => {
+    setShowCard({
+      showCard: e
+    });
     setOpen(true);
   };
-
   const handleClose = () => {
     setOpen(false);
   };
+
   return (
     <>
-      {infos.map(inf => {
+      {profile.browser.result.map(inf => {
         return (
-          <Box
-            key={inf.id}
-            style={{ margin: "0 4%" }}
-            flexGrow={1}
-            onClick={handleClickOpen}
-          >
-            <Avatar src={inf.img} alt={inf.name} className={classes.avatar} />
-            <h5 style={{ textAlign: "center" }}>{inf.name}</h5>
-            <p style={{ textAlign: "center" }}>{inf.age} years old</p>
+          <Box key={inf.id} style={{ margin: "0 4%" }} flexGrow={1}>
+            <Avatar
+              src={`./uploads/${inf.id}/profile.jpg`}
+              alt={inf.first_name}
+              className={classes.avatar}
+              onClick={() => handleClickOpen(inf)}
+            />
+            <h5 style={{ textAlign: "center" }}>
+              {inf.first_name} {inf.last_name}
+            </h5>
+            <p style={{ textAlign: "center" }}>{inf.user_birth} years old</p>
             <ProfileDialog
               open={open}
               handleClose={handleClose}
-              inf={inf}
+              info={showCard.showCard}
               classes={classes}
             />
           </Box>
@@ -284,112 +220,285 @@ const Profile = ({ infos }) => {
 const ProfilesContainer = ({ children }) => {
   return (
     <>
-      <Title text={"Members"} />
-      <img
-        src={"img/underTitleLine.png"}
-        alt="wrap"
-        style={{ display: "block", margin: "2% auto" }}
-      />
-      <Box display="flex" flexWrap="wrap" alignItems="center">
+      <Grid
+        xs={12}
+        container
+        item
+        justify="center"
+        style={{ paddingTop: "20px" }}
+      >
+        <Typography variant="subtitle1">Members</Typography>
+      </Grid>
+      <Grid xs={12} container item justify="center">
+        <img src={"img/underTitleLine.png"} alt="wrap" />
+      </Grid>
+
+      <Box display="flex" flexWrap="wrap" alignItems="center" pt={5}>
         {children}
       </Box>
     </>
   );
 };
+const Sort = () => {
+  const classes = useStyles();
+  const [sort, setSort] = useState({
+    sort_by: ""
+  });
+  const [{ profile }, dispatch] = useUserStore();
+  console.log(profile);
+
+  const handleChange = event => {
+    console.log("test");
+    setSort({
+      ...sort,
+      [event.target.name]: event.target.value
+    });
+  };
+  return (
+    <Card style={{ backgroundColor: "transparent" }}>
+      <CardContent style={{ height: "164px" }}>
+        <Grid
+          container
+          direction="row"
+          justify="space-between"
+          alignItems="center"
+        >
+          <Grid xs={12} container item justify="center">
+            <Typography variant="overline" gutterBottom>
+              <img
+                src="./img/widget-title-border.png"
+                alt="left"
+                style={{ color: "rgb(231, 76, 60)" }}
+              />
+              {" Sort By "}
+              <img
+                src="./img/widget-title-border.png"
+                alt="left"
+                style={{ color: "rgb(231, 76, 60)", transform: "scaleX(-1)" }}
+              />
+            </Typography>
+          </Grid>
+          <Divider className={classes.divider} />
+
+          <Grid item xs={12}>
+            <FormControl component="fieldset" style={{ display: "block" }}>
+              <RadioGroup
+                row
+                aria-label="gender"
+                name="user_gender_interest"
+                style={{ justifyContent: "center" }}
+                name="sort_by"
+                onChange={handleChange}
+                value={
+                  profile.browser.sort_by
+                    ? profile.browser.sort_by
+                    : sort.sort_by
+                }
+              >
+                <FormControlLabel
+                  value="Age"
+                  control={<Radio color="secondary" />}
+                  label="Age"
+                  labelPlacement="start"
+                />
+                <FormControlLabel
+                  value="location"
+                  control={<Radio color="secondary" />}
+                  label="location"
+                  labelPlacement="start"
+                />
+                <FormControlLabel
+                  value="fame rating"
+                  control={<Radio color="secondary" />}
+                  label="fame rating"
+                  labelPlacement="start"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+        </Grid>
+      </CardContent>
+      {/* <CardActions>
+          <Button size="small">Learn More</Button>
+        </CardActions> */}
+    </Card>
+  );
+};
+function valuetext(value) {
+  return `${value}`;
+}
 
 const Filter = () => {
   const classes = useStyles();
-  return (
-    <Grid
-      container
-      direction="row"
-      justify="space-around"
-      alignItems="flex-end"
-    >
-      <Grid item xs={2}>
-        <TextField
-          name="user_birth_day"
-          variant="outlined"
-          fullWidth
-          value="test"
-          label="Day"
-          inputProps={{ maxLength: 2 }}
-        />
-      </Grid>
-      <Grid item xs={2}>
-        <TextField
-          name="user_birth_day"
-          variant="outlined"
-          fullWidth
-          value="test"
-          label="Day"
-          inputProps={{ maxLength: 2 }}
-        />
-      </Grid>
-      <Grid item xs={2}>
-        <TextField
-          name="user_birth_day"
-          variant="outlined"
-          fullWidth
-          value="test"
-          label="Day"
-          inputProps={{ maxLength: 2 }}
-        />
-      </Grid>
-      <Grid item xs={2}>
-        <TextField
-          name="user_birth_day"
-          variant="outlined"
-          fullWidth
-          value="test"
-          label="Day"
-          inputProps={{ maxLength: 2 }}
-        />
-      </Grid>
-      <Grid item xs={2}>
-        <TextField
-          name="user_birth_day"
-          variant="outlined"
-          fullWidth
-          value="test"
-          label="Day"
-          inputProps={{ maxLength: 2 }}
-        />
-      </Grid>
-    </Grid>
-  );
-};
+  const [filter, setFilter] = React.useState({
+    age_range: [16, 80],
+    location_range: 5000,
+    fame_rating: 1
+  });
+  const [{ profile }, dispatch] = useUserStore();
+  const submitForm = form => {
+    form.preventDefault();
+    async function filterFunc() {
+      await filterBrowser(filter, dispatch);
+    }
+    filterFunc();
+  };
 
-const Sort = () => {
-  return <div>Sort By Age, Locations, FameRate, Common Tags</div>;
+  const handleChange = name => (event, newValue) => {
+    setFilter({
+      ...filter,
+      [name]: newValue
+    });
+  };
+  console.log();
+  return (
+    <form className={classes.form} onSubmit={form => submitForm(form)}>
+      <Card style={{ backgroundColor: "transparent" }}>
+        <CardContent
+          style={{
+            paddingBottom: 10
+          }}
+        >
+          <Grid
+            container
+            direction="row"
+            justify="space-between"
+            alignItems="center"
+          >
+            <Grid xs={12} container item justify="center">
+              <Typography variant="overline" gutterBottom>
+                <img
+                  src="./img/widget-title-border.png"
+                  alt="left"
+                  style={{ color: "rgb(231, 76, 60)" }}
+                />
+                {" Filter "}
+                <img
+                  src="./img/widget-title-border.png"
+                  alt="left"
+                  style={{ color: "rgb(231, 76, 60)", transform: "scaleX(-1)" }}
+                />
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} md={3}>
+              <Grid xs={12} container item justify="center">
+                <Typography variant="overline" id="range-slider" gutterBottom>
+                  Age range
+                </Typography>
+              </Grid>
+
+              <Slider
+                className={classes.slider}
+                max={80}
+                min={16}
+                step={1}
+                value={filter.age_range}
+                onChange={handleChange("age_range")}
+                valueLabelDisplay="auto"
+                aria-labelledby="range-slider"
+                getAriaValueText={valuetext}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Grid xs={12} container item justify="center">
+                <Typography variant="overline" id="range-slider" gutterBottom>
+                  Location Range
+                </Typography>
+              </Grid>
+
+              <Slider
+                className={classes.slider}
+                value={filter.location_range}
+                max={5000}
+                step={1}
+                onChange={handleChange("location_range")}
+                valueLabelDisplay="auto"
+                aria-labelledby="discrete-slider-always"
+                getAriaValueText={valuetext}
+              />
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Grid xs={12} container item justify="center">
+                <Typography variant="overline" id="range-slider" gutterBottom>
+                  fame rating
+                </Typography>
+              </Grid>
+              <Grid xs={12} container item justify="center">
+                <Rating
+                  name="simple-controlled"
+                  value={filter.fame_rating}
+                  onChange={handleChange("fame_rating")}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid xs={12} container item justify="center">
+            <Button
+              type="submit"
+              size="medium"
+              variant="contained"
+              color="primary"
+              className={classes.submit}
+            >
+              Filter
+            </Button>
+          </Grid>
+        </CardContent>
+      </Card>
+    </form>
+  );
 };
 
 const Header = () => {
   const classes = useStyles();
   return (
-    <Cover img={"/img/banner-brwose.jpg"}>
-      <Container>
-        <div>
-          <img src="./img/t-left-img.png" alt="left" />
-          <Title text={"Browse"} color="#FFF" classes={classes.title} />
-          <img src="./img/t-right-img.png" alt="right" />
-        </div>
+    <>
+      <Cover img={"/img/banner-brwose.jpg"}>
+        <Grid xs={12} container item justify="center">
+          <div>
+            <img src="./img/t-left-img.png" alt="left" />
+            <Title text={"Browse"} color="#FFF" classes={classes.title} />
+            <img src="./img/t-right-img.png" alt="right" />
+          </div>
+        </Grid>
+      </Cover>
 
-        <Sort />
-        <Filter />
-      </Container>
-    </Cover>
+      <Grid
+        container
+        direction="row"
+        justify="space-between"
+        alignItems="flex-end"
+        style={{ marginTop: "-5%" }}
+      >
+        <Grid item xs={12} md={6}>
+          <Filter />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Sort />
+        </Grid>
+      </Grid>
+    </>
   );
 };
 
 const Browse = () => {
+  const [{ profile }, dispatch] = useUserStore();
+  console.log(profile);
+  useEffect(() => {
+    async function test() {
+      await getBrowser(dispatch);
+    }
+    test();
+  }, []);
+
   return (
     <div>
       <CssBaseline />
       <Header />
       <Container>
         <ProfilesContainer>
-          <Profile infos={info} />
+          <Profile />
         </ProfilesContainer>
       </Container>
     </div>
