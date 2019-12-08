@@ -504,6 +504,7 @@ async function getUserNotifications(userId) {
     const [result] = await pool.query(sql, [userId]);
     return result;
   } catch (error) {
+    console.log(error);
     return false;
   }
 }

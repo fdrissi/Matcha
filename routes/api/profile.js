@@ -683,6 +683,7 @@ router.get("/getUserNotifications", middleware.auth, async (req, res) => {
   const id = req.user.id;
   try {
     const result = await profileModel.getUserNotifications(id);
+    console.log(result);
     return res.json({
       success: true,
       notifications: result
