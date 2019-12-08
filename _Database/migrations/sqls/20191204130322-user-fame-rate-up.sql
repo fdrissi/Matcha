@@ -1,6 +1,6 @@
-CREATE TABLE user_likes
+CREATE TABLE user_fame_rate
 (
     id int PRIMARY Key AUTO_INCREMENT,
-	id_user int,
-	id_profile int
+	liked int DEFAULT 0,
+	unliked int DEFAULT 0
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

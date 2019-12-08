@@ -6,9 +6,7 @@ import {
   FAILIED_UPDATE_USER,
   REMOVE_ERRORS,
   PROFILE_BLOCKED,
-  PROFILE_LIKED,
-  PROFILE_MATCHED,
-  PROFILE_REPORTED
+  PROFILE_LIKED
 } from "./actionTypes";
 
 export const setUserImages = async (formData, row, dispatch) => {
@@ -41,7 +39,7 @@ export const setUserImages = async (formData, row, dispatch) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    return false;
   }
 };
 
@@ -77,7 +75,9 @@ export const setUserCover = async (filed, dispatch) => {
         }
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    return false;
+  }
 };
 
 export const getUserImages = async (dispatch, id = null) => {
@@ -100,7 +100,7 @@ export const getUserImages = async (dispatch, id = null) => {
     } else {
     }
   } catch (error) {
-    console.log(error);
+    return false;
   }
 };
 
@@ -137,7 +137,9 @@ export const removeUserImage = async (photo, filed, dispatch) => {
         payload: res.data.result
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    return false;
+  }
 };
 
 export const getUserInfo = async (dispatch, id = null) => {
@@ -146,7 +148,6 @@ export const getUserInfo = async (dispatch, id = null) => {
       "Content-Type": "application/json"
     }
   };
-  console.log("id action", id);
   try {
     const res = await axios.get(
       "/api/profile/getUserInfo",
@@ -160,7 +161,7 @@ export const getUserInfo = async (dispatch, id = null) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    return false;
   }
 };
 
@@ -206,7 +207,9 @@ export const updateUserInfo = async (mydata, dispatch) => {
         }
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    return false;
+  }
 };
 
 export const setUserLocation = async (latitude, longitude, error) => {
@@ -226,7 +229,6 @@ export const setUserLocation = async (latitude, longitude, error) => {
 export const getpreedefined = async () => {
   const res = await axios.get("api/profile/getpreedefined");
   if (res.data.success) {
-    //console.log(res.data.predefined);
     return res.data.predefined;
   }
 };
@@ -238,7 +240,7 @@ export const likeProfile = async (profileId, dispatch) => {
     }
   };
   try {
-    const res = await axios.post(
+    const result = await axios.post(
       "/api/profile/userLikeProfile",
       {
         profile: { id: profileId }
@@ -246,6 +248,7 @@ export const likeProfile = async (profileId, dispatch) => {
       config
     );
     await isUserLikedProfile(profileId, dispatch);
+    return result;
   } catch (error) {
     return false;
   }
@@ -265,7 +268,6 @@ export const isUserLikedProfile = async (profileId, dispatch) => {
       },
       config
     );
-    console.log("success", res.data.success);
     dispatch({
       type: PROFILE_LIKED,
       payload: res.data.success
@@ -282,7 +284,7 @@ export const blockProfile = async (profileId, dispatch) => {
     }
   };
   try {
-    const res = await axios.post(
+    await axios.post(
       "/api/profile/userBlockProfile",
       {
         profile: { id: profileId }
@@ -339,28 +341,20 @@ export const reportProfile = async profileId => {
   }
 };
 
-export const setUserOnline = async () => {
+export const recordVisitedProfiles = async profileId => {
   const config = {
     header: {
       "Content-Type": "application/json"
     }
   };
   try {
-    const res = await axios.get("/api/profile/setUserOnline", config);
-    return res.data.success;
-  } catch (error) {
-    return false;
-  }
-};
-
-export const setUserOffline = async () => {
-  const config = {
-    header: {
-      "Content-Type": "application/json"
-    }
-  };
-  try {
-    const res = await axios.get("/api/profile/setUserOffline", config);
+    const res = await axios.post(
+      "/api/profile/recordVisitedProfiles",
+      {
+        profile: { id: profileId }
+      },
+      config
+    );
     return res.data.success;
   } catch (error) {
     return false;

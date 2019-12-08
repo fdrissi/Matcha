@@ -151,7 +151,7 @@ const Form = () => {
         </Typography>
 
         <Grid container spacing={2}>
-          <Grid item sx={12} sm={6}>
+          <Grid item xs={12} sm={6}>
             <TextField
               error={operations.errors.firstName ? true : false}
               helperText={operations.errors.firstName}
@@ -167,7 +167,7 @@ const Form = () => {
             />
           </Grid>
 
-          <Grid item sx={12} sm={6}>
+          <Grid item xs={12} sm={6}>
             <TextField
               error={operations.errors.lastName ? true : false}
               helperText={operations.errors.lastName}

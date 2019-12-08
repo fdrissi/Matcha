@@ -6,8 +6,13 @@ users
 FOR
 EACH
 ROW
-INSERT INTO user_info
-    (id)
-VALUES
-    (new.id)
-
+BEGIN
+    INSERT INTO user_info
+    SET id
+    =
+    (new.id);
+    INSERT INTO user_fame_rate
+    SET id
+    =
+    (new.id);
+END;
