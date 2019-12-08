@@ -11,11 +11,20 @@ app.use(cookieParser());
 // Init Middleware
 app.use(express.json({ extended: false }));
 
+// This middleware adds the json header to every response
+app.use("*", (req, res, next) => {
+  res.setHeader("Content-Type", "application/json");
+  next();
+});
+
 // Routes
 app.use("/api/users", require("./routes/api/users"));
 app.use("/api/auth", require("./routes/api/auth"));
 app.use("/api/profile", require("./routes/api/profile"));
-//app.use("/api/socket", require("./routes/api/socket"));
+// Handle not valid route
+app.use("*", (req, res) => {
+  res.status(404).json({ status: false, message: "Endpoint Not Found" });
+});
 
 const PORT = process.env.PORT || 5000;
 
@@ -26,17 +35,36 @@ const io = require("socket.io").listen(server, {
   pingTimeout: 60000
 });
 //Share it
-//app.set("io", io);
 let users = [];
 io.on("connection", socket => {
-  console.log("connected", socket.id);
-
   socket.on("login", user => {
-    console.log("on login");
-    socket.username = user;
-    console.log("socket usernsme", socket.username);
-    users.indexOf(user) === -1 && user && users.push(parseInt(user));
+    if (users.findIndex(x => x.id === user) === -1 && user) {
+      socket.userId = user;
+      users.push({ id: user, notifications: 0 });
+    }
     io.sockets.emit("login", { users });
+    io.sockets.emit("notification", { users });
   });
-  socket.on("disconnect", () => console.log("disconnect", socket.username));
+
+  socket.on("notification", data => {
+    users.find(x => {
+      if (x.id === data.id) x.notifications += 1;
+    });
+    console.log(users);
+    io.sockets.emit("notification", { users });
+  });
+
+  socket.on("clearNotifications", data => {
+    users.find(x => {
+      if (x.id === data.id) x.notifications = 0;
+    });
+    io.sockets.emit("notification", { users });
+  });
+  socket.on("disconnect", () => {
+    users.find((o, i) => {
+      if (o && o.id === socket.userId) {
+        users.splice(i, 1);
+      }
+    });
+  });
 });

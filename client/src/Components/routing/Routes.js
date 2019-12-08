@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Route, Switch } from "react-router-dom";
 import Login from "../auth/Login";
 import Register from "../auth/Register";
@@ -8,22 +8,15 @@ import Recover from "../auth/Recover";
 import Editpass from "../auth/Editpass";
 import { Profile } from "../profile/Profile";
 import { Notifications } from "../pages/Notifications";
+import { History } from "../pages/History";
 import Browse from "../pages/Browse";
 import Chat from "../pages/Chat";
 import Edit_Profile from "../profile/Edit_Profile";
 import PrivateRoute from "./PrivateRoute";
 import { useUserStore } from "../../Context/appStore";
-import { setUserOnline } from "../../actions/profileAction";
-import io from "socket.io-client";
-const socket = io("http://localhost:5000");
 
 const Routes = () => {
   const [{ auth }] = useUserStore();
-
-  useEffect(() => {
-    socket.emit("login", auth.userInfo.id);
-    //socket.on("login", data => data.users.length > 0 && setUserOnline());
-  }, [auth]);
 
   return (
     <div style={{ flex: 1 }}>
@@ -40,6 +33,7 @@ const Routes = () => {
           path="/profile/:id"
           component={Profile}
         />
+        <PrivateRoute auth={auth} exact path="/history" component={History} />
         <PrivateRoute auth={auth} exact path="/browse" component={Browse} />
         <PrivateRoute auth={auth} exact path="/chat" component={Chat} />
         <PrivateRoute

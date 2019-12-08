@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import { useUserStore } from "../../Context/appStore";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import Divider from "@material-ui/core/Divider";
@@ -10,11 +9,9 @@ import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import Typography from "@material-ui/core/Typography";
 import { CssBaseline, Container, Fab, Grid } from "@material-ui/core";
-import NotificationsIcon from "@material-ui/icons/Notifications";
+import HistoryIcon from "@material-ui/icons/History";
 import DeleteIcon from "@material-ui/icons/Delete";
 import axios from "axios";
-import io from "socket.io-client";
-const socket = io("http://localhost:5000");
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -58,25 +55,21 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-export const NotificationsList = ({ userNotification }) => {
+export const HistoryList = ({ userHistory }) => {
   const classes = useStyles();
 
   return (
     <List className={classes.root}>
-      <ListItem
-        alignItems="flex-start"
-        className={classes.item}
-        style={{ backgroundColor: !userNotification.seen && "#F2F8FD" }}
-      >
+      <ListItem alignItems="flex-start" className={classes.item}>
         <ListItemAvatar>
           <Avatar
             alt="Remy Sharp"
-            src={`/uploads/${userNotification.profile_image}`}
+            src={`/uploads/${userHistory.profile_image}`}
           />
         </ListItemAvatar>
-        <Link to={`profile/${userNotification.id_profile}`}>
+        <Link to={`profile/${userHistory.id_profile}`}>
           <ListItemText
-            primary={`${userNotification.first_name} ${userNotification.last_name}`}
+            primary={`${userHistory.first_name} ${userHistory.last_name}`}
             secondary={
               <React.Fragment>
                 <Typography
@@ -85,9 +78,9 @@ export const NotificationsList = ({ userNotification }) => {
                   className={classes.inline}
                   color="textPrimary"
                 >
-                  {`At ${userNotification.date}`}
+                  {userHistory.date}
                 </Typography>
-                {` - ${userNotification.notification} you`}
+                {" - On this date you visited this profile"}
               </React.Fragment>
             }
           />
@@ -102,7 +95,7 @@ const Icon = () => {
   const classes = useStyles();
   return (
     <Avatar className={classes.avatar}>
-      <NotificationsIcon style={{ fontSize: "80px" }} />
+      <HistoryIcon style={{ fontSize: "80px" }} />
     </Avatar>
   );
 };
@@ -125,10 +118,10 @@ const ButtonRed = ({ icon = false }) => {
   );
 };
 
-export const Title = ({ text, classes, color = "black", setNotifications }) => {
+export const Title = ({ text, classes, color = "black", setHistory }) => {
   const handleClick = async () => {
-    await axios.get("/api/profile/clearUserNotifications");
-    setNotifications([]);
+    await axios.get("/api/profile/clearUserHistory");
+    setHistory([]);
   };
   return (
     <Grid container>
@@ -149,52 +142,34 @@ export const Title = ({ text, classes, color = "black", setNotifications }) => {
   );
 };
 
-const NotificationsHoler = ({ notifications, setNotifications }) => {
+const HistoryHolder = ({ history, setHistory }) => {
   const classes = useStyles();
   return (
     <Container component="main" maxWidth="sm">
       <CssBaseline />
       <Icon />
-      <Title
-        text={"Notifications"}
-        classes={classes}
-        setNotifications={setNotifications}
-      />
-      {notifications.length === 0 ? (
-        <p style={{ color: "grey", fontSize: "12px" }}>Notifications empty</p>
-      ) : (
-        notifications.map(notif => (
-          <NotificationsList key={notif.id} userNotification={notif} />
-        ))
-      )}
+      <Title text={"History"} classes={classes} setHistory={setHistory} />
+      {history.map(his => (
+        <HistoryList userHistory={his} key={his.id} />
+      ))}
     </Container>
   );
 };
 
-export const Notifications = () => {
+export const History = () => {
   const [load, setLoad] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [{ auth }] = useUserStore();
-
+  const [history, setHistory] = useState([]);
   useEffect(() => {
     (async () => {
-      const result = await axios.get("/api/profile/getUserNotifications");
-      setNotifications(result.data.notifications);
+      const result = await axios.get("/api/profile/getUserHistory");
+      setHistory(result.data.history);
       setLoad(true);
     })();
-    (async () => {
-      await axios.get("/api/profile/updateNotifications");
-    })();
-    socket.emit("clearNotifications", { id: auth.userInfo.id });
-  }, [auth.userInfo.id]);
-
+  }, []);
   if (!load) return null;
   return (
     <div>
-      <NotificationsHoler
-        notifications={notifications}
-        setNotifications={setNotifications}
-      />
+      <HistoryHolder history={history} setHistory={setHistory} />
     </div>
   );
 };

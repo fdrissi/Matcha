@@ -4,10 +4,10 @@ import {
   getUserInfo,
   getUserImages,
   likeProfile,
-  isUserLikedProfile,
-  blockProfile
+  blockProfile,
+  reportProfile,
+  recordVisitedProfiles
 } from "../../actions/profileAction";
-import Moment from "react-moment";
 import {
   makeStyles,
   Avatar,
@@ -20,7 +20,8 @@ import {
   Fab,
   Box,
   Dialog,
-  DialogContent
+  DialogContent,
+  CircularProgress
 } from "@material-ui/core";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
@@ -30,7 +31,7 @@ import Image from "material-ui-image";
 import io from "socket.io-client";
 const socket = io("http://localhost:5000");
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
   cover: {
     width: "100%",
     minHeight: "421px",
@@ -86,18 +87,38 @@ const useStyles = makeStyles(() => ({
   border: {
     border: "2px solid #e0e0e0",
     borderRadius: "5px",
-    padding: "30px 22px",
+    padding: "20px 10px",
     marginBottom: "5%"
+  },
+  list: {
+    listStyle: "none",
+    wordBreak: "break-all",
+    padding: "0px 0px 0px 40px",
+    [theme.breakpoints.down("sm")]: {
+      listStyle: "none",
+      wordBreak: "break-all",
+      padding: "0px 0px 0px 10px"
+    }
   },
   normalli: {
     fontWeight: "normal",
     fontSize: "16px",
-    color: "#000"
+    color: "#000",
+    [theme.breakpoints.down("sm")]: {
+      fontWeight: "normal",
+      fontSize: "12px",
+      color: "#334249"
+    }
   },
   boldli: {
     fontWeight: "bold",
     fontSize: "16px",
-    color: "##334249"
+    color: "#334249",
+    [theme.breakpoints.down("sm")]: {
+      fontWeight: "bold",
+      fontSize: "12px",
+      color: "#334249"
+    }
   },
   title: {
     fontWeight: "bold",
@@ -110,27 +131,33 @@ const useStyles = makeStyles(() => ({
 const UserInfo = () => {
   const classes = useStyles();
   const [{ profile }] = useUserStore();
-
-  let date =
-    profile.info.user_birth_year &&
-    `${profile.info.user_birth_year}-${profile.info.user_birth_month}-${profile.info.user_birth_day}`;
+  let circle =
+    profile.info.user_fame_rate === 0 ? 100 : profile.info.user_fame_rate;
+  let color = "#e74c3c";
+  if (profile.info.user_fame_rate >= 75) color = "#008000";
+  else if (profile.info.user_fame_rate >= 50) color = "#00FF00";
   return (
     <>
       <h3 className={classes.name}>
         {profile.info.user_first_name + " " + profile.info.user_last_name}
       </h3>
-      <h4 className={classes.info}>
-        {date && (
-          <Moment format="YYYY-MM-DD" fromNow ago>
-            {date}
-          </Moment>
-        )}
-      </h4>
+      <h4 className={classes.info}>{profile.info.user_age}</h4>
       <br />
       <h4 className={classes.info} style={{ marginRight: "5%" }}>
         Morocco, {profile.info.user_city}
       </h4>
-      <h4 className={classes.info}>FameRate</h4>
+      <h4 className={classes.info}>
+        <CircularProgress
+          variant="static"
+          thickness={7}
+          value={circle}
+          size={30}
+          style={{
+            color: color,
+            verticalAlign: "middle"
+          }}
+        />
+      </h4>
     </>
   );
 };
@@ -141,10 +168,23 @@ const ProfileImage = () => {
   const [online, setOnline] = useState(false);
 
   useEffect(() => {
-    socket.on("login", data => {
-      data.users.indexOf(parseInt(profile.info.id)) > -1 && setOnline(true);
-    });
-  }, [profile, auth]);
+    let unmounted = false;
+    // Check if user logged in
+    if (socket.listeners("login").length <= 1) {
+      socket.on("login", data => {
+        const exist = data.users.find(x => {
+          return x.id === profile.info.id;
+        });
+        if (exist && !unmounted) setOnline(true);
+      });
+    }
+    // if is the owner profile, set online true
+    if (auth.userInfo.id === profile.info.id) setOnline(true);
+    return () => {
+      unmounted = true;
+    };
+  }, [profile.info.id, auth.userInfo.id]);
+
   return (
     <>
       <Avatar
@@ -183,6 +223,11 @@ const LongMenu = () => {
     await blockProfile(profile.info.id, dispatch);
   };
 
+  const handleReport = async () => {
+    handleClose();
+    await reportProfile(profile.info.id);
+  };
+
   return (
     <>
       <IconButton
@@ -211,7 +256,7 @@ const LongMenu = () => {
         <MenuItem onClick={handleBlock}>
           {profile.info.blocked ? "Unblock" : "Block"}
         </MenuItem>
-        <MenuItem onClick={handleClose}>{"Report"}</MenuItem>
+        <MenuItem onClick={handleReport}>{"Report"}</MenuItem>
       </Menu>
     </>
   );
@@ -265,12 +310,13 @@ const ProfileHeader = () => {
   const [{ auth, profile }, dispatch] = useUserStore();
 
   const handleClick = async () => {
-    await likeProfile(profile.info.id, dispatch);
+    const result = await likeProfile(profile.info.id, dispatch);
+    if (result) {
+      socket.emit("notification", { id: profile.info.id });
+    }
   };
-  useEffect(() => {
-    console.log("object", profile.info);
-  }, [profile]);
-  console.log("liked", profile.info.liked);
+
+  if (profile.info.loading) return null;
   return (
     <Cover img={"/uploads/" + profile.photo.cover_Image}>
       <UserAllInfoContainer>
@@ -312,10 +358,10 @@ const ProfileHeader = () => {
   );
 };
 
-const Parameters = ({ values = [], liClassName }) => {
+const Parameters = ({ values = [], liClassName, lstClass }) => {
   return (
     <div style={{ display: "inline-block" }}>
-      <ul style={{ listStyle: "none" }}>
+      <ul className={lstClass}>
         <li className={liClassName}>{values[0]}</li>
         <li className={liClassName}>{values[1]}</li>
         <li className={liClassName}>{values[2]}</li>
@@ -343,14 +389,14 @@ const ProfileContent = ({ classes }) => {
     user_relationship,
     user_gender_interest,
     user_current_occupancy,
-    user_tags
+    user_tags.slice(0, 3) + ""
   ];
 
   const params = [
     "Gender",
     "Country",
     "City",
-    "relationship",
+    "Relationship",
     "Interest",
     "Occupancy",
     "Tags"
@@ -362,19 +408,29 @@ const ProfileContent = ({ classes }) => {
         <Parameters
           values={params.slice(0, 4)}
           liClassName={classes.normalli}
+          lstClass={classes.list}
         />
       </ProfileContentContainer>
       <ProfileContentContainer>
-        <Parameters values={values.slice(0, 4)} liClassName={classes.boldli} />
+        <Parameters
+          values={values.slice(0, 4)}
+          liClassName={classes.boldli}
+          lstClass={classes.list}
+        />
       </ProfileContentContainer>
       <ProfileContentContainer>
         <Parameters
           values={params.slice(4, 8)}
           liClassName={classes.normalli}
+          lstClass={classes.list}
         />
       </ProfileContentContainer>
       <ProfileContentContainer>
-        <Parameters values={values.slice(4, 8)} liClassName={classes.boldli} />
+        <Parameters
+          values={values.slice(4, 8)}
+          liClassName={classes.boldli}
+          lstClass={classes.list}
+        />
       </ProfileContentContainer>
     </Grid>
   );
@@ -458,10 +514,6 @@ export const Profile = ({ match }) => {
   const id = match.params.id;
 
   useEffect(() => {
-    console.log(auth);
-  }, [auth]);
-
-  useEffect(() => {
     const info = async () => {
       await getUserInfo(stableDispatch, id);
       await getUserImages(stableDispatch, id);
@@ -469,22 +521,35 @@ export const Profile = ({ match }) => {
     info();
   }, [stableDispatch, id]);
 
+  useEffect(() => {
+    if (+profile.info.id !== 0 && auth.userInfo.id !== 0) {
+      console.log("ids", +profile.info.id, auth.userInfo.id);
+      recordVisitedProfiles(+profile.info.id);
+      if (
+        socket.listeners("notification").length === 0 &&
+        +profile.info.id !== auth.userInfo.id
+      ) {
+        socket.emit("notification", { id: profile.info.id });
+      }
+    }
+  }, [profile.info.id, auth.userInfo.id]);
+
   const imgs = [
     {
       id: 1,
-      src: `/uploads/${profile.photo.cover_Image}`
-    },
-    {
-      id: 2,
       src: `/uploads/${profile.photo.first_Image}`
     },
     {
-      id: 3,
+      id: 2,
       src: `/uploads/${profile.photo.second_Image}`
     },
     {
-      id: 4,
+      id: 3,
       src: `/uploads/${profile.photo.third_Image}`
+    },
+    {
+      id: 4,
+      src: `/uploads/${profile.photo.fourth_Image}`
     }
   ];
 
