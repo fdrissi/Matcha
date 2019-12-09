@@ -294,7 +294,7 @@ const Sort = () => {
                 style={{ justifyContent: "center" }}
                 name="sort_by"
                 onChange={handleChange}
-                value={sort.sort_by}
+                value={profile.browser.sort_by}
               >
                 <FormControlLabel
                   value="Age"
