@@ -195,6 +195,7 @@ function EditProfile() {
   const handleChangeIndex = index => {
     setIndex(index);
   };
+  console.log(profile);
 
   const onImageChange = event => {
     event.persist();
