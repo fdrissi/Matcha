@@ -19,7 +19,6 @@ app.use("*", (req, res, next) => {
 
 // Routes
 app.use("/api/users", require("./routes/api/users"));
-app.use("/api/auth", require("./routes/api/auth"));
 app.use("/api/profile", require("./routes/api/profile"));
 // Handle not valid route
 app.use("*", (req, res) => {
