@@ -21,6 +21,8 @@ app.use("*", (req, res, next) => {
 app.use("/api/users", require("./routes/api/users"));
 app.use("/api/auth", require("./routes/api/auth"));
 app.use("/api/profile", require("./routes/api/profile"));
+app.use("/api/browse", require("./routes/api/browse"));
+
 // Handle not valid route
 app.use("*", (req, res) => {
   res.status(404).json({ status: false, message: "Endpoint Not Found" });
