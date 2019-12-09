@@ -80,10 +80,11 @@ const Editpass = params => {
     event.preventDefault();
   };
 
-  const [state, dispatch] = useUserStore();
+  const [{ operations, alert, token }, dispatch] = useUserStore();
+
   const stableDispatch = useCallback(dispatch, []);
 
-  const { is_loading, token_valide, token_valide_message } = state.token;
+  const { is_loading, token_valide, token_valide_message } = token;
 
   const submitForm = async form => {
     form.preventDefault();
@@ -116,7 +117,7 @@ const Editpass = params => {
   }, [params.params.token, stableDispatch]);
   useEffect(() => {
     return () => {
-      if (!state.register.success && token_valide) {
+      if (!operations.success && token_valide) {
         stableDispatch({
           type: REMOVE_ALERT
         });
@@ -125,7 +126,7 @@ const Editpass = params => {
         });
       }
     };
-  }, [state.register.success, token_valide, stableDispatch]);
+  }, [operations.success, token_valide, stableDispatch]);
 
   if (is_loading) {
     return null;
@@ -137,9 +138,7 @@ const Editpass = params => {
         <Container component="main" maxWidth="xs">
           <CssBaseline />
           <div className={classes.paper}>
-            {state.alert.msg && (
-              <Alert message={state.alert.msg} type={state.alert.alertType} />
-            )}
+            {alert.msg && <Alert message={alert.msg} type={alert.alertType} />}
             <Avatar className={classes.avatar}>
               <LockOutlinedIcon />
             </Avatar>
@@ -149,9 +148,7 @@ const Editpass = params => {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
-                    error={
-                      state.register.errors.password.length > 0 ? true : false
-                    }
+                    error={operations.errors.password.length > 0 ? true : false}
                     variant="outlined"
                     required
                     fullWidth
@@ -179,16 +176,16 @@ const Editpass = params => {
                       )
                     }}
                   />
-                  {state.register.errors.password.length > 0 && (
+                  {operations.errors.password.length > 0 && (
                     <FormHelperText className={classes.helperText}>
-                      <sup>*</sup> {state.register.errors.password}
+                      <sup>*</sup> {operations.errors.password}
                     </FormHelperText>
                   )}
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
                     error={
-                      state.register.errors.confirmPassword.length > 0
+                      operations.errors.confirmPassword.length > 0
                         ? true
                         : false
                     }
@@ -219,9 +216,9 @@ const Editpass = params => {
                       )
                     }}
                   />
-                  {state.register.errors.confirmPassword.length > 0 && (
+                  {operations.errors.confirmPassword.length > 0 && (
                     <FormHelperText className={classes.helperText}>
-                      <sup>*</sup> {state.register.errors.confirmPassword}
+                      <sup>*</sup> {operations.errors.confirmPassword}
                     </FormHelperText>
                   )}
                 </Grid>
