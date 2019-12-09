@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Cover } from "../profile/Profile";
 import { Title } from "./Notifications";
-import { getBrowser, filterBrowser } from "../../actions/profileAction";
+import {
+  getBrowse,
+  filterBrowser,
+  sortProfiles
+} from "../../actions/browseAction";
 
 import {
   Box,
@@ -30,7 +34,6 @@ import Radio from "@material-ui/core/Radio";
 import Slider from "@material-ui/core/Slider";
 import Rating from "@material-ui/lab/Rating";
 import { useUserStore } from "../../Context/appStore";
-import axios from "axios";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -245,15 +248,17 @@ const Sort = () => {
     sort_by: ""
   });
   const [{ profile }, dispatch] = useUserStore();
-  console.log(profile);
 
   const handleChange = event => {
-    console.log("test");
     setSort({
       ...sort,
       [event.target.name]: event.target.value
     });
   };
+
+  useEffect(() => {
+    sortProfiles(profile, dispatch, sort);
+  }, [sort]);
   return (
     <Card style={{ backgroundColor: "transparent" }}>
       <CardContent style={{ height: "164px" }}>
@@ -289,11 +294,7 @@ const Sort = () => {
                 style={{ justifyContent: "center" }}
                 name="sort_by"
                 onChange={handleChange}
-                value={
-                  profile.browser.sort_by
-                    ? profile.browser.sort_by
-                    : sort.sort_by
-                }
+                value={profile.browser.sort_by}
               >
                 <FormControlLabel
                   value="Age"
@@ -302,15 +303,15 @@ const Sort = () => {
                   labelPlacement="start"
                 />
                 <FormControlLabel
-                  value="location"
+                  value="Location"
                   control={<Radio color="secondary" />}
-                  label="location"
+                  label="Location"
                   labelPlacement="start"
                 />
                 <FormControlLabel
-                  value="fame rating"
+                  value="Fame rating"
                   control={<Radio color="secondary" />}
-                  label="fame rating"
+                  label="Fame rating"
                   labelPlacement="start"
                 />
               </RadioGroup>
@@ -350,7 +351,6 @@ const Filter = () => {
       [name]: newValue
     });
   };
-  console.log();
   return (
     <form className={classes.form} onSubmit={form => submitForm(form)}>
       <Card style={{ backgroundColor: "transparent" }}>
@@ -457,12 +457,7 @@ const Header = () => {
       <Cover img={"/img/banner-brwose.jpg"}>
         <Grid xs={12} container item justify="center">
           <div>
-            <Typography
-              variant="h5"
-              id="range-slider"
-              gutterBottom
-              classes={classes.title}
-            >
+            <Typography variant="h5" id="range-slider" gutterBottom>
               <img src="./img/t-left-img.png" alt="left" />
               Browse
               <img src="./img/t-right-img.png" alt="right" />
@@ -490,11 +485,10 @@ const Header = () => {
 };
 
 const Browse = () => {
-  const [{ profile }, dispatch] = useUserStore();
-  console.log(profile);
+  const [{}, dispatch] = useUserStore();
   useEffect(() => {
     async function test() {
-      await getBrowser(dispatch);
+      await getBrowse(dispatch);
     }
     test();
   }, []);

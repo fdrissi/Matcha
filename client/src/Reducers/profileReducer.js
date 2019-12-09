@@ -4,7 +4,8 @@ import {
   PROFILE_BLOCKED,
   PROFILE_LIKED,
   PROFILE_MATCHED,
-  BROWSER_RETURN
+  BROWSER_RETURN,
+  SORT_BY_BACK
 } from "../actions/actionTypes";
 
 export const profileInitState = {
@@ -64,6 +65,8 @@ export const profileReducer = (state, action) => {
       return { ...state, info: { ...state.info, matched: payload } };
     case BROWSER_RETURN:
       return { ...state, browser: { ...state.browser, result: payload } };
+    case SORT_BY_BACK:
+      return { ...state, browser: { ...state.browser, sort_by: payload } };
     default:
       return state;
   }
