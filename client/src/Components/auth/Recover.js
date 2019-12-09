@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -12,6 +12,7 @@ import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
 import Alert from "../inc/Alert";
 import { recover } from "../../actions/userAction";
+import { REMOVE_ALERT } from "../../actions/actionTypes";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -55,8 +56,8 @@ function Recover() {
   const [MyForm, setMyFormData] = useState({
     data: ""
   });
-
   const [state, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
 
   const submitForm = async form => {
     form.preventDefault();
@@ -69,6 +70,15 @@ function Recover() {
       data: event.target.value.trim()
     }));
   };
+
+  useEffect(() => {
+    return () => {
+      stableDispatch({
+        type: REMOVE_ALERT
+      });
+    };
+  }, [stableDispatch]);
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />

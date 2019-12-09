@@ -5,7 +5,7 @@ import Login from "../auth/Login";
 
 const PrivateRoute = ({ component, ...rest }) => {
   const [{ auth }] = useUserStore();
-  const finaleComponent = auth.userInfo.isAuthenticated ? component : Login;
+  const finaleComponent = auth.isAuthenticated ? component : Login;
   if (auth.userInfo.loading) return null;
   return <Route {...rest} component={finaleComponent} />;
 };

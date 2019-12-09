@@ -1,4 +1,5 @@
-var nodemailer = require("nodemailer");
+const nodemailer = require("nodemailer");
+const config = require("config");
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -6,8 +7,10 @@ const transporter = nodemailer.createTransport({
     pass: "hdhgiitchzayjgfd"
   }
 });
+const url = config.get("url");
 
-const sendActivation = async (email, userName, token, url) => {
+const sendActivation = async (email, userName, token) => {
+  console.log(url);
   let mailOptions = {
     from: "ayoubebelomari@gmail.com",
     to: email,
@@ -24,7 +27,7 @@ const sendActivation = async (email, userName, token, url) => {
   });
 };
 
-const sendRecovery = async (info, token, url) => {
+const sendRecovery = async (info, token) => {
   let mailOptions = {
     from: "ayoubebelomari@gmail.com",
     to: info.email,
