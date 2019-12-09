@@ -242,111 +242,6 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
   }
 });
 
-//  Workibng on the browser
-// @route   Post api/profle/getBrowser
-// @desc    get Browser data
-// @access  Private
-router.get("/getBrowser/", [middleware.auth], async (req, res) => {
-  try {
-    const id = req.user.id;
-    const interesting = await profileModel.getUserInfoByRow(
-      id,
-      "user_gender_interest"
-    );
-    const lat = await profileModel.getUserInfoByRow(id, "user_lat");
-    const long = await profileModel.getUserInfoByRow(id, "user_lng");
-    const gender = await profileModel.getUserInfoByRow(id, "user_gender");
-    const data = await profileModel.getAllUserForBrowser(
-      id,
-      interesting,
-      gender
-    );
-    function distance(lat1, lon1, lat2, lon2) {
-      var p = 0.017453292519943295; // Math.PI / 180
-      var c = Math.cos;
-      var a =
-        0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        (c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p))) / 2;
-      return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
-    }
-    data.map(value => {
-      const destination = parseFloat(
-        distance(lat, long, value.user_lat, value.user_lng).toFixed(2)
-      );
-      value.destination = destination;
-    });
-    data.sort((a, b) =>
-      a.destination > b.destination ? 1 : b.destination > a.destination ? -1 : 0
-    );
-    return res.json(data);
-  } catch (error) {
-    return false;
-  }
-});
-
-//  Workibng on the browser
-// @route   Post api/profle/getFilter
-// @desc    filter for the browser
-// @access  Private
-router.get(
-  "/getFilter",
-  [middleware.auth, middleware.browse_filter],
-  async (req, res) => {
-    const id = req.user.id;
-    const { filter } = req.query;
-    const { age_range, location_range, fame_rating } = JSON.parse(filter);
-    const interesting = await profileModel.getUserInfoByRow(
-      id,
-      "user_gender_interest"
-    );
-    const lat = await profileModel.getUserInfoByRow(id, "user_lat");
-    const long = await profileModel.getUserInfoByRow(id, "user_lng");
-    const gender = await profileModel.getUserInfoByRow(id, "user_gender");
-    const newData = await profileModel.getFilterUserForBrowser(
-      id,
-      interesting,
-      gender,
-      filter
-    );
-
-    function distance(lat1, lon1, lat2, lon2) {
-      var p = 0.017453292519943295; // Math.PI / 180
-      var c = Math.cos;
-      var a =
-        0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        (c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p))) / 2;
-      return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
-    }
-    console.log(age_range);
-
-    const data = newData.filter(el => {
-      const destination = parseFloat(
-        distance(lat, long, el.user_lat, el.user_lng).toFixed(2)
-      );
-      return !(
-        destination > location_range ||
-        el.user_birth < age_range[0] ||
-        el.user_birth > age_range[1]
-      );
-    });
-    data.forEach(el => {
-      const destination = parseFloat(
-        distance(lat, long, el.user_lat, el.user_lng).toFixed(2)
-      );
-      el.destination = destination;
-    });
-    data.sort((a, b) =>
-      a.destination > b.destination ? 1 : b.destination > a.destination ? -1 : 0
-    );
-    return res.json({
-      success: true,
-      data
-    });
-  }
-);
-
 // Profile_info
 
 // @route   Post api/profle/getInfo
@@ -742,6 +637,7 @@ router.get("/getUserNotifications", middleware.auth, async (req, res) => {
   const id = req.user.id;
   try {
     const result = await profileModel.getUserNotifications(id);
+    console.log(result);
     return res.json({
       success: true,
       notifications: result

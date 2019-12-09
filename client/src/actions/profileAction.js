@@ -6,8 +6,7 @@ import {
   FAILIED_UPDATE_USER,
   REMOVE_ERRORS,
   PROFILE_BLOCKED,
-  PROFILE_LIKED,
-  BROWSER_RETURN
+  PROFILE_LIKED
 } from "./actionTypes";
 
 export const setUserImages = async (formData, row, dispatch) => {
@@ -225,44 +224,6 @@ export const setUserLocation = async (latitude, longitude, error) => {
     { data: { latitude, longitude, error } },
     config
   );
-};
-
-export const getBrowser = async dispatch => {
-  const config = {
-    header: {
-      "Content-Type": "application/json"
-    }
-  };
-  const res = await axios.get(`api/profile/getBrowser`, config);
-  dispatch({
-    type: BROWSER_RETURN,
-    payload: res.data
-  });
-};
-
-export const filterBrowser = async (filter, dispatch) => {
-  const config = {
-    header: {
-      "Content-Type": "application/json"
-    }
-  };
-  const res = await axios.get(
-    `api/profile/getFilter`,
-    {
-      params: {
-        filter: filter
-      }
-    },
-    config
-  );
-  if (res.data.success) {
-    console.log(res.data.errorMsg);
-  } else {
-    dispatch({
-      type: BROWSER_RETURN,
-      payload: res.data.data
-    });
-  }
 };
 
 export const getpreedefined = async () => {
