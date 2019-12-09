@@ -24,7 +24,23 @@ export const sortProfiles = async (profile, dispatch, sort) => {
     payload: sort.sort_by
   });
   console.log(profile);
-  console.log("test");
+  switch (sort) {
+    case "Location":
+      profile.browser.result.sort((a, b) =>
+        a.destination > b.destination
+          ? 1
+          : b.destination > a.destination
+          ? -1
+          : 0
+      );
+      break;
+    case "Age":
+      profile.browser.result.sort((a, b) =>
+        a.user_birth > b.user_birth ? 1 : b.user_birth > a.user_birth ? -1 : 0
+      );
+      break;
+    default:
+  }
 };
 
 export const filterBrowser = async (filter, dispatch) => {
