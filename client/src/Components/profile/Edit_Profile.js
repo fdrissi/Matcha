@@ -262,8 +262,6 @@ function EditProfile() {
     setData(profile.info);
   }, [profile.info]);
 
-  console.log(profile.info);
-
   useEffect(() => {
     if (!isFirstRun.current) {
       const formData = new FormData();

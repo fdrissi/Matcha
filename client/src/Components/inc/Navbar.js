@@ -190,7 +190,24 @@ const NavCircle = () => {
         >
           <MenuItem onClick={handleClose}>Profile</MenuItem>
         </Link>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
+        <Link
+          to={`/setting`}
+          style={{ color: "black", textDecoration: "none" }}
+        >
+          <MenuItem onClick={handleClose}>Setting</MenuItem>
+        </Link>
+        <Link
+          to={`/edit-profile`}
+          style={{ color: "black", textDecoration: "none" }}
+        >
+          <MenuItem onClick={handleClose}>Edit Profile</MenuItem>
+        </Link>
+        <Link
+          to={`/history`}
+          style={{ color: "black", textDecoration: "none" }}
+        >
+          <MenuItem onClick={handleClose}>History</MenuItem>
+        </Link>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </div>
