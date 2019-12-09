@@ -41,23 +41,23 @@ var storage = multer.diskStorage({
 // @route   Post api/profle/upload
 // @desc    upload user images
 // @access  Private
-var upload = multer({ storage: storage });
+const upload = multer({ storage: storage });
 router.post(
   "/upload/:row",
   [middleware.auth, upload.single("myImage")],
   async (req, res) => {
-<<<<<<< HEAD
     try {
       const file = req.file;
       const { row } = req.params;
       const id = req.user.id;
       const image = new Jimp(file.path, async function(err, image) {
         if (!err && file) {
+          console.log(id);
           let filename = id + "/" + file.filename;
           const remove = await profileModel.removeOnUpload(id, row);
           const counter = await profileModel.getCounter(id);
           if (row === "profile_Image")
-            check = await profileModel.setProfile(id, filename);
+            check = await profileModel.setProfile(id, "profile.png");
           else if (remove !== "photo_holder.png" && row !== "profile_Image")
             check = await profileModel.setImageRow(id, row, filename);
           else check = await profileModel.SetImage(id, filename, counter);
@@ -84,29 +84,6 @@ router.post(
               success: false,
               errorMsg: "There is an error on upload image api 😱"
             });
-=======
-    const file = req.file;
-    const { row } = req.params;
-    const id = req.user.id;
-    const image = new Jimp(file.path, async function(err, image) {
-      if (!err && file) {
-        console.log(id);
-        let filename = id + "/" + file.filename;
-        const remove = await profileModel.removeOnUpload(id, row);
-        const counter = await profileModel.getCounter(id);
-        if (row === "profile_Image")
-          check = await profileModel.setProfile(id, "profile.png");
-        else if (remove !== "photo_holder.png" && row !== "profile_Image")
-          check = await profileModel.setImageRow(id, row, filename);
-        else check = await profileModel.SetImage(id, filename, counter);
-        const result = await profileModel.getImage(id);
-        const cover = await profileModel.getImageByRow(id, "cover_Image");
-        if (check) {
-          if (remove !== "photo_holder.png" && remove !== `${id}/profile.png`) {
-            await unlinkAsync(`./client/public/uploads/${remove}`);
-            if (remove === cover)
-              await profileModel.setImageCover(id, "cover_holder.png");
->>>>>>> e3c9ebdeb7ac42744b8050b63ffbcb007954811c
           }
         } else {
           await unlinkAsync(file.path);
