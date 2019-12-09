@@ -306,6 +306,6 @@ export const updateUser = async (formData, dispatch) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    return false;
   }
 };

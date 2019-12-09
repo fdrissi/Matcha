@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useUserStore } from "../../Context/appStore";
+import { loadUser } from "../../actions/userAction";
 import { Route, Link } from "react-router-dom";
 import {
   IconButton,
@@ -138,7 +139,7 @@ const NavBtn = ({ text, link }) => (
 const NavCircle = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const [{ auth }] = useUserStore();
+  const [{ auth }, dispatch] = useUserStore();
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -146,6 +147,13 @@ const NavCircle = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    const result = await axios.get("/api/users/logout");
+    if (result.data.success) {
+      await loadUser(dispatch);
+    }
   };
 
   if (auth.loading) return null;
@@ -176,10 +184,14 @@ const NavCircle = () => {
         open={open}
         onClose={handleClose}
       >
-        <Link to={`/profile/${auth.userInfo.id}`}>
+        <Link
+          to={`/profile/${auth.userInfo.id}`}
+          style={{ color: "black", textDecoration: "none" }}
+        >
           <MenuItem onClick={handleClose}>Profile</MenuItem>
         </Link>
         <MenuItem onClick={handleClose}>My account</MenuItem>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </div>
   );

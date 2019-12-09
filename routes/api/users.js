@@ -9,7 +9,6 @@ const key = config.get("keyOrSecret");
 const crypto = require("crypto");
 const middleware = require("../../middleware/midlleware");
 
-
 // @route   POST api/users/login
 // @desc    Login User
 // @access  Public
@@ -38,6 +37,18 @@ router.post("/login", async (req, res) => {
     res.cookie("token", token, { httpOnly: true, maxAge: expiration * 1000 }); //one hour or 2 weeks
     res.json({ success: true });
   });
+});
+
+// @route   POST api/users/logout
+// @desc    Login User
+// @access  Public
+router.get("/logout", [middleware.auth], async (req, res) => {
+  try {
+    res.clearCookie("token");
+    return res.json({ success: true });
+  } catch (error) {
+    return res.json({ success: false, errorMsg: "Error" });
+  }
 });
 
 // @route   POST api/users/register
@@ -258,85 +269,88 @@ router.get("/activation", async (req, res) => {
 // @route   POST api/users/updateUser
 // @desc    Edit user info (name, email, password...)
 // @access  Public
-router.post("/updateUser", [middleware.auth, middleware.setting], async (req, res) => {
-  const errors = {
-    firstName: "",
-    lastName: "",
-    userName: "",
-    email: "",
-    newPassword: "",
-    oldPassword: "",
-    confirmPassword: ""
-  };
-  const { firstName, lastName, userName, email, newPassword } = req.body;
+router.post(
+  "/updateUser",
+  [middleware.auth, middleware.setting],
+  async (req, res) => {
+    const errors = {
+      firstName: "",
+      lastName: "",
+      userName: "",
+      email: "",
+      newPassword: "",
+      oldPassword: "",
+      confirmPassword: ""
+    };
+    const { firstName, lastName, userName, email, newPassword } = req.body;
 
-  try {
-    let update = null;
-    const user = userModel.findById(req.user.id);
-    if (user.first_name !== firstName) {
-      update = await userModel.updateFirstName(firstName, req.user.id);
-      if (!update)
-        return res.json({
-          success: false,
-          errorMsg: "Error while update user First Name",
-          errors
-        });
+    try {
+      let update = null;
+      const user = userModel.findById(req.user.id);
+      if (user.first_name !== firstName) {
+        update = await userModel.updateFirstName(firstName, req.user.id);
+        if (!update)
+          return res.json({
+            success: false,
+            errorMsg: "Error while update user First Name",
+            errors
+          });
+      }
+
+      if (user.last_name !== lastName) {
+        update = await userModel.updateLastName(lastName, req.user.id);
+        if (!update)
+          return res.json({
+            success: false,
+            errorMsg: "Error while update Last Name",
+            errors
+          });
+      }
+
+      if (newPassword !== "") {
+        const hash = bcrypt.hashSync(newPassword, 10);
+        update = await userModel.updatePassword(hash, req.user.id);
+        if (!update)
+          return res.json({
+            success: false,
+            errorMsg: "Error while update user password",
+            errors
+          });
+      }
+
+      if (user.username !== userName) {
+        update = await userModel.updateUsername(userName, req.user.id);
+        if (!update)
+          return res.json({
+            success: false,
+            errorMsg: "Error while update Username",
+            errors
+          });
+      }
+
+      if (user.email !== email) {
+        update = userModel.updateEmail(email, req.user.id);
+        if (!update)
+          return res.json({
+            success: false,
+            errorMsg: "Error while update Email",
+            errors
+          });
+      }
+
+      return res.json({
+        success: true,
+        errorMsg: "User Info updated successfully",
+        errors
+      });
+    } catch (error) {
+      return res.json({
+        success: false,
+        errorMsg: "Error while update user info",
+        errors
+      });
     }
-
-    if (user.last_name !== lastName) {
-      update = await userModel.updateLastName(lastName, req.user.id);
-      if (!update)
-        return res.json({
-          success: false,
-          errorMsg: "Error while update Last Name",
-          errors
-        });
-    }
-
-    if (newPassword !== "") {
-      const hash = bcrypt.hashSync(newPassword, 10);
-      update = await userModel.updatePassword(hash, req.user.id);
-      if (!update)
-        return res.json({
-          success: false,
-          errorMsg: "Error while update user password",
-          errors
-        });
-    }
-
-    if (user.username !== userName) {
-      update = await userModel.updateUsername(userName, req.user.id);
-      if (!update)
-        return res.json({
-          success: false,
-          errorMsg: "Error while update Username",
-          errors
-        });
-    }
-
-    if (user.email !== email) {
-      update = userModel.updateEmail(email, req.user.id);
-      if (!update)
-        return res.json({
-          success: false,
-          errorMsg: "Error while update Email",
-          errors
-        });
-    }
-
-    return res.json({
-      success: true,
-      errorMsg: "User Info updated successfully",
-      errors
-    });
-  } catch (error) {
-    console.log(error);
-    return res.json({
-      success: false,
-      errorMsg: "Error while update user info",
-      errors
-    });
   }
-});
+);
 
 module.exports = router;
