@@ -29,7 +29,7 @@ var storage = multer.diskStorage({
   },
   filename: function(req, file, callback) {
     const { row } = req.params;
-    if (row === "profile_Image") return callback(null, "profile" + ".jpg");
+    if (row === "profile_Image") return callback(null, "profile" + ".png");
     else
       return callback(
         null,
@@ -52,11 +52,12 @@ router.post(
       const id = req.user.id;
       const image = new Jimp(file.path, async function(err, image) {
         if (!err && file) {
+          console.log(id);
           let filename = id + "/" + file.filename;
           const remove = await profileModel.removeOnUpload(id, row);
           const counter = await profileModel.getCounter(id);
           if (row === "profile_Image")
-            check = await profileModel.setProfile(id, filename);
+            check = await profileModel.setProfile(id, "profile.png");
           else if (remove !== "photo_holder.png" && row !== "profile_Image")
             check = await profileModel.setImageRow(id, row, filename);
           else check = await profileModel.SetImage(id, filename, counter);
