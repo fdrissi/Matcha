@@ -7,12 +7,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const sendActivation = async (email, userName, token) => {
+const sendActivation = async (email, userName, token, url) => {
   let mailOptions = {
     from: "ayoubebelomari@gmail.com",
     to: email,
     subject: "Activation Of Your Registration",
-    text: `Please Click On This link <a href="http://localhost:3000/activate/${userName}/${token}">Link</a> to activate  your account.`
+    text: `Please Click On This link <a href="http://${url}/activate/${userName}/${token}">Link</a> to activate  your account.`
   };
 
   await transporter.sendMail(mailOptions, function(error, info) {
@@ -24,12 +24,12 @@ const sendActivation = async (email, userName, token) => {
   });
 };
 
-const sendRecovery = async (info, token) => {
+const sendRecovery = async (info, token, url) => {
   let mailOptions = {
     from: "ayoubebelomari@gmail.com",
     to: info.email,
     subject: "Recovery Email",
-    text: `Hi ${info.username} Please Click On This link <a href="http://localhost:3000/editpass/${token}">Link</a> So you can update your account password`
+    text: `Hi ${info.username} Please Click On This link <a href="http://${url}/editpass/${token}">Link</a> So you can update your account password`
   };
 
   await transporter.sendMail(mailOptions, function(error) {

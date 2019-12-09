@@ -17,7 +17,7 @@ async function login(email) {
   }
 }
 
-async function register(data) {
+async function register(data, url) {
   try {
     data = escapeSpecialChars(data);
     const token = crypto.randomBytes(64).toString("hex");
@@ -33,7 +33,7 @@ async function register(data) {
       token
     ]);
     if (result.affectedRows) {
-      sendActivation(data.email, data.userName, token);
+      sendActivation(data.email, data.userName, token, url);
       return result.affectedRows;
     }
   } catch (e) {

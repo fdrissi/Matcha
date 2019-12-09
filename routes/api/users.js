@@ -9,6 +9,8 @@ const key = config.get("keyOrSecret");
 const crypto = require("crypto");
 const middleware = require("../../middleware/midlleware");
 
+const url = config.get("url");
+
 // @route   POST api/users/login
 // @desc    Login User
 // @access  Public
@@ -68,7 +70,7 @@ router.post("/register", [middleware.register], async (req, res) => {
       password: "",
       confirmPassword: ""
     };
-    const user = await userModel.register(req.body);
+    const user = await userModel.register(req.body, url);
     if (!user) {
       return res.json({
         success: false,
@@ -104,7 +106,7 @@ router.post("/recover", async (req, res) => {
         const resultFromSr = userModel.setRecovery(result.email, token);
         if (resultFromSr) {
           // here we gonna send the email of the recovery
-          if (sendRecovery(result, token)) {
+          if (sendRecovery(result, token, url)) {
             return res.json({
               success: true,
               errorMsg:

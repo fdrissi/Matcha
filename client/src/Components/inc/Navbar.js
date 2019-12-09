@@ -150,9 +150,10 @@ const NavCircle = () => {
   };
 
   const handleLogout = async () => {
+    handleClose();
     const result = await axios.get("/api/users/logout");
     if (result.data.success) {
-      await loadUser(dispatch);
+      loadUser(dispatch);
     }
   };
 
