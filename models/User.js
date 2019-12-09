@@ -28,13 +28,12 @@ async function register(data) {
       hash,
       token
     ]);
-    //console.log(result);
     if (result.affectedRows) {
       sendActivation(data.email, data.userName, token);
       return result.affectedRows;
     }
   } catch (e) {
-    console.log(e);
+    return false;
   }
 }
 

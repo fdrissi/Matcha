@@ -255,7 +255,7 @@ export const filterBrowser = async (filter, dispatch) => {
     },
     config
   );
-  if (!res.data.success) {
+  if (res.data.success) {
     console.log(res.data.errorMsg);
   } else {
     dispatch({

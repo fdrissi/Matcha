@@ -50,7 +50,6 @@ io.on("connection", socket => {
     users.find(x => {
       if (x.id === data.id) x.notifications += 1;
     });
-    console.log(users);
     io.sockets.emit("notification", { users });
   });
 
