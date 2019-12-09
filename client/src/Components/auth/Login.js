@@ -75,10 +75,10 @@ const SignIn = () => {
     };
   }, [stableDispatch]);
 
+  if (state.auth.loading) return null;
   if (state.auth.isAuthenticated) {
     return <Redirect to="/setting" />;
   }
-
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />

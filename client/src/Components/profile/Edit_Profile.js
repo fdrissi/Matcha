@@ -263,8 +263,6 @@ function EditProfile() {
     setData(profile.info);
   }, [profile.info]);
 
-  console.log(profile.info);
-
   useEffect(() => {
     if (!isFirstRun.current) {
       const formData = new FormData();
@@ -295,9 +293,7 @@ function EditProfile() {
           <AccountCircle />
         </Avatar>
         <Typography variant="h5">Edit Profile</Typography>
-        <Box textAlign="center">
-          Tempor ad excepteur irure officia in labore velit.
-        </Box>
+        <Box textAlign="center">Edit Your Personnal info</Box>
         <Divider className={classes.divider} />
 
         <AppBar position="static" color="default">

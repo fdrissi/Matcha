@@ -523,7 +523,6 @@ export const Profile = ({ match }) => {
 
   useEffect(() => {
     if (+profile.info.id !== 0 && auth.userInfo.id !== 0) {
-      console.log("ids", +profile.info.id, auth.userInfo.id);
       recordVisitedProfiles(+profile.info.id);
       if (
         socket.listeners("notification").length === 0 &&
