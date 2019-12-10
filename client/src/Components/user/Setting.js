@@ -137,7 +137,6 @@ const Form = () => {
     };
   }, [stableDispatch]);
 
-  if (auth.loading) return null;
   return auth.loading ? null : (
     <Container component="main" maxWidth="xs">
       <CssBaseline />

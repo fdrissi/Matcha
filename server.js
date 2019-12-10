@@ -19,7 +19,6 @@ app.use("*", (req, res, next) => {
 
 // Routes
 app.use("/api/users", require("./routes/api/users"));
-app.use("/api/auth", require("./routes/api/auth"));
 app.use("/api/profile", require("./routes/api/profile"));
 app.use("/api/browse", require("./routes/api/browse"));
 
@@ -52,7 +51,6 @@ io.on("connection", socket => {
     users.find(x => {
       if (x.id === data.id) x.notifications += 1;
     });
-    console.log(users);
     io.sockets.emit("notification", { users });
   });
 

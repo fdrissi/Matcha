@@ -6,9 +6,7 @@ import {
   FAILIED_UPDATE_USER,
   REMOVE_ERRORS,
   PROFILE_BLOCKED,
-  PROFILE_LIKED,
-  PROFILE_MATCHED,
-  PROFILE_REPORTED
+  PROFILE_LIKED
 } from "./actionTypes";
 
 export const setUserImages = async (formData, row, dispatch) => {

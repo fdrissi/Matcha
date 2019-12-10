@@ -1,4 +1,5 @@
-var nodemailer = require("nodemailer");
+const nodemailer = require("nodemailer");
+const config = require("config");
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -6,13 +7,15 @@ const transporter = nodemailer.createTransport({
     pass: "hdhgiitchzayjgfd"
   }
 });
+const url = config.get("url");
 
 const sendActivation = async (email, userName, token) => {
+  console.log(url);
   let mailOptions = {
     from: "ayoubebelomari@gmail.com",
     to: email,
     subject: "Activation Of Your Registration",
-    text: `Please Click On This link <a href="http://localhost:3000/activate/${userName}/${token}">Link</a> to activate  your account.`
+    text: `Please Click On This link <a href="http://${url}/activate/${userName}/${token}">Link</a> to activate  your account.`
   };
 
   await transporter.sendMail(mailOptions, function(error, info) {
@@ -29,7 +32,7 @@ const sendRecovery = async (info, token) => {
     from: "ayoubebelomari@gmail.com",
     to: info.email,
     subject: "Recovery Email",
-    text: `Hi ${info.username} Please Click On This link <a href="http://localhost:3000/editpass/${token}">Link</a> So you can update your account password`
+    text: `Hi ${info.username} Please Click On This link <a href="http://${url}/editpass/${token}">Link</a> So you can update your account password`
   };
 
   await transporter.sendMail(mailOptions, function(error) {
