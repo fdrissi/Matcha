@@ -198,7 +198,7 @@ const Profile = () => {
         return (
           <Box key={inf.id} style={{ margin: "0 4%" }} flexGrow={1}>
             <Avatar
-              src={`./uploads/${inf.id}/profile.jpg`}
+              src={`./uploads/${inf.id}/profile.png`}
               alt={inf.first_name}
               className={classes.avatar}
               onClick={() => handleClickOpen(inf)}
@@ -451,7 +451,6 @@ const Filter = () => {
 };
 
 const Header = () => {
-  const classes = useStyles();
   return (
     <>
       <Cover img={"/img/banner-brwose.jpg"}>
