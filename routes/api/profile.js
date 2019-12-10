@@ -351,7 +351,7 @@ router.post(
           lng: parseFloat(result.user_lng, 10)
         }
       };
-      console.log(my_info);
+      console.log(JSON.parse(result));
       if (check) {
         // that mean that there is a change
         return res.json({
