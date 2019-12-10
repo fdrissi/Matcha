@@ -41,7 +41,7 @@ var storage = multer.diskStorage({
 // @route   Post api/profle/upload
 // @desc    upload user images
 // @access  Private
-var upload = multer({ storage: storage });
+const upload = multer({ storage: storage });
 router.post(
   "/upload/:row",
   [middleware.auth, upload.single("myImage")],

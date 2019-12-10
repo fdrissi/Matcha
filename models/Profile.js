@@ -40,7 +40,6 @@ async function setProfile(id, photoname) {
       return false;
     }
   } catch (error) {
-
     return false;
   }
 }
