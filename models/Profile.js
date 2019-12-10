@@ -30,6 +30,14 @@ async function SetImage(id, photoname, counter) {
 }
 
 async function setProfile(id, photoname) {
+<<<<<<< HEAD
+  let filename = id + "/" + photoname;
+  let sql = "UPDATE photos SET profile_Image = ? WHERE id = ?";
+  const [result] = await pool.query(sql, [filename, id]);
+  if (!empty(result)) {
+    return true;
+  } else {
+=======
   try {
     const merge = id + "/" + photoname;
     let sql = "UPDATE photos SET profile_Image = ? WHERE id = ?";
@@ -40,6 +48,7 @@ async function setProfile(id, photoname) {
       return false;
     }
   } catch (error) {
+>>>>>>> 6cd802fd459b8dcfe4623f9652b5eef8a61873f1
     return false;
   }
 }
