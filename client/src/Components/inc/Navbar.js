@@ -104,10 +104,7 @@ const NavMessage = () => {
 
   return (
     <>
-      <Link
-        to={"/notifications"}
-        style={{ color: "white", textDecoration: "none" }}
-      >
+      <Link to={"/chat"} style={{ color: "white", textDecoration: "none" }}>
         <IconButton
           aria-label="show 4 new mails"
           color="inherit"

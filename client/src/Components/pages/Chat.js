@@ -1,6 +1,30 @@
 import React, { useState } from "react";
-import { NotificationsList as UserChat } from "./Notifications";
-import { Container, Grid, Box, TextField, Button } from "@material-ui/core";
+import {
+  makeStyles,
+  Container,
+  Grid,
+  Box,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  Divider,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
+  Typography
+} from "@material-ui/core";
+
+const useStyles = makeStyles(() => ({
+  item: {
+    "&:hover": {
+      backgroundColor: "#F2F8FD"
+    }
+  },
+  inline: {
+    display: "inline"
+  }
+}));
 
 const UserInfo = () => {
   return <div>userInfo</div>;
@@ -50,6 +74,37 @@ const Conversation = () => {
         <SubmitBox />
       </Grid>
     </Grid>
+  );
+};
+
+export const UserChat = () => {
+  const classes = useStyles();
+
+  return (
+    <List className={classes.root}>
+      <ListItem alignItems="flex-start" className={classes.item}>
+        <ListItemAvatar>
+          <Avatar alt="Remy Sharp" src={`/uploads/1/profile.jpg`} />
+        </ListItemAvatar>
+        <ListItemText
+          primary={`Full Name`}
+          secondary={
+            <React.Fragment>
+              <Typography
+                component="span"
+                variant="body2"
+                className={classes.inline}
+                color="textPrimary"
+              >
+                {`At date`}
+              </Typography>
+              {` - message you`}
+            </React.Fragment>
+          }
+        />
+      </ListItem>
+      <Divider variant="inset" component="li" />
+    </List>
   );
 };
 
