@@ -12,6 +12,7 @@ const publicIp = require("public-ip");
 const predefined = require("../globals");
 const iplocation = require("iplocation").default;
 const moment = require("moment");
+var _ = require("lodash");
 
 const unlinkAsync = promisify(fs.unlink);
 
@@ -53,7 +54,7 @@ router.post(
       const id = req.user.id;
       const image = new Jimp(file.path, async function(err, image) {
         if (!err && file) {
-          console.log(id);
+          let isEmpty = false;
           let filename = id + "/" + file.filename;
           const remove = await profileModel.removeOnUpload(id, row);
           const counter = await profileModel.getCounter(id);
@@ -83,6 +84,21 @@ router.post(
             }
             if (remove === "photo_holder.png" && row !== "profile_Image")
               await profileModel.imagesCounter(id, "add");
+            // her we gonna verified if the user set all the info on his profile
+            const responde = await profileModel.getUserInfo(id);
+            Object.keys(responde).forEach(key => {
+              if (responde[key] === "") isEmpty = true;
+            });
+            if (
+              _.isEmpty(JSON.parse(responde.user_tags)) ||
+              responde.profile_Image === "photo_holder.png"
+            )
+              isEmpty = true;
+            if (isEmpty) {
+              await profileModel.setInfoVerified(false, id);
+            } else {
+              await profileModel.setInfoVerified(true, id);
+            }
             return res.json({
               success: true,
               errorMsg: "Your image hass been uploaded 🤘",
@@ -221,8 +237,24 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
             errorMsg: "You Can't Delete This photo",
             result
           });
-        } else if (filed === "profile_Image") await profileModel.setHolder(id);
-        else {
+        } else if (filed === "profile_Image") {
+          await profileModel.setHolder(id);
+          // her we gonna verified if the user set all the info on his profile
+          const responde = await profileModel.getUserInfo(id);
+          Object.keys(responde).forEach(key => {
+            if (responde[key] === "") isEmpty = true;
+          });
+          if (
+            _.isEmpty(JSON.parse(responde.user_tags)) ||
+            responde.profile_Image === "photo_holder.png"
+          )
+            isEmpty = true;
+          if (isEmpty) {
+            await profileModel.setInfoVerified(false, id);
+          } else {
+            await profileModel.setInfoVerified(true, id);
+          }
+        } else {
           await profileModel.fixPosition(id, filed);
         }
         const result = await profileModel.getImage(id);
@@ -351,9 +383,26 @@ router.post(
           lng: parseFloat(result.user_lng, 10)
         }
       };
-      console.log(JSON.parse(result));
+
       if (check) {
         // that mean that there is a change
+        // her we gonna verified if the user set all the info on his profile
+        let isEmpty = false;
+        Object.keys(result).forEach(key => {
+          if (result[key] === "") isEmpty = true;
+        });
+        if (
+          _.isEmpty(JSON.parse(result.user_tags)) ||
+          result.profile_Image === "photo_holder.png"
+        )
+          isEmpty = true;
+        console.log(isEmpty);
+        if (isEmpty) {
+          await profileModel.setInfoVerified(false, id);
+        } else {
+          await profileModel.setInfoVerified(true, id);
+        }
+        console.log(isEmpty);
         return res.json({
           success: true,
           errorMsg: "UPDATE SUCCESS 😎",
@@ -368,6 +417,7 @@ router.post(
         });
       }
     } catch (error) {
+      console.log(error);
       return res.json({
         success: false,
         errorMsg: "Error Occured"
