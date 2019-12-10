@@ -29,7 +29,8 @@ var storage = multer.diskStorage({
   },
   filename: function(req, file, callback) {
     const { row } = req.params;
-    if (row === "profile_Image") return callback(null, "profile" + ".png");
+    if (row === "profile_Image")
+      return callback(null, "profile" + path.extname(file.originalname));
     else
       return callback(
         null,
@@ -46,49 +47,67 @@ router.post(
   "/upload/:row",
   [middleware.auth, upload.single("myImage")],
   async (req, res) => {
-    const file = req.file;
-    const { row } = req.params;
-    const id = req.user.id;
-    const image = new Jimp(file.path, async function(err, image) {
-      if (!err && file) {
-        console.log(id);
-        let filename = id + "/" + file.filename;
-        const remove = await profileModel.removeOnUpload(id, row);
-        const counter = await profileModel.getCounter(id);
-        if (row === "profile_Image")
-          check = await profileModel.setProfile(id, "profile.png");
-        else if (remove !== "photo_holder.png" && row !== "profile_Image")
-          check = await profileModel.setImageRow(id, row, filename);
-        else check = await profileModel.SetImage(id, filename, counter);
-        const result = await profileModel.getImage(id);
-        const cover = await profileModel.getImageByRow(id, "cover_Image");
-        if (check) {
-          if (remove !== "photo_holder.png" && remove !== `${id}/profile.png`) {
-            await unlinkAsync(`./client/public/uploads/${remove}`);
-            if (remove === cover)
-              await profileModel.setImageCover(id, "cover_holder.png");
+    try {
+      const file = req.file;
+      const { row } = req.params;
+      const id = req.user.id;
+      const image = new Jimp(file.path, async function(err, image) {
+        if (!err && file) {
+          console.log(id);
+          let filename = id + "/" + file.filename;
+          const remove = await profileModel.removeOnUpload(id, row);
+          const counter = await profileModel.getCounter(id);
+          if (row === "profile_Image") {
+            fs.rename(
+              file.path,
+              `client/public/uploads/${id}/profile.png`,
+              function(err) {
+                if (err) throw err;
+                console.log("file Renamed");
+              }
+            );
+            check = await profileModel.setProfile(id, "profile.png");
+          } else if (remove !== "photo_holder.png" && row !== "profile_Image")
+            check = await profileModel.setImageRow(id, row, filename);
+          else check = await profileModel.SetImage(id, filename, counter);
+          const result = await profileModel.getImage(id);
+          const cover = await profileModel.getImageByRow(id, "cover_Image");
+          if (check) {
+            if (
+              remove !== "photo_holder.png" &&
+              remove !== `${id}/profile.png`
+            ) {
+              await unlinkAsync(`./client/public/uploads/${remove}`);
+              if (remove === cover)
+                await profileModel.setImageCover(id, "cover_holder.png");
+            }
+            if (remove === "photo_holder.png" && row !== "profile_Image")
+              await profileModel.imagesCounter(id, "add");
+            return res.json({
+              success: true,
+              errorMsg: "Your image hass been uploaded 🤘",
+              result
+            });
+          } else {
+            return res.json({
+              success: false,
+              errorMsg: "There is an error on upload image api 😱"
+            });
           }
-          if (remove === "photo_holder.png" && row !== "profile_Image")
-            await profileModel.imagesCounter(id, "add");
-          return res.json({
-            success: true,
-            errorMsg: "Your image hass been uploaded 🤘",
-            result
-          });
         } else {
+          await unlinkAsync(file.path);
           return res.json({
             success: false,
-            errorMsg: "There is an error on upload image api 😱"
+            errorMsg: "Please upload a Valide image 😠"
           });
         }
-      } else {
-        await unlinkAsync(file.path);
-        return res.json({
-          success: false,
-          errorMsg: "Please upload a Valide image 😠"
-        });
-      }
-    });
+      });
+    } catch (error) {
+      return res.json({
+        success: false,
+        errorMsg: "Error Occured"
+      });
+    }
   }
 );
 

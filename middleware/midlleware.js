@@ -5,6 +5,7 @@ const escapeSpecialChars = require("../helpers/escapeSpecialChars");
 const bcrypt = require("bcryptjs");
 const predefined = require("../routes/globals");
 const moment = require("moment");
+const Jimp = require("jimp");
 
 async function validateEmail(req) {
   req.body.email = req.body.email.toLowerCase().trim();
@@ -92,6 +93,7 @@ module.exports = middleware = {
       return res.json({ success: false, errorMsg: "Access denied" });
     }
   },
+
   async setting(req, res, next) {
     req.body = escapeSpecialChars(req.body);
 

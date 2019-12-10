@@ -26,13 +26,9 @@ export const sortProfiles = async (profile, dispatch, sort) => {
   console.log(profile);
   console.log(sort);
   switch (sort.sort_by) {
-    case "Location":
+    case "Fame rating":
       profile.browser.result.sort((a, b) =>
-        a.destination > b.destination
-          ? 1
-          : b.destination > a.destination
-          ? -1
-          : 0
+        a.fame_rate < b.fame_rate ? 1 : b.fame_rate < a.fame_rate ? -1 : 0
       );
       break;
     case "Age":
@@ -42,7 +38,11 @@ export const sortProfiles = async (profile, dispatch, sort) => {
       break;
     default:
       profile.browser.result.sort((a, b) =>
-        a.fame_rate > b.fame_rate ? 1 : b.fame_rate > a.fame_rate ? -1 : 0
+        a.destination > b.destination
+          ? 1
+          : b.destination > a.destination
+          ? -1
+          : 0
       );
   }
 };
