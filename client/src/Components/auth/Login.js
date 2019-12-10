@@ -77,7 +77,7 @@ const SignIn = () => {
 
   if (state.auth.loading) return null;
   if (state.auth.isAuthenticated) {
-    return <Redirect to="/setting" />;
+    return <Redirect to="/edit-profile" />;
   }
   return (
     <Container component="main" maxWidth="xs">
