@@ -12,6 +12,7 @@ import { History } from "../pages/History";
 import Browse from "../pages/Browse";
 import Chat from "../pages/Chat";
 import Edit_Profile from "../profile/Edit_Profile";
+import Notfound from "../pages/Notfound";
 import PrivateRoute from "./PrivateRoute";
 
 const Routes = () => {
@@ -30,6 +31,7 @@ const Routes = () => {
         <PrivateRoute exact path="/chat" component={Chat} />
         <PrivateRoute exact path="/notifications" component={Notifications} />
         <PrivateRoute exact path="/edit-profile" component={Edit_Profile} />
+        <Route path="" component={Notfound} />
       </Switch>
     </div>
   );
