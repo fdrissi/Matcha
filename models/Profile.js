@@ -30,25 +30,12 @@ async function SetImage(id, photoname, counter) {
 }
 
 async function setProfile(id, photoname) {
-<<<<<<< HEAD
   let filename = id + "/" + photoname;
   let sql = "UPDATE photos SET profile_Image = ? WHERE id = ?";
   const [result] = await pool.query(sql, [filename, id]);
   if (!empty(result)) {
     return true;
   } else {
-=======
-  try {
-    const merge = id + "/" + photoname;
-    let sql = "UPDATE photos SET profile_Image = ? WHERE id = ?";
-    const [result] = await pool.query(sql, [merge, id]);
-    if (!empty(result)) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (error) {
->>>>>>> 6cd802fd459b8dcfe4623f9652b5eef8a61873f1
     return false;
   }
 }
@@ -204,7 +191,7 @@ async function fixPosition(id, row) {
 async function getUserInfo(id) {
   try {
     let sql =
-      "SELECT t2.first_name, t2.last_name, t1.* , DATE_FORMAT(t1.user_birth, '%Y-%m-%d') as user_birth FROM user_info t1 INNER JOIN users t2 ON t1.id = t2.id WHERE t1.id = ?";
+      "SELECT t2.first_name, t2.last_name, t3.profile_Image, t1.* , DATE_FORMAT(t1.user_birth, '%Y-%m-%d') as user_birth FROM user_info t1 INNER JOIN users t2 ON t1.id = t2.id INNER JOIN photos t3 ON t1.id = t3.id WHERE t1.id = ?";
     const [result] = await pool.query(sql, [id]);
     return result[0];
   } catch (error) {
@@ -254,6 +241,18 @@ async function updateUserInfo(data, id) {
       return false;
     }
   } catch (error) {
+    return false;
+  }
+}
+
+// update info_verified
+async function setInfoVerified(value, id) {
+  try {
+    let sql = "UPDATE user_info SET info_verified = ? WHERE id = ?";
+    await pool.query(sql, [value, id]);
+    return true;
+  } catch (error) {
+    console.log(error);
     return false;
   }
 }
@@ -577,6 +576,7 @@ module.exports = {
   setImageCover,
   getUserInfo,
   updateUserInfo,
+  setInfoVerified,
   getResultByRow,
   updateGeoLocation,
   likeProfile,
