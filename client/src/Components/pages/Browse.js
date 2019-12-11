@@ -123,7 +123,7 @@ const ProfileDialog = ({ open, handleClose, info, classes }) => {
               <Grid container justify="center" alignItems="center">
                 <Grid item xs={12}>
                   <Avatar
-                    src={`./uploads/${info.id}/profile.jpg`}
+                    src={`./uploads/${info.id}/profile.png`}
                     alt={info.first_name}
                     className={classes.avatar}
                   />
@@ -177,6 +177,7 @@ const Profile = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [{ profile }] = useUserStore();
+  console.log(profile);
 
   const [showCard, setShowCard] = React.useState({
     myinfo: {}
