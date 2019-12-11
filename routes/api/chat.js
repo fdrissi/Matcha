@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const escapeHtmlChars = require("../../helpers/escapeSpecialChars");
 const middleware = require("../../middleware/midlleware");
 const chatModel = require("../../models/Chat");
 
@@ -13,7 +14,7 @@ router.get("/:id", [middleware.auth], async (req, res) => {
       return res.json({
         success: false
       });
-    const result = await chatModel.getUserAllConversations(id);
+    const result = await chatModel.getUserAllMatches(id);
     return res.json({
       success: true,
       conversations: result
@@ -31,6 +32,10 @@ router.get("/:id", [middleware.auth], async (req, res) => {
 router.get("/:uid/conversation/:pid", [middleware.auth], async (req, res) => {
   try {
     const uid = req.params.uid;
+    if (uid !== req.user.id)
+      return res.json({
+        success: false
+      });
     const pid = req.params.pid;
     const result = await chatModel.getUserConversations(uid, pid);
     return res.json({
@@ -49,6 +54,8 @@ router.get("/:uid/conversation/:pid", [middleware.auth], async (req, res) => {
 // @access  Public
 router.post("/sendMessage", [middleware.auth], async (req, res) => {
   try {
+    //Sanitize msg
+    req.body.data.message = escapeHtmlChars(req.body.data.message);
     const { sender, reciever, message } = req.body.data;
     const result = await chatModel.sendMessage(sender, reciever, message);
     return res.json({
@@ -70,11 +77,11 @@ router.delete(
   async (req, res) => {
     try {
       const uid = req.params.uid;
-      const pid = req.params.pid;
-      if (uid === pid)
+      if (uid !== req.user.id)
         return res.json({
           success: false
         });
+      const pid = req.params.pid;
       const result = await chatModel.getUserConversations(uid, pid);
       return res.json({
         success: result
