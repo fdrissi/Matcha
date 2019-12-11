@@ -80,7 +80,7 @@ const Editpass = params => {
     event.preventDefault();
   };
 
-  const [{ operations, alert, token }, dispatch] = useUserStore();
+  const [{ auth, operations, alert, token }, dispatch] = useUserStore();
 
   const stableDispatch = useCallback(dispatch, []);
 
@@ -128,6 +128,7 @@ const Editpass = params => {
     };
   }, [operations.success, token_valide, stableDispatch]);
 
+  if (auth.isAuthenticated && !auth.loading) return <Redirect to="/profile" />;
   if (is_loading) {
     return null;
   } else {

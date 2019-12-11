@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const config = require("config");
 const jwt = require("jsonwebtoken");
 const userModel = require("../../models/User");
+const profileModel = require("../../models/Profile");
 const { sendRecovery } = require("../../helpers/emailSender");
 const express = require("express");
 const router = express.Router();
@@ -241,7 +242,9 @@ router.get("/checktoken", async (req, res) => {
 router.get("/current", [middleware.auth], async (req, res) => {
   try {
     const user = await userModel.findById(req.user.id);
+    const profile_info = await profileModel.getUserInfo(req.user.id);
     delete user.password;
+    user.info_verified = !!profile_info.info_verified;
     res.json({ success: true, user });
   } catch (error) {
     return res.json({ success: false });
