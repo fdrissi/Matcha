@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import {
   getUserInfo,
@@ -553,6 +554,7 @@ export const Profile = ({ match }) => {
   ];
 
   if (profile.photo.loading || profile.info.loading) return null;
+  if (!auth.userInfo.info_verified) return <Redirect to="/edit-profile" />;
   return (
     <div style={{ flex: 1 }}>
       <CssBaseline />

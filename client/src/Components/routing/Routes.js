@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
+import { useUserStore } from "../../Context/appStore";
 import Login from "../auth/Login";
 import Register from "../auth/Register";
 import Setting from "../user/Setting";
@@ -16,6 +17,8 @@ import Notfound from "../pages/Notfound";
 import PrivateRoute from "./PrivateRoute";
 
 const Routes = () => {
+  const [{ auth }] = useUserStore();
+  const access = auth.userInfo.info_verified;
   return (
     <div style={{ flex: 1 }}>
       <Switch>
@@ -26,10 +29,26 @@ const Routes = () => {
         <Route exact path="/recover" component={Recover} />
         <Route exact path="/editpass/:token/" component={Editpass} />
         <PrivateRoute exact path="/profile/:id?" component={Profile} />
-        <PrivateRoute exact path="/history" component={History} />
-        <PrivateRoute exact path="/browse" component={Browse} />
-        <PrivateRoute exact path="/chat" component={Chat} />
-        <PrivateRoute exact path="/notifications" component={Notifications} />
+        <PrivateRoute
+          exact
+          path="/history"
+          component={access ? History : Edit_Profile}
+        />
+        <PrivateRoute
+          exact
+          path="/browse"
+          component={access ? Browse : Edit_Profile}
+        />
+        <PrivateRoute
+          exact
+          path="/chat"
+          component={access ? Chat : Edit_Profile}
+        />
+        <PrivateRoute
+          exact
+          path="/notifications"
+          component={access ? Notifications : Edit_Profile}
+        />
         <PrivateRoute exact path="/edit-profile" component={Edit_Profile} />
         <Route path="" component={Notfound} />
       </Switch>
