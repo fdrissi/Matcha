@@ -460,7 +460,7 @@ const Header = () => {
               variant="h5"
               id="range-slider"
               gutterBottom
-              style={{ color: "#FFF", fontWeight: "800", fontSize: "30px" }}
+              style={{ color: "#FFF", fontWeight: "900", fontSize: "30px" }}
             >
               <img src="./img/t-left-img.png" alt="left" />
               Browse
