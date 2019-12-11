@@ -1,4 +1,4 @@
-const escapeHtmlChars = unsafe => {
+module.exports = escapeHtmlChars = unsafe => {
   return unsafe
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

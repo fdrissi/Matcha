@@ -454,10 +454,15 @@ const Filter = () => {
 const Header = () => {
   return (
     <>
-      <Cover img={"/img/banner-brwose.jpg"}>
+      <Cover img={"/img/banner-brwose.jpg"} style={{ postion: "relative" }}>
         <Grid xs={12} container item justify="center">
-          <div>
-            <Typography variant="h5" id="range-slider" gutterBottom>
+          <div style={{ position: "absolute", top: "50%" }}>
+            <Typography
+              variant="h5"
+              id="range-slider"
+              gutterBottom
+              style={{ color: "#FFF", fontWeight: "900", fontSize: "30px" }}
+            >
               <img src="./img/t-left-img.png" alt="left" />
               Browse
               <img src="./img/t-right-img.png" alt="right" />
