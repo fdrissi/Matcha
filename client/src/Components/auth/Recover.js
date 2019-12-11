@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { Redirect } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -78,7 +79,9 @@ function Recover() {
       });
     };
   }, [stableDispatch]);
-
+  if (state.auth.loading) return null;
+  if (state.auth.isAuthenticated && !state.auth.loading)
+    return <Redirect to="/profile" />;
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
