@@ -76,8 +76,11 @@ const SignIn = () => {
   }, [stableDispatch]);
 
   if (state.auth.loading) return null;
-  if (state.auth.isAuthenticated) {
+  if (state.auth.isAuthenticated && !state.auth.userInfo.info_verified) {
     return <Redirect to="/edit-profile" />;
+  }
+  if (state.auth.isAuthenticated && state.auth.userInfo.info_verified) {
+    return <Redirect to="/profile" />;
   }
   return (
     <Container component="main" maxWidth="xs">

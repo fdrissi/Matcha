@@ -24,7 +24,8 @@ export const authInitState = {
     recovery_key: "",
     username: "",
     verification_key: "",
-    verified: ""
+    verified: "",
+    info_verified: false
   }
 };
 
@@ -120,6 +121,7 @@ export const tokenvalidationInitState = {
   token_valide: false,
   is_loading: true
 };
+
 export const passeditReducer = (state = tokenvalidationInitState, action) => {
   const { type, payload } = action;
   switch (type) {

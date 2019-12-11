@@ -383,7 +383,6 @@ router.post(
           lng: parseFloat(result.user_lng, 10)
         }
       };
-      console.log(result);
 
       if (check) {
         // that mean that there is a change

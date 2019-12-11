@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 
 function SignUp() {
   const [toLogin, setToHome] = useState(false);
-  const [{ alert, operations }, dispatch] = useUserStore();
+  const [{ auth, alert, operations }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
 
   const classes = useStyles();
@@ -140,7 +140,8 @@ function SignUp() {
     clearTimeout(timer);
   };
   const { firstName, lastName, userName, email } = MyForm;
-
+  if (auth.loading) return null;
+  if (auth.isAuthenticated && !auth.loading) return <Redirect to="/profile" />;
   return (
     <>
       {toLogin ? (
