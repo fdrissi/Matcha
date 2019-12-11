@@ -84,7 +84,7 @@ export const UserChat = () => {
     <List className={classes.root}>
       <ListItem alignItems="flex-start" className={classes.item}>
         <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src={`/uploads/1/profile.jpg`} />
+          <Avatar alt="Remy Sharp" src={`/uploads/1/profile.png`} />
         </ListItemAvatar>
         <ListItemText
           primary={`Full Name`}
