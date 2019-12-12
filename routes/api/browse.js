@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const middleware = require("../../middleware/midlleware");
 const browseModel = require("../../models/Browse");
-const userModel = require("../../models/User");
+const profileModel = require("../../models/Profile");
 const moment = require("moment");
+var _ = require("lodash");
 
 //  Workibng on the browser
 // @route   Post api/profle/getBrowser
@@ -20,6 +21,7 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
   const long = await browseModel.getUserInfoByRow(id, "user_lng");
   const gender = await browseModel.getUserInfoByRow(id, "user_gender");
   const data = await browseModel.getAllUserForBrowser(id, interesting, gender);
+  const user_tags = await browseModel.getUserInfoByRow(id, "user_tags");
   const sort_by = "Location";
   function distance(lat1, lon1, lat2, lon2) {
     var p = 0.017453292519943295; // Math.PI / 180
@@ -35,9 +37,26 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
       distance(lat, long, value.user_lat, value.user_lng).toFixed(2)
     );
     value.destination = destination;
+    value.common_tags = _.intersection(
+      JSON.parse(user_tags),
+      JSON.parse(value.user_tags)
+    ).length;
   });
+  for (let element of data) {
+    element.isLiked = await profileModel.isUserLikedProfile(id, element.id);
+  }
+  // const data = newData.filter(el => {
+  //   return !(el.isLiked === true);
+  // });
   data.sort((a, b) =>
-    a.destination > b.destination ? 1 : b.destination > a.destination ? -1 : 0
+    // a.destination > b.destination ? 1 : b.destination > a.destination ? -1 : 0
+    a.destination > b.destination
+      ? 1
+      : b.destination > a.destination
+      ? -1
+      : a.common_tags > b.common_tags
+      ? -1
+      : 1
   );
   return res.json({ data, sort_by });
 });
@@ -60,6 +79,7 @@ router.get(
     );
     const lat = await browseModel.getUserInfoByRow(id, "user_lat");
     const long = await browseModel.getUserInfoByRow(id, "user_lng");
+    const user_tags = await browseModel.getUserInfoByRow(id, "user_tags");
     const gender = await browseModel.getUserInfoByRow(id, "user_gender");
     const newData = await browseModel.getFilterUserForBrowser(
       id,
@@ -100,9 +120,19 @@ router.get(
         distance(lat, long, el.user_lat, el.user_lng).toFixed(2)
       );
       el.destination = destination;
+      el.common_tags = _.intersection(
+        JSON.parse(user_tags),
+        JSON.parse(el.user_tags)
+      ).length;
     });
     data.sort((a, b) =>
-      a.destination > b.destination ? 1 : b.destination > a.destination ? -1 : 0
+      a.destination > b.destination
+        ? 1
+        : b.destination > a.destination
+        ? -1
+        : a.common_tags > b.common_tags
+        ? -1
+        : 1
     );
     return res.json({
       success: true,

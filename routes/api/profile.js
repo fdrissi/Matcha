@@ -64,7 +64,6 @@ router.post(
               `client/public/uploads/${id}/profile.png`,
               function(err) {
                 if (err) throw err;
-                console.log("file Renamed");
               }
             );
             check = await profileModel.setProfile(id, "profile.png");
@@ -396,13 +395,11 @@ router.post(
           result.profile_Image === "photo_holder.png"
         )
           isEmpty = true;
-        console.log(isEmpty);
         if (isEmpty) {
           await profileModel.setInfoVerified(false, id);
         } else {
           await profileModel.setInfoVerified(true, id);
         }
-        console.log(isEmpty);
         return res.json({
           success: true,
           errorMsg: "UPDATE SUCCESS 😎",
@@ -417,7 +414,6 @@ router.post(
         });
       }
     } catch (error) {
-      console.log(error);
       return res.json({
         success: false,
         errorMsg: "Error Occured"
@@ -697,7 +693,6 @@ router.get("/getUserNotifications", middleware.auth, async (req, res) => {
   const id = req.user.id;
   try {
     const result = await profileModel.getUserNotifications(id);
-    console.log(result);
     return res.json({
       success: true,
       notifications: result

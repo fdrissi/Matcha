@@ -170,6 +170,7 @@ const ProfileImage = () => {
 
   useEffect(() => {
     let unmounted = false;
+    window.scrollTo(0, 0);
     // Check if user logged in
     if (socket.listeners("login").length <= 1) {
       socket.on("login", data => {
