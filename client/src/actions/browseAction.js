@@ -1,10 +1,5 @@
 import axios from "axios";
-import {
-  BROWSER_RETURN,
-  SORT_BY_BACK,
-  SET_NEW_ISLIK,
-  SET_ALERT
-} from "./actionTypes";
+import { BROWSER_RETURN, SORT_BY_BACK, SET_ALERT } from "./actionTypes";
 
 export const getBrowse = async dispatch => {
   const config = {
@@ -61,51 +56,6 @@ export const sortProfiles = async (profile, dispatch, sort) => {
           ? -1
           : 1
       );
-  }
-};
-export const likeProfile = async (profileId, dispatch) => {
-  const config = {
-    header: {
-      "Content-Type": "application/json"
-    }
-  };
-  try {
-    await axios.post(
-      "/api/profile/userLikeProfile",
-      {
-        profile: { id: profileId }
-      },
-      config
-    );
-    await isUserLikedProfile(profileId, dispatch);
-  } catch (error) {
-    return false;
-  }
-};
-
-export const isUserLikedProfile = async (profileId, dispatch) => {
-  const config = {
-    header: {
-      "Content-Type": "application/json"
-    }
-  };
-  try {
-    const res = await axios.post(
-      "/api/profile/isUserLikedProfile",
-      {
-        profile: { id: profileId }
-      },
-      config
-    );
-    dispatch({
-      type: SET_NEW_ISLIK,
-      payload: {
-        isLiked: res.data.success,
-        userId: profileId
-      }
-    });
-  } catch (error) {
-    return false;
   }
 };
 
