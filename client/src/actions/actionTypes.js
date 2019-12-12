@@ -19,3 +19,4 @@ export const PROFILE_LIKED = "PROFILE_LIKED";
 export const PROFILE_MATCHED = "PROFILE_MATCHED";
 export const BROWSER_RETURN = "BROWSER_RETURN";
 export const SORT_BY_BACK = "SORT_BY_BACK";
+export const SET_NEW_ISLIK = "SET_NEW_ISLIK";

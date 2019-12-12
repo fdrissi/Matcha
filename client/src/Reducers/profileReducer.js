@@ -5,7 +5,8 @@ import {
   PROFILE_LIKED,
   PROFILE_MATCHED,
   BROWSER_RETURN,
-  SORT_BY_BACK
+  SORT_BY_BACK,
+  SET_NEW_ISLIK
 } from "../actions/actionTypes";
 
 export const profileInitState = {
@@ -45,6 +46,7 @@ export const profileInitState = {
     }
   },
   browser: {
+    loading: true,
     result: [],
     sort_by: ""
   }
@@ -64,9 +66,24 @@ export const profileReducer = (state, action) => {
     case PROFILE_MATCHED:
       return { ...state, info: { ...state.info, matched: payload } };
     case BROWSER_RETURN:
-      return { ...state, browser: { ...state.browser, result: payload } };
+      return {
+        ...state,
+        browser: { ...state.browser, result: payload, loading: false }
+      };
     case SORT_BY_BACK:
       return { ...state, browser: { ...state.browser, sort_by: payload } };
+    case SET_NEW_ISLIK:
+      return {
+        ...state,
+        browser: {
+          ...state.browser,
+          result: state.browser.result.map(user =>
+            user.id === payload.userId
+              ? { ...user, isLiked: payload.isLiked }
+              : user
+          )
+        }
+      };
     default:
       return state;
   }

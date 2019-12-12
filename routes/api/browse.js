@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const middleware = require("../../middleware/midlleware");
 const browseModel = require("../../models/Browse");
-const userModel = require("../../models/User");
+const profileModel = require("../../models/Profile");
 const moment = require("moment");
 var _ = require("lodash");
 
@@ -24,7 +24,6 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
   const user_tags = await browseModel.getUserInfoByRow(id, "user_tags");
   const sort_by = "Location";
   function distance(lat1, lon1, lat2, lon2) {
-    console.log(lat1, lon1, lat2, lon2);
     var p = 0.017453292519943295; // Math.PI / 180
     var c = Math.cos;
     var a =
@@ -37,14 +36,18 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
     const destination = parseFloat(
       distance(lat, long, value.user_lat, value.user_lng).toFixed(2)
     );
-    console.log(destination);
     value.destination = destination;
     value.common_tags = _.intersection(
       JSON.parse(user_tags),
       JSON.parse(value.user_tags)
     ).length;
   });
-  console.log(data);
+  for (let element of data) {
+    element.isLiked = await profileModel.isUserLikedProfile(id, element.id);
+  }
+  // const data = newData.filter(el => {
+  //   return !(el.isLiked === true);
+  // });
   data.sort((a, b) =>
     // a.destination > b.destination ? 1 : b.destination > a.destination ? -1 : 0
     a.destination > b.destination

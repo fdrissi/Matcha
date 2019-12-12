@@ -1,5 +1,10 @@
 import axios from "axios";
-import { BROWSER_RETURN, SORT_BY_BACK } from "./actionTypes";
+import {
+  BROWSER_RETURN,
+  SORT_BY_BACK,
+  SET_NEW_ISLIK,
+  SET_ALERT
+} from "./actionTypes";
 
 export const getBrowse = async dispatch => {
   const config = {
@@ -23,11 +28,9 @@ export const sortProfiles = async (profile, dispatch, sort) => {
     type: SORT_BY_BACK,
     payload: sort.sort_by
   });
-  console.log(profile);
-  console.log(sort);
   switch (sort.sort_by) {
     case "Fame rating":
-      profile.browser.result.sort((a, b) =>
+      profile.sort((a, b) =>
         a.fame_rate < b.fame_rate
           ? 1
           : b.fame_rate < a.fame_rate
@@ -38,7 +41,7 @@ export const sortProfiles = async (profile, dispatch, sort) => {
       );
       break;
     case "Age":
-      profile.browser.result.sort((a, b) =>
+      profile.sort((a, b) =>
         a.user_birth > b.user_birth
           ? 1
           : b.user_birth > a.user_birth
@@ -49,7 +52,7 @@ export const sortProfiles = async (profile, dispatch, sort) => {
       );
       break;
     default:
-      profile.browser.result.sort((a, b) =>
+      profile.sort((a, b) =>
         a.destination > b.destination
           ? 1
           : b.destination > a.destination
@@ -58,6 +61,51 @@ export const sortProfiles = async (profile, dispatch, sort) => {
           ? -1
           : 1
       );
+  }
+};
+export const likeProfile = async (profileId, dispatch) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    await axios.post(
+      "/api/profile/userLikeProfile",
+      {
+        profile: { id: profileId }
+      },
+      config
+    );
+    await isUserLikedProfile(profileId, dispatch);
+  } catch (error) {
+    return false;
+  }
+};
+
+export const isUserLikedProfile = async (profileId, dispatch) => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    const res = await axios.post(
+      "/api/profile/isUserLikedProfile",
+      {
+        profile: { id: profileId }
+      },
+      config
+    );
+    dispatch({
+      type: SET_NEW_ISLIK,
+      payload: {
+        isLiked: res.data.success,
+        userId: profileId
+      }
+    });
+  } catch (error) {
+    return false;
   }
 };
 
@@ -77,7 +125,13 @@ export const filterBrowser = async (filter, dispatch) => {
     config
   );
   if (!res.data.success) {
-    console.log(res.data.errorMsg);
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "danger",
+        msg: res.data.errorMsg
+      }
+    });
   } else {
     dispatch({
       type: BROWSER_RETURN,

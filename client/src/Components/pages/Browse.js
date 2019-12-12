@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Cover } from "../profile/Profile";
-import { Title } from "./Notifications";
+import NavigationIcon from "@material-ui/icons/Navigation";
+import Alert from "../inc/Alert";
+import { REMOVE_ALERT } from "../../actions/actionTypes";
+
 import {
   getBrowse,
   filterBrowser,
@@ -23,7 +26,6 @@ import {
 } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
-import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -34,6 +36,7 @@ import Radio from "@material-ui/core/Radio";
 import Slider from "@material-ui/core/Slider";
 import Rating from "@material-ui/lab/Rating";
 import { useUserStore } from "../../Context/appStore";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -50,6 +53,10 @@ const useStyles = makeStyles(theme => ({
   },
   divider: {
     margin: theme.spacing(3, 0)
+  },
+  button: {
+    color: "white",
+    background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
   },
   title: {
     fontSize: "30px",
@@ -145,13 +152,6 @@ const ProfileDialog = ({ open, handleClose, info, classes }) => {
                     {info.user_city}
                   </p>
                 </Grid>
-                {/* <Grid item xs={4}>
-                  <p style={{ textAlign: "center", fontWeight: "700" }}>
-                    {JSON.parse(inf.user_tags).map((tag, index) => {
-                      if (index === 0) return tag;
-                    })}
-                  </p>
-                </Grid> */}
                 <Grid item xs={4}>
                   <p style={{ textAlign: "center", fontWeight: "700" }}>
                     {info.destination} KM
@@ -162,9 +162,15 @@ const ProfileDialog = ({ open, handleClose, info, classes }) => {
             <DialogActions
               style={{ justifyContent: "center", backgroundColor: "#e74c3c" }}
             >
-              <Fab style={{ color: "#e74c3c" }}>
-                <ThumbUpAltIcon />
-              </Fab>
+              <Link
+                to={"/profile/" + info.id}
+                style={{ textDecoration: "none" }}
+              >
+                <Fab variant="extended" className={classes.button}>
+                  <NavigationIcon />
+                  Porfile
+                </Fab>
+              </Link>
             </DialogActions>
           </Dialog>
         </div>
@@ -177,7 +183,6 @@ const Profile = () => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const [{ profile }] = useUserStore();
-  console.log(profile);
 
   const [showCard, setShowCard] = React.useState({
     myinfo: {}
@@ -192,7 +197,6 @@ const Profile = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
   return (
     <>
       {profile.browser.result.map(inf => {
@@ -222,6 +226,13 @@ const Profile = () => {
 };
 
 const ProfilesContainer = ({ children }) => {
+  const [{ alert }, dispatch] = useUserStore();
+  if (alert.msg !== "")
+    setTimeout(() => {
+      dispatch({
+        type: REMOVE_ALERT
+      });
+    }, 2000);
   return (
     <>
       <Grid
@@ -232,6 +243,7 @@ const ProfilesContainer = ({ children }) => {
         style={{ paddingTop: "20px" }}
       >
         <Typography variant="subtitle1">Members</Typography>
+        {alert.msg && <Alert message={alert.msg} type={alert.alertType} />}
       </Grid>
       <Grid xs={12} container item justify="center">
         <img src={"img/underTitleLine.png"} alt="wrap" />
@@ -249,6 +261,7 @@ const Sort = () => {
     sort_by: ""
   });
   const [{ profile }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
 
   const handleChange = event => {
     setSort({
@@ -258,8 +271,8 @@ const Sort = () => {
   };
 
   useEffect(() => {
-    sortProfiles(profile, dispatch, sort);
-  }, [sort]);
+    sortProfiles(profile.browser.result, stableDispatch, sort);
+  }, [sort, stableDispatch, profile.browser.result]);
   return (
     <Card style={{ backgroundColor: "transparent" }}>
       <CardContent style={{ height: "164px" }}>
@@ -291,7 +304,6 @@ const Sort = () => {
               <RadioGroup
                 row
                 aria-label="gender"
-                name="user_gender_interest"
                 style={{ justifyContent: "center" }}
                 name="sort_by"
                 onChange={handleChange}
@@ -337,7 +349,7 @@ const Filter = () => {
     location_range: 5000,
     fame_rating: 1
   });
-  const [{ profile }, dispatch] = useUserStore();
+  const [, dispatch] = useUserStore();
   const submitForm = form => {
     form.preventDefault();
     async function filterFunc() {
@@ -490,14 +502,16 @@ const Header = () => {
 };
 
 const Browse = () => {
-  const [{}, dispatch] = useUserStore();
+  const [{ profile }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
+
   useEffect(() => {
     async function test() {
-      await getBrowse(dispatch);
+      await getBrowse(stableDispatch);
     }
     test();
-  }, []);
-
+  }, [stableDispatch]);
+  if (profile.browser.loading) return null;
   return (
     <div>
       <CssBaseline />
