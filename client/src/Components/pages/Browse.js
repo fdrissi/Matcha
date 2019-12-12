@@ -506,10 +506,10 @@ const Browse = () => {
   const stableDispatch = useCallback(dispatch, []);
 
   useEffect(() => {
-    async function test() {
+    async function gBrowse() {
       await getBrowse(stableDispatch);
     }
-    test();
+    gBrowse();
   }, [stableDispatch]);
   if (profile.browser.loading) return null;
   return (
