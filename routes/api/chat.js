@@ -10,7 +10,7 @@ const chatModel = require("../../models/Chat");
 router.get("/:id", [middleware.auth], async (req, res) => {
   try {
     const id = req.params.id;
-    if (id !== req.user.id)
+    if (+id !== +req.user.id)
       return res.json({
         success: false
       });
@@ -32,7 +32,7 @@ router.get("/:id", [middleware.auth], async (req, res) => {
 router.get("/:uid/conversation/:pid", [middleware.auth], async (req, res) => {
   try {
     const uid = req.params.uid;
-    if (uid !== req.user.id)
+    if (+uid !== +req.user.id)
       return res.json({
         success: false
       });
@@ -52,37 +52,17 @@ router.get("/:uid/conversation/:pid", [middleware.auth], async (req, res) => {
 // @route   Post api/chat/sendMessage
 // @desc    Send message
 // @access  Public
-router.post("/sendMessage", [middleware.auth], async (req, res) => {
-  try {
-    //Sanitize msg
-    req.body.data.message = escapeHtmlChars(req.body.data.message);
-    const { sender, reciever, message } = req.body.data;
-    const result = await chatModel.sendMessage(sender, reciever, message);
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
-  }
-});
-
-// @route   Delete api/chat/:uid/conversation/:pid
-// @desc    Delete conversation
-// @access  Public
-router.delete(
-  "/:uid/conversation/:pid",
-  [middleware.auth],
+router.post(
+  "/sendMessage",
+  [middleware.auth, middleware.chat],
   async (req, res) => {
     try {
-      const uid = req.params.uid;
-      if (uid !== req.user.id)
+      const { sender, receiver, message } = req.body;
+      if (+sender !== +req.user.id || +sender === +receiver)
         return res.json({
           success: false
         });
-      const pid = req.params.pid;
-      const result = await chatModel.getUserConversations(uid, pid);
+      const result = await chatModel.sendMessage(sender, receiver, message);
       return res.json({
         success: result
       });
@@ -93,3 +73,31 @@ router.delete(
     }
   }
 );
+
+// @route   Delete api/chat/:uid/conversation/:pid
+// @desc    Delete conversation
+// @access  Public
+router.delete(
+  "/:uid/conversation/:pid",
+  [middleware.auth],
+  async (req, res) => {
+    try {
+      const uid = req.params.uid;
+      const pid = req.params.pid;
+      if (+uid !== +req.user.id || +uid === +pid)
+        return res.json({
+          success: false
+        });
+      const result = await chatModel.deleteConversation(uid, pid);
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
+  }
+);
+
+module.exports = router;

@@ -15,7 +15,8 @@ async function validateEmail(req) {
       return "Email already exists";
     else {
       let regex = /\S+@\S+\.\S+/;
-      if (!regex.test(req.body.email)) return "Enter valid Email";
+      if (!regex.test(req.body.email) || req.body.email.length >= 256)
+        return "Enter valid Email";
     }
   }
   return "";
@@ -28,7 +29,7 @@ async function validateUsername(req) {
     if (await userModel.findByUsername(req.body.userName))
       return "Username already exists";
     else {
-      let regex = /^[a-z0-9]{3,10}$/;
+      let regex = /^[a-z0-9]{3,20}$/;
       if (!regex.test(req.body.userName)) return "Enter valid Username";
     }
   }
@@ -36,7 +37,7 @@ async function validateUsername(req) {
 }
 
 function validatePassword(req) {
-  let regex = /(?=.*[a-zA-Z])(?=.*[0-9]).{8,}/i;
+  let regex = /(?=.*[a-zA-Z])(?=.*[0-9]).{8,30}/i;
   if (req.body.newPassword !== "") {
     if (!regex.test(req.body.newPassword)) {
       return ["Enter valid Password", "Enter valid Password"];
@@ -49,7 +50,7 @@ function validatePassword(req) {
 function validateFirstName(req) {
   req.body.firstName = req.body.firstName.trim();
   let firstName = "";
-  let regex = /^[A-Za-z]{3,20}$/;
+  let regex = /^[A-Za-z]{3,30}$/;
   firstName = !regex.test(req.body.firstName) ? "Enter valid First Name" : "";
   return firstName;
 }
@@ -57,7 +58,7 @@ function validateFirstName(req) {
 function validateLastName(req) {
   req.body.lastName = req.body.lastName.trim();
   let lastName = "";
-  let regex = /^[A-Za-z]{3,20}$/;
+  let regex = /^[A-Za-z]{3,30}$/;
   lastName = !regex.test(req.body.lastName) ? "Enter valid Last Name" : "";
   return lastName;
 }
@@ -93,7 +94,20 @@ module.exports = middleware = {
       return res.json({ success: false, errorMsg: "Access denied" });
     }
   },
-
+  chat: async function(req, res, next) {
+    req.body = escapeSpecialChars(req.body);
+    const { sender, receiver, message } = req.body;
+    if (
+      !sender ||
+      !receiver ||
+      !message.trim() ||
+      !(await userModel.findById(receiver))
+    )
+      return res.json({
+        success: false
+      });
+    next();
+  },
   async setting(req, res, next) {
     req.body = escapeSpecialChars(req.body);
 
