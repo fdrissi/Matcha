@@ -32,7 +32,7 @@ const getUserAllMatches = async userId => {
 const getUserConversations = async (uid, pid) => {
   try {
     const sql =
-      "SELECT * FROM `user_messages` WHERE sender = ? AND receiver = ? OR sender = ? AND receiver = ?";
+      "SELECT * FROM `user_messages` WHERE sender = ? AND receiver = ? OR sender = ? AND receiver = ? ORDER BY date";
     const [result] = await pool.query(sql, [uid, pid, pid, uid]);
     return result;
   } catch (error) {

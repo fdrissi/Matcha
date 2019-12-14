@@ -5,7 +5,7 @@ const middleware = require("../../middleware/midlleware");
 const chatModel = require("../../models/Chat");
 
 // @route   Get api/chat/:id/
-// @desc    Get all user chats
+// @desc    Get all user matches
 // @access  Public
 router.get("/:id", [middleware.auth], async (req, res) => {
   try {
