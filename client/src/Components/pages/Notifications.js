@@ -172,7 +172,7 @@ const NotificationsHoler = ({ notifications, setNotifications }) => {
 };
 
 export const Notifications = () => {
-  const [load, setLoad] = useState(false);
+  const [load, setLoad] = useState(true);
   const [notifications, setNotifications] = useState([]);
   const [{ auth }] = useUserStore();
 
@@ -181,15 +181,16 @@ export const Notifications = () => {
       let result = await axios.get("/api/profile/getUserNotifications");
       if (result.data.success) {
         setNotifications(result.data.notifications);
-        setLoad(true);
+        setLoad(false);
         result = await axios.get("/api/profile/updateNotifications");
-        if (result.data.success)
+        if (result.data.success) {
           socket.emit("clearNotifications", { id: auth.userInfo.id });
+        }
       }
     })();
   }, [auth.userInfo.id]);
 
-  if (!load) return null;
+  if (load) return null;
   return (
     <div>
       <NotificationsHoler

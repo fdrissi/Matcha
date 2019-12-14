@@ -55,31 +55,38 @@ const UserInfo = ({ info }) => {
 
 const LoadChat = ({ chat }) => {
   const [{ auth }] = useUserStore();
+  const messagesEndRef = React.createRef();
+  useEffect(() => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [messagesEndRef]);
   return (
-    <div style={{ height: "70vh", overflowY: "scroll" }}>
-      {chat.length === 0
-        ? "Conversation Empty"
-        : chat.map(msg => (
-            <li
-              key={msg.id}
-              style={{
-                listStyle: "none",
-                fontWeight: "600",
-                color: "#FFF",
-                borderRadius: "5px",
-                marginBottom: "5px"
-              }}
-            >
-              <span
+    <div>
+      <div style={{ height: "70vh", overflowY: "scroll" }}>
+        {chat.length === 0
+          ? "Conversation Empty"
+          : chat.map(msg => (
+              <li
+                key={msg.id}
                 style={{
-                  padding: "2px 5px",
+                  listStyle: "none",
+                  fontWeight: "600",
+                  color: "#FFF",
                   borderRadius: "5px",
-                  backgroundColor:
-                    +msg.sender !== +auth.userInfo.id ? "#e74c3c" : "#3f51b5"
+                  marginBottom: "5px"
                 }}
-              >{`${msg.message}`}</span>
-            </li>
-          ))}
+              >
+                <span
+                  style={{
+                    padding: "2px 5px",
+                    borderRadius: "5px",
+                    backgroundColor:
+                      +msg.sender !== +auth.userInfo.id ? "#e74c3c" : "#3f51b5"
+                  }}
+                >{`${msg.message}`}</span>
+              </li>
+            ))}
+        <div ref={messagesEndRef}></div>
+      </div>
     </div>
   );
 };

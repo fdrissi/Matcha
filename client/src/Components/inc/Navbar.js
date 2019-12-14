@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUserStore } from "../../Context/appStore";
 import { loadUser } from "../../actions/userAction";
 import { Route, Link } from "react-router-dom";
@@ -67,17 +67,33 @@ const useStyles = makeStyles(theme => ({
 const NavNotifications = () => {
   const classes = useStyles();
   const [dbNotif, setDbNotif] = useState(0);
+  const [{ auth }] = useUserStore();
 
-  if (socket.listeners("notification").length <= 1) {
-    socket.on("notification", data => {
-      (async () => {
-        const result = await axios.get("/api/profile/unseenNotificationsCount");
-        if (result.data.success) {
-          setDbNotif(result.data.count);
-        }
-      })();
+  //if (socket.listeners("notification").length < 1) {
+
+  useEffect(() => {
+    socket.on("notify", async data => {
+      console.log(data);
+      const result = await axios.get("/api/profile/unseenNotificationsCount");
+      console.log("navbar notif coun", result.data);
+      if (result.data.success) {
+        setDbNotif(result.data.count);
+      }
     });
-  }
+    (async () => {
+      const result = await axios.get("/api/profile/unseenNotificationsCount");
+      console.log("navbar notif coun", result.data);
+      if (result.data.success) {
+        setDbNotif(result.data.count);
+      }
+    })();
+  }, [auth.userInfo.id]);
+  //}
+
+  // socket.on("clearNotifications", data => {
+  //   console.log("clear recieved");
+  //   setDbNotif(0);
+  // });
 
   return (
     <>

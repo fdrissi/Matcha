@@ -314,7 +314,7 @@ const ProfileHeader = () => {
   const handleClick = async () => {
     const result = await likeProfile(profile.info.id, dispatch);
     if (result) {
-      socket.emit("notification", { id: profile.info.id });
+      socket.emit("notify", { id: profile.info.id });
     }
   };
 
@@ -527,10 +527,10 @@ export const Profile = ({ match }) => {
     if (+profile.info.id !== 0 && auth.userInfo.id !== 0) {
       recordVisitedProfiles(+profile.info.id);
       if (
-        socket.listeners("notification").length === 0 &&
+        socket.listeners("notify").length === 0 &&
         +profile.info.id !== auth.userInfo.id
       ) {
-        socket.emit("notification", { id: profile.info.id });
+        socket.emit("notify", { id: profile.info.id });
       }
     }
   }, [profile.info.id, auth.userInfo.id]);

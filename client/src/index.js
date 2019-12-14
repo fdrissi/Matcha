@@ -12,7 +12,6 @@ import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 import io from "socket.io-client";
 import axios from "axios";
-const socket = io("http://localhost:5000");
 
 const theme = createMuiTheme({
   typography: {
@@ -48,11 +47,13 @@ axios.interceptors.response.use(
 
 function App() {
   const [{ auth }, dispatch] = useUserStore();
-
   useEffect(() => {
-    if (socket.listeners("login").length <= 1)
-      socket.emit("login", auth.userInfo.id);
-  }, [auth.userInfo.id]);
+    if (auth.isAuthenticated) {
+      const socket = io("http://localhost:5000");
+      if (socket.listeners("login").length <= 1)
+        socket.emit("login", auth.userInfo.id);
+    }
+  }, [auth.userInfo.id, auth.isAuthenticated]);
 
   return (
     <div

@@ -80,7 +80,7 @@ const SignIn = () => {
     return <Redirect to="/edit-profile" />;
   }
   if (state.auth.isAuthenticated && state.auth.userInfo.info_verified) {
-    return <Redirect to="/profile" />;
+    return <Redirect to="/browse" />;
   }
   return (
     <Container component="main" maxWidth="xs">

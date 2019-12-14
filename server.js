@@ -1,6 +1,10 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const cookie = require("cookie");
+const jwt = require("jsonwebtoken");
+const config = require("config");
+const key = config.get("keyOrSecret");
 
 const app = express();
 app.use(cors());
@@ -38,28 +42,50 @@ const io = require("socket.io").listen(server, {
 });
 //Share it
 let users = [];
-io.on("connection", socket => {
+io.use(function(socket, next) {
+  if (socket.handshake.headers && socket.handshake.headers.cookie) {
+    const cookies = cookie.parse(socket.handshake.headers.cookie);
+    jwt.verify(cookies.token, key, function(err, decoded) {
+      if (err) return next(new Error("Authentication error"));
+      socket.decoded = decoded;
+      next();
+    });
+  } else {
+    next(new Error("Authentication error"));
+  }
+}).on("connection", socket => {
+  console.log("new socket connected");
   socket.on("login", user => {
     if (users.findIndex(x => x.id === user) === -1 && user) {
       socket.userId = user;
-      users.push({ id: user, notifications: 0 });
+      users.push({ socket: socket.id, id: user, notifications: 0 });
     }
+    console.log("connected users", users);
     io.sockets.emit("login", { users });
-    io.sockets.emit("notification", { users });
+    //io.sockets.emit("notification", { users });
   });
 
-  socket.on("notification", data => {
+  socket.on("notify", data => {
+    console.log("comming notification to the server", data);
     users.find(x => {
-      if (x.id === data.id) x.notifications += 1;
+      if (x.id === data.id) {
+        x.notifications += 1;
+        console.log("emit notification from server to ", x.id);
+        console.log(x.socket);
+        io.sockets.to(x.socket).emit("notify", { users });
+      }
     });
-    io.sockets.emit("notification", { users });
   });
 
   socket.on("clearNotifications", data => {
+    console.log("comming ClearNotifications to the server", data);
     users.find(x => {
-      if (x.id === data.id) x.notifications = 0;
+      if (x.id === data.id) {
+        x.notifications = 0;
+        console.log("clear notifications for user: ", x.socket, x.id, users);
+        socket.to(x.socket).emit("notify", { users });
+      }
     });
-    io.sockets.emit("notification", { users });
   });
   socket.on("disconnect", () => {
     users.find((o, i) => {
