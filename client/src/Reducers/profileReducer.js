@@ -6,7 +6,8 @@ import {
   PROFILE_MATCHED,
   BROWSER_RETURN,
   SORT_BY_BACK,
-  SET_NEW_ISLIK
+  SET_NEW_ISLIK,
+  CLEAR_PROFILE_INIT
 } from "../actions/actionTypes";
 
 export const profileInitState = {
@@ -84,6 +85,8 @@ export const profileReducer = (state, action) => {
           )
         }
       };
+    case CLEAR_PROFILE_INIT:
+      return (state = profileInitState);
     default:
       return state;
   }

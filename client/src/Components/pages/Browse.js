@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Cover } from "../profile/Profile";
 import NavigationIcon from "@material-ui/icons/Navigation";
 import Alert from "../inc/Alert";
-import { REMOVE_ALERT } from "../../actions/actionTypes";
+import { REMOVE_ALERT, CLEAR_PROFILE_INIT } from "../../actions/actionTypes";
 
 import {
   getBrowse,
@@ -510,6 +510,13 @@ const Browse = () => {
       await getBrowse(stableDispatch);
     }
     gBrowse();
+  }, [stableDispatch]);
+  useEffect(() => {
+    return () => {
+      stableDispatch({
+        type: CLEAR_PROFILE_INIT
+      });
+    };
   }, [stableDispatch]);
   if (profile.browser.loading) return null;
   return (
