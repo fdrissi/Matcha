@@ -191,6 +191,9 @@ const NavCircle = () => {
         <Link to={`/browse`} style={{ color: "black", textDecoration: "none" }}>
           <MenuItem onClick={handleClose}>Browse</MenuItem>
         </Link>
+        <Link to={`/search`} style={{ color: "black", textDecoration: "none" }}>
+          <MenuItem onClick={handleClose}>Search</MenuItem>
+        </Link>
         <Link
           to={`/setting`}
           style={{ color: "black", textDecoration: "none" }}
