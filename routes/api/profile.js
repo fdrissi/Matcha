@@ -285,7 +285,7 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
 
 // Profile_info
 
-// @route   Post api/profle/getInfo
+// @route   Post api/profle/getUserInfo
 // @desc    get user info
 // @access  Private
 router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
@@ -532,7 +532,7 @@ router.post("/isUserLikedProfile", middleware.auth, async (req, res) => {
 });
 
 // @route   Post api/profle/areMatched
-// @desc    is user already liked specific profile
+// @desc    are users matched
 // @access  Private
 router.post("/areMatched", middleware.auth, async (req, res) => {
   const { profile } = req.body;
@@ -555,7 +555,7 @@ router.post("/areMatched", middleware.auth, async (req, res) => {
 });
 
 // @route   Post api/profile/userBlockProfile
-// @desc    is user already liked specific profile
+// @desc    Block or unblock profile
 // @access  Private
 router.post("/userBlockProfile", middleware.auth, async (req, res) => {
   const { profile } = req.body;
@@ -722,7 +722,7 @@ router.get("/clearUserNotifications", middleware.auth, async (req, res) => {
 });
 
 // @route   Get api/profile/updateNotifications
-// @desc    Clear user notifications
+// @desc    Update notifications, seen or not
 // @access  Private
 router.get("/updateNotifications", middleware.auth, async (req, res) => {
   const id = req.user.id;

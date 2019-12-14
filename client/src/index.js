@@ -11,6 +11,7 @@ import Footer from "./Components/inc/Footer";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 import io from "socket.io-client";
+import axios from "axios";
 const socket = io("http://localhost:5000");
 
 const theme = createMuiTheme({
@@ -24,6 +25,26 @@ const theme = createMuiTheme({
     ].join(",")
   }
 });
+
+axios.interceptors.response.use(
+  function(response) {
+    if (
+      response.data.errorMsg === "Access denied" &&
+      window.location.pathname !== "/login" &&
+      window.location.pathname !== "/" &&
+      window.location.pathname !== "/register" &&
+      window.location.pathname !== "/recover" &&
+      window.location.pathname !== "/editpass/"
+    )
+      window.location = "/login";
+    return response;
+  },
+  function(error) {
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
+    return Promise.reject(error);
+  }
+);
 
 function App() {
   const [{ auth }, dispatch] = useUserStore();

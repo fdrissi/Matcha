@@ -178,15 +178,15 @@ export const Notifications = () => {
 
   useEffect(() => {
     (async () => {
-      const result = await axios.get("/api/profile/getUserNotifications");
-      setNotifications(result.data.notifications);
-      console.log(result);
-      setLoad(true);
+      let result = await axios.get("/api/profile/getUserNotifications");
+      if (result.data.success) {
+        setNotifications(result.data.notifications);
+        setLoad(true);
+        result = await axios.get("/api/profile/updateNotifications");
+        if (result.data.success)
+          socket.emit("clearNotifications", { id: auth.userInfo.id });
+      }
     })();
-    (async () => {
-      await axios.get("/api/profile/updateNotifications");
-    })();
-    socket.emit("clearNotifications", { id: auth.userInfo.id });
   }, [auth.userInfo.id]);
 
   if (!load) return null;
