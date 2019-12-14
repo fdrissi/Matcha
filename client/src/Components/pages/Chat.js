@@ -88,7 +88,6 @@ const SubmitBox = ({ selected }) => {
   const [{ auth }] = useUserStore();
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
-  const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const profileId =
     auth.userInfo.id === selected.id_user
@@ -129,12 +128,11 @@ const SubmitBox = ({ selected }) => {
       if (result.data.success) {
         let oldChat = chat;
         oldChat.push({
-          id: index,
+          id: Date.now(),
           sender: auth.userInfo.id,
           receiver: profileId,
           message
         });
-        setIndex(index + 1);
         setChat(oldChat);
         setMessage("");
       }
