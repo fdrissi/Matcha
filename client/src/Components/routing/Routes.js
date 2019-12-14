@@ -11,6 +11,7 @@ import { Profile } from "../profile/Profile";
 import { Notifications } from "../pages/Notifications";
 import { History } from "../pages/History";
 import Browse from "../pages/Browse";
+import Search from "../pages/Search";
 import Chat from "../pages/Chat";
 import Edit_Profile from "../profile/Edit_Profile";
 import Notfound from "../pages/Notfound";
@@ -38,6 +39,11 @@ const Routes = () => {
           exact
           path="/browse"
           component={access ? Browse : Edit_Profile}
+        />
+        <PrivateRoute
+          exact
+          path="/search"
+          component={access ? Search : Edit_Profile}
         />
         <PrivateRoute
           exact
