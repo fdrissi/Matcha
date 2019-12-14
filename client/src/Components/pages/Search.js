@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Cover } from "../profile/Profile";
 import NavigationIcon from "@material-ui/icons/Navigation";
 import Alert from "../inc/Alert";
-import { REMOVE_ALERT } from "../../actions/actionTypes";
+import { REMOVE_ALERT, CLEAR_PROFILE_INIT } from "../../actions/actionTypes";
 import Places from "../inc/GoogleMaps";
 
 import { getSearch, sortProfiles } from "../../actions/browseAction";
@@ -524,6 +524,13 @@ const Search = () => {
   console.log(profile);
   // dont remove it im gonna work with later for clearing result when leaving page
   const stableDispatch = useCallback(dispatch, []);
+  useEffect(() => {
+    return () => {
+      stableDispatch({
+        type: CLEAR_PROFILE_INIT
+      });
+    };
+  }, [stableDispatch]);
 
   return (
     <div>
