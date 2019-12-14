@@ -56,7 +56,7 @@ const UserInfo = ({ info }) => {
 const LoadChat = ({ chat }) => {
   const [{ auth }] = useUserStore();
   return (
-    <div style={{ height: "70vh" }}>
+    <div style={{ height: "70vh", overflowY: "scroll" }}>
       {chat.length === 0
         ? "Conversation Empty"
         : chat.map(msg => (
