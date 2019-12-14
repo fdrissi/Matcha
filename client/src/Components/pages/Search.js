@@ -486,7 +486,7 @@ const Header = () => {
     <>
       <Cover img={"/img/banner-brwose.jpg"} style={{ postion: "relative" }}>
         <Grid xs={12} container item justify="center">
-          <div style={{ position: "absolute", top: "50%" }}>
+          <div style={{ position: "absolute", top: "80%", opacity: "0.7" }}>
             <Typography
               variant="h5"
               id="range-slider"
