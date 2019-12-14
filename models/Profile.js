@@ -30,12 +30,16 @@ async function SetImage(id, photoname, counter) {
 }
 
 async function setProfile(id, photoname) {
-  let filename = id + "/" + photoname;
-  let sql = "UPDATE photos SET profile_Image = ? WHERE id = ?";
-  const [result] = await pool.query(sql, [filename, id]);
-  if (!empty(result)) {
-    return true;
-  } else {
+  try {
+    let filename = id + "/" + photoname;
+    let sql = "UPDATE photos SET profile_Image = ? WHERE id = ?";
+    const [result] = await pool.query(sql, [filename, id]);
+    if (!empty(result)) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
     return false;
   }
 }
@@ -70,11 +74,15 @@ async function getImage(id) {
 }
 
 async function imagesCounter(id, action) {
-  let sql;
-  if (action === "add")
-    sql = `UPDATE photos SET counter = counter + 1 WHERE id = ?`;
-  else sql = `UPDATE photos SET counter = counter - 1 WHERE id = ?`;
-  const [result] = await pool.query(sql, [id]);
+  try {
+    let sql;
+    if (action === "add")
+      sql = `UPDATE photos SET counter = counter + 1 WHERE id = ?`;
+    else sql = `UPDATE photos SET counter = counter - 1 WHERE id = ?`;
+    await pool.query(sql, [id]);
+  } catch (error) {
+    return false;
+  }
 }
 
 async function removeOnUpload(id, row) {

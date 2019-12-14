@@ -241,6 +241,44 @@ module.exports = middleware = {
     next();
   },
 
+  async search_filter(req, res, next) {
+    const { filter } = req.query;
+    const { age_range, tags, location, fame_rating } = JSON.parse(filter);
+    // check age_range Values
+    if (
+      age_range[0] > age_range[1] ||
+      typeof age_range[0] != "number" ||
+      typeof age_range[1] != "number"
+    ) {
+      return res.json({
+        success: false,
+        errorMsg: "Something Goes Wrong On Age Range 💩"
+      });
+    }
+    // check location Values
+    if (location.length === 0) {
+      return res.json({
+        success: false,
+        errorMsg: "Please chose A Location 🤔"
+      });
+    }
+    // check fame_rating Values
+    if (typeof fame_rating != "number" || fame_rating < 1 || fame_rating > 5) {
+      return res.json({
+        success: false,
+        errorMsg: "Something Goes Wrong On fame_rating 💩"
+      });
+    }
+    // check fame_rating Values
+    if (typeof tags != "number" || fame_rating < 0 || fame_rating > 10) {
+      return res.json({
+        success: false,
+        errorMsg: "Something Goes Wrong On fame_rating 💩"
+      });
+    }
+    next();
+  },
+
   async browse_filter(req, res, next) {
     const { filter } = req.query;
     const { age_range, location_range, fame_rating } = JSON.parse(filter);

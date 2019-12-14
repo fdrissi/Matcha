@@ -93,3 +93,39 @@ export const filterBrowser = async (filter, dispatch) => {
     });
   }
 };
+
+export const getSearch = async (filter, dispatch) => {
+  console.log(filter);
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  const res = await axios.get(
+    `api/browse/getSearch`,
+    {
+      params: {
+        filter: filter
+      }
+    },
+    config
+  );
+  if (!res.data.success) {
+    dispatch({
+      type: SET_ALERT,
+      payload: {
+        alertType: "danger",
+        msg: res.data.errorMsg
+      }
+    });
+  } else {
+    dispatch({
+      type: BROWSER_RETURN,
+      payload: res.data.data
+    });
+    dispatch({
+      type: SORT_BY_BACK,
+      payload: res.data.sort_by
+    });
+  }
+};
