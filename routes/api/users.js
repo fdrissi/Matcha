@@ -107,7 +107,6 @@ router.post("/recover", async (req, res) => {
         const resultFromSr = userModel.setRecovery(result.email, token);
         if (resultFromSr) {
           // here we gonna send the email of the recovery
-          console.log("url", url);
           if (sendRecovery(result, token, url)) {
             return res.json({
               success: true,

@@ -356,7 +356,7 @@ const SearchBy = () => {
     }
     searchFunc();
   };
-  console.log(filter);
+  //console.log(filter);
 
   const handleChange = name => (event, newValue) => {
     setFilter({
@@ -521,7 +521,7 @@ const Header = () => {
 
 const Search = () => {
   const [{ profile }, dispatch] = useUserStore();
-  console.log(profile);
+  //console.log(profile);
   // dont remove it im gonna work with later for clearing result when leaving page
   const stableDispatch = useCallback(dispatch, []);
   useEffect(() => {

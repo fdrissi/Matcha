@@ -180,7 +180,7 @@ export const Notifications = () => {
     (async () => {
       const result = await axios.get("/api/profile/getUserNotifications");
       setNotifications(result.data.notifications);
-      console.log(result);
+      //console.log(result);
       setLoad(false);
     })();
     (async () => {

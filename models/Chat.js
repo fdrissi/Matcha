@@ -69,7 +69,6 @@ const deleteConversation = async (uid, pid) => {
     const [result] = await pool.query(sql, [uid, pid, pid, uid]);
     return !!result.affectedRows;
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
@@ -89,7 +88,7 @@ const isConversationHasUnreadMessage = async (uid, pid) => {
   try {
     const sql =
       "SELECT COUNT(*) as count FROM `user_messages` WHERE (`sender` = ? AND `receiver` = ? ) AND seen = ?";
-    const [result] = await pool.query(sql, [pid, uid, pid, uid, false]);
+    const [result] = await pool.query(sql, [pid, uid, false]);
     return result[0].count;
   } catch (error) {
     return false;

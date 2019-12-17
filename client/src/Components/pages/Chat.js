@@ -64,7 +64,7 @@ const LoadChat = ({ chat }) => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     if (auth.userInfo.id && chat.length > 0) {
       const msg = chat[0];
-      console.log("loadChat");
+      //console.log("loadChat");
       const uid = +auth.userInfo.id;
       const pid =
         +msg.sender !== +auth.userInfo.id ? +msg.sender : +msg.receiver;
@@ -247,7 +247,7 @@ export const UserChat = ({ info, select }) => {
       );
       setIncommingMessage(result.data.count);
     })();
-  }, [info]);
+  });
 
   return (
     <List className={classes.root}>

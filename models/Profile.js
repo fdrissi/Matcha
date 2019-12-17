@@ -260,7 +260,6 @@ async function setInfoVerified(value, id) {
     await pool.query(sql, [value, id]);
     return true;
   } catch (error) {
-    console.log(error);
     return false;
   }
 }
@@ -533,7 +532,6 @@ async function getUserNotifications(userId) {
     const [result] = await pool.query(sql, [userId]);
     return result;
   } catch (error) {
-    console.log(error);
     return false;
   }
 }
