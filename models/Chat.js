@@ -51,12 +51,46 @@ const sendMessage = async (sender, receiver, message) => {
   }
 };
 
+const setMessageSeen = async (uid, pid) => {
+  try {
+    const sql =
+      "UPDATE `user_messages` SET seen = ? WHERE `sender` = ? AND `receiver` = ?";
+    const [result] = await pool.query(sql, [true, pid, uid]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
+};
+
 const deleteConversation = async (uid, pid) => {
   try {
     const sql =
       "DELETE FROM `user_messages` WHERE sender = ? AND receiver = ? OR sender = ? AND receiver = ?";
     const [result] = await pool.query(sql, [uid, pid, pid, uid]);
     return !!result.affectedRows;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const getUnseenMessagesCount = async uid => {
+  try {
+    const sql =
+      "SELECT MIN(id) FROM `user_messages` WHERE `receiver` = ? AND seen = ? GROUP BY sender";
+    const [result] = await pool.query(sql, [uid, false]);
+    return result.length;
+  } catch (error) {
+    return false;
+  }
+};
+
+const isConversationHasUnreadMessage = async (uid, pid) => {
+  try {
+    const sql =
+      "SELECT COUNT(*) as count FROM `user_messages` WHERE (`sender` = ? AND `receiver` = ? ) AND seen = ?";
+    const [result] = await pool.query(sql, [pid, uid, pid, uid, false]);
+    return result[0].count;
   } catch (error) {
     return false;
   }
@@ -66,5 +100,8 @@ module.exports = {
   getUserAllMatches,
   getUserConversations,
   sendMessage,
-  deleteConversation
+  deleteConversation,
+  setMessageSeen,
+  getUnseenMessagesCount,
+  isConversationHasUnreadMessage
 };

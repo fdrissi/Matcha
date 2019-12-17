@@ -41,7 +41,7 @@ const io = require("socket.io").listen(server, {
   pingTimeout: 60000
 });
 //Share it
-let users = [];
+let users = {};
 io.use(function(socket, next) {
   if (socket.handshake.headers && socket.handshake.headers.cookie) {
     const cookies = cookie.parse(socket.handshake.headers.cookie);
@@ -54,44 +54,38 @@ io.use(function(socket, next) {
     next(new Error("Authentication error"));
   }
 }).on("connection", socket => {
-  console.log("new socket connected");
+  console.log("new connection", socket.id);
   socket.on("login", user => {
-    if (users.findIndex(x => x.id === user) === -1 && user) {
-      socket.userId = user;
-      users.push({ socket: socket.id, id: user, notifications: 0 });
-    }
+    socket.userId = user;
+    users[user] = socket.id;
+    console.log("new socket", socket.id);
     console.log("connected users", users);
-    io.sockets.emit("login", { users });
-    //io.sockets.emit("notification", { users });
+    socket.emit("login", users);
   });
 
-  socket.on("notify", data => {
-    console.log("comming notification to the server", data);
-    users.find(x => {
-      if (x.id === data.id) {
-        x.notifications += 1;
-        console.log("emit notification from server to ", x.id);
-        console.log(x.socket);
-        io.sockets.to(x.socket).emit("notify", { users });
-      }
-    });
+  socket.on("notification", data => {
+    console.log("notification received to backend", data);
+    socket.to(users[data.id]).emit("notification", { users });
   });
 
   socket.on("clearNotifications", data => {
-    console.log("comming ClearNotifications to the server", data);
-    users.find(x => {
-      if (x.id === data.id) {
-        x.notifications = 0;
-        console.log("clear notifications for user: ", x.socket, x.id, users);
-        socket.to(x.socket).emit("notify", { users });
-      }
-    });
+    socket.to(users[data.id]).emit("notification", { users });
   });
+
+  socket.on("newMessage", data => {
+    if (users[data.receiver]) {
+      socket.to(users[data.receiver]).emit("newMessage", data);
+      socket.to(users[data.receiver]).emit("notifMessage", data);
+    }
+  });
+
+  socket.on("seenUpdated", data => {
+    console.log("emit to ", users[data]);
+    io.sockets.to(users[data]).emit("notifMessage", data);
+  });
+
   socket.on("disconnect", () => {
-    users.find((o, i) => {
-      if (o && o.id === socket.userId) {
-        users.splice(i, 1);
-      }
-    });
+    //delete users[socket.userId];
+    console.log("disconnect", users);
   });
 });

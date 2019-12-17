@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "../../Context/appStore";
+import { useSocketStore } from "../../Context/appStore";
 import { loadUser } from "../../actions/userAction";
 import { Route, Link } from "react-router-dom";
 import {
@@ -17,9 +18,7 @@ import { AccountCircle } from "@material-ui/icons/";
 import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
-import io from "socket.io-client";
 import axios from "axios";
-const socket = io("http://localhost:5000");
 
 const useStyles = makeStyles(theme => ({
   menuButton: {
@@ -68,26 +67,38 @@ const NavNotifications = () => {
   const classes = useStyles();
   const [dbNotif, setDbNotif] = useState(0);
   const [{ auth }] = useUserStore();
+  const socket = useSocketStore();
+
+  if (socket.listeners("notification").length <= 1) {
+    socket.on("notification", data => {
+      (async () => {
+        const result = await axios.get("/api/profile/unseenNotificationsCount");
+        if (result.data.success) {
+          setDbNotif(result.data.count);
+        }
+      })();
+    });
+  }
 
   //if (socket.listeners("notification").length < 1) {
 
-  useEffect(() => {
-    socket.on("notify", async data => {
-      console.log(data);
-      const result = await axios.get("/api/profile/unseenNotificationsCount");
-      console.log("navbar notif coun", result.data);
-      if (result.data.success) {
-        setDbNotif(result.data.count);
-      }
-    });
-    (async () => {
-      const result = await axios.get("/api/profile/unseenNotificationsCount");
-      console.log("navbar notif coun", result.data);
-      if (result.data.success) {
-        setDbNotif(result.data.count);
-      }
-    })();
-  }, [auth.userInfo.id]);
+  // useEffect(() => {
+  //   socket.on("notify", async data => {
+  //     console.log(data);
+  //     const result = await axios.get("/api/profile/unseenNotificationsCount");
+  //     console.log("navbar notif coun", result.data);
+  //     if (result.data.success) {
+  //       setDbNotif(result.data.count);
+  //     }
+  //   });
+  //   (async () => {
+  //     const result = await axios.get("/api/profile/unseenNotificationsCount");
+  //     console.log("navbar notif coun", result.data);
+  //     if (result.data.success) {
+  //       setDbNotif(result.data.count);
+  //     }
+  //   })();
+  // }, [auth.userInfo.id]);
   //}
 
   // socket.on("clearNotifications", data => {
@@ -117,6 +128,34 @@ const NavNotifications = () => {
 
 const NavMessage = () => {
   const classes = useStyles();
+  const [dbNotif, setDbNotif] = useState(0);
+  const [{ auth }] = useUserStore();
+  const socket = useSocketStore();
+
+  if (socket.listeners("newMessage").length < 1)
+    socket.on("notifMessage", data => {
+      (async () => {
+        const result = await axios.get(
+          `/api/chat/unseenCount/${auth.userInfo.id}`
+        );
+        if (result.data.success) {
+          setDbNotif(result.data.count);
+        }
+      })();
+    });
+
+  useEffect(() => {
+    if (auth.userInfo.id) {
+      (async () => {
+        const result = await axios.get(
+          `/api/chat/unseenCount/${auth.userInfo.id}`
+        );
+        if (result.data.success) {
+          setDbNotif(result.data.count);
+        }
+      })();
+    }
+  }, [auth.userInfo.id]);
 
   return (
     <>
@@ -126,7 +165,7 @@ const NavMessage = () => {
           color="inherit"
           style={{ height: "100%" }}
         >
-          <Badge badgeContent={0} color="secondary">
+          <Badge badgeContent={dbNotif} color="secondary">
             <MailIcon className={classes.actions} />
           </Badge>
         </IconButton>
