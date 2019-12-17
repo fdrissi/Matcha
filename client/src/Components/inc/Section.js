@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { Grid } from "@material-ui/core";
 import Image from "material-ui-image";
+import axios from "axios";
 
 const useStyle = makeStyles({
   section: {
@@ -52,7 +53,7 @@ const images = [
 const Widget = ({ classes, img, title, text }) => {
   return (
     <>
-      <img src={img.img} alt={img.title} className={classes.image} />
+      <img src={img} alt={title} className={classes.image} />
       <Typography variant="h6" align="center">
         {title}
       </Typography>
@@ -81,21 +82,51 @@ const Title = () => {
 
 const Section = () => {
   const classes = useStyle();
+  const [totalMembers, setTotalMembers] = useState();
+  useEffect(() => {
+    async function setTotal() {
+      const res = await axios.get("api/users/getTotal");
+      setTotalMembers(res.data.total);
+    }
+    setTotal();
+  }, [totalMembers]);
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
         <Title />
       </Grid>
-      {images.map(img => (
-        <Grid key={img.id} item sm={3} xs={6}>
-          <Widget
-            classes={classes}
-            img={img}
-            title={img.title}
-            text={img.text}
-          />
-        </Grid>
-      ))}
+      <Grid item sm={3} xs={6}>
+        <Widget
+          classes={classes}
+          img="./img/members.png"
+          title={totalMembers}
+          text="Total Members"
+        />
+      </Grid>
+      <Grid item sm={3} xs={6}>
+        <Widget
+          classes={classes}
+          img="./img/online.png"
+          title={"500"}
+          text={"Online"}
+        />
+      </Grid>
+      <Grid item sm={3} xs={6}>
+        <Widget
+          classes={classes}
+          img="./img/men.png"
+          title={"300"}
+          text={"Men Online"}
+        />
+      </Grid>
+      <Grid item sm={3} xs={6}>
+        <Widget
+          classes={classes}
+          img="./img/women.png"
+          title={"200"}
+          text={"Women  Online"}
+        />
+      </Grid>
     </Grid>
   );
 };

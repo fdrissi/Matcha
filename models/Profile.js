@@ -402,6 +402,22 @@ async function unblockProfile(userId, profileId) {
   }
 }
 
+async function isOnOFUserBlockedBy(userId, profileId) {
+  try {
+    const sql =
+      "SELECT * FROM `user_block` WHERE `id_user` = ? AND `id_profile` = ? OR `id_user` = ? AND `id_profile` = ? ";
+    const [result] = await pool.query(sql, [
+      userId,
+      profileId,
+      profileId,
+      userId
+    ]);
+    return result.length > 0 ? true : false;
+  } catch (error) {
+    return false;
+  }
+}
+
 async function isUserBlockedProfile(userId, profileId) {
   try {
     const sql =
@@ -603,5 +619,6 @@ module.exports = {
   getUserNotifications,
   clearUserNotifications,
   updateNotifications,
-  getUnseenNotificationsCount
+  getUnseenNotificationsCount,
+  isOnOFUserBlockedBy
 };

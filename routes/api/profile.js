@@ -19,7 +19,6 @@ const unlinkAsync = promisify(fs.unlink);
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
     const { id } = req.user;
-    const { row } = req.params;
     const dir = `./client/public/uploads/${id}/`;
     fs.exists(dir, exists => {
       if (!exists) {

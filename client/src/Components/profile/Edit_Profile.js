@@ -195,7 +195,6 @@ function EditProfile() {
   const handleChangeIndex = index => {
     setIndex(index);
   };
-  console.log(profile);
 
   const onImageChange = event => {
     event.persist();
@@ -740,9 +739,7 @@ function EditProfile() {
                 <label htmlFor="profileImage-button-file">
                   <IconButton component="span">
                     <Avatar
-                      src={
-                        `./uploads/${profile.photo.profile_Image}?` + Date.now()
-                      }
+                      src={`./uploads/${profile.photo.profile_Image}`}
                       style={{
                         margin: "10px",
                         width: "200px",

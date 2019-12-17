@@ -9,6 +9,7 @@ const router = express.Router();
 const key = config.get("keyOrSecret");
 const crypto = require("crypto");
 const middleware = require("../../middleware/midlleware");
+const _ = require("lodash");
 
 const url = config.get("url");
 
@@ -303,7 +304,7 @@ router.get("/activation", async (req, res) => {
 
 // @route   POST api/users/updateUser
 // @desc    Edit user info (name, email, password...)
-// @access  Public
+// @access  Privet
 router.post(
   "/updateUser",
   [middleware.auth, middleware.setting],
@@ -387,5 +388,17 @@ router.post(
     }
   }
 );
+
+// @route   POST api/users/getTotal
+// @desc    GET THE TOTAL OF USERS
+// @access  Public
+router.get("/getTotal", async (req, res) => {
+  const result = await userModel.getTotalUser();
+  const { total } = result;
+  console.log(total);
+  return res.json({
+    total
+  });
+});
 
 module.exports = router;

@@ -20,6 +20,7 @@ import PrivateRoute from "./PrivateRoute";
 const Routes = () => {
   const [{ auth }] = useUserStore();
   const access = auth.userInfo.info_verified;
+  console.log("access ", access);
   return (
     <div style={{ flex: 1 }}>
       <Switch>

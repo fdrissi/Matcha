@@ -43,7 +43,6 @@ export default function GoogleMaps({ search, setFilter }) {
         "google-maps"
       );
     }
-
     loaded.current = true;
   }
 
