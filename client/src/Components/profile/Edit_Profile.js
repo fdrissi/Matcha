@@ -233,6 +233,7 @@ function EditProfile() {
       }));
     }
   };
+  console.log(profile);
 
   if (alert.msg !== "")
     setTimeout(() => {
@@ -263,11 +264,14 @@ function EditProfile() {
   }, [profile.info]);
 
   useEffect(() => {
-    if (!isFirstRun.current) {
-      const formData = new FormData();
-      formData.append("myImage", myPhoto.file);
-      setUserImages(formData, myPhoto.id, stableDispatch);
+    async function testt() {
+      if (!isFirstRun.current) {
+        const formData = new FormData();
+        formData.append("myImage", myPhoto.file);
+        await setUserImages(formData, myPhoto.id, stableDispatch);
+      }
     }
+    testt();
     isFirstRun.current = false;
   }, [myPhoto.file, myPhoto.id, stableDispatch]);
 

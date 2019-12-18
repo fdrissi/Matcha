@@ -29,13 +29,10 @@ var storage = multer.diskStorage({
   },
   filename: function(req, file, callback) {
     const { row } = req.params;
-    if (row === "profile_Image")
-      return callback(null, "profile" + path.extname(file.originalname));
-    else
-      return callback(
-        null,
-        "IMAGE-" + Date.now() + path.extname(file.originalname)
-      );
+    return callback(
+      null,
+      "IMAGE-" + Date.now() + path.extname(file.originalname)
+    );
   }
 });
 
@@ -58,24 +55,19 @@ router.post(
           const remove = await profileModel.removeOnUpload(id, row);
           const counter = await profileModel.getCounter(id);
           if (row === "profile_Image") {
-            fs.rename(
-              file.path,
-              `client/public/uploads/${id}/profile.png`,
-              function(err) {
-                if (err) throw err;
-              }
-            );
-            check = await profileModel.setProfile(id, "profile.png");
-          } else if (remove !== "photo_holder.png" && row !== "profile_Image")
+            // for the profile image change
+            check = await profileModel.setProfile(id, file.filename);
+          } else if (remove !== "photo_holder.png" && row !== "profile_Image") {
+            // in case he set a image on previouse image
             check = await profileModel.setImageRow(id, row, filename);
-          else check = await profileModel.SetImage(id, filename, counter);
+          } else {
+            // here we gonna add image in case there is no image on it before
+            check = await profileModel.SetImage(id, filename, counter);
+          }
           const result = await profileModel.getImage(id);
           const cover = await profileModel.getImageByRow(id, "cover_Image");
           if (check) {
-            if (
-              remove !== "photo_holder.png" &&
-              remove !== `${id}/profile.png`
-            ) {
+            if (remove !== "photo_holder.png") {
               await unlinkAsync(`./client/public/uploads/${remove}`);
               if (remove === cover)
                 await profileModel.setImageCover(id, "cover_holder.png");

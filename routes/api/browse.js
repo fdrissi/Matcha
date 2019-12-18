@@ -65,12 +65,13 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
         element.id
       );
     }
+    console.log(newData);
     const data = newData.filter(el => {
       return !(
         el.is_Blocked === true ||
         el.destination > 30 ||
-        el.fame_rate === 0 ||
-        el.common_tags === 1
+        el.fame_rate < 20 ||
+        el.common_tags < 1
       );
     });
 

@@ -18,6 +18,7 @@ export const setUserImages = async (formData, row, dispatch) => {
   try {
     const res = await axios.post(`api/profile/upload/${row}`, formData, config);
     if (res.data.success) {
+      console.log(res.data.result);
       dispatch({
         type: PHOTO_SUCCESS,
         payload: res.data.result
@@ -39,6 +40,7 @@ export const setUserImages = async (formData, row, dispatch) => {
       });
     }
   } catch (error) {
+    console.log(error);
     return false;
   }
 };
