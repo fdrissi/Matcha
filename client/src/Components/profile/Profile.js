@@ -29,8 +29,7 @@ import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
 import ThumbDownAltIcon from "@material-ui/icons/ThumbDownAlt";
 import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
 import Image from "material-ui-image";
-import io from "socket.io-client";
-const socket = io("http://localhost:5000");
+import { useSocketStore } from "../../Context/appStore";
 
 const useStyles = makeStyles(theme => ({
   cover: {
@@ -166,6 +165,7 @@ const UserInfo = () => {
 const ProfileImage = () => {
   const classes = useStyles();
   const [{ auth, profile }] = useUserStore();
+  const socket = useSocketStore();
   const [online, setOnline] = useState(false);
 
   useEffect(() => {
@@ -174,9 +174,7 @@ const ProfileImage = () => {
     // Check if user logged in
     if (socket.listeners("login").length <= 1) {
       socket.on("login", data => {
-        const exist = data.users.find(x => {
-          return x.id === profile.info.id;
-        });
+        const exist = data[profile.info.id];
         if (exist && !unmounted) setOnline(true);
       });
     }
@@ -310,11 +308,12 @@ export const Cover = ({ children, img = "/img/banner-brwose.jpg" }) => {
 
 const ProfileHeader = () => {
   const [{ auth, profile }, dispatch] = useUserStore();
+  const socket = useSocketStore();
 
   const handleClick = async () => {
     const result = await likeProfile(profile.info.id, dispatch);
     if (result) {
-      socket.emit("notification", { id: profile.info.id });
+      socket.emit("notify", { id: profile.info.id });
     }
   };
 
@@ -512,6 +511,7 @@ const Gallery = ({ images }) => {
 export const Profile = ({ match }) => {
   const classes = useStyles();
   const [{ auth, profile }, dispatch] = useUserStore();
+  const socket = useSocketStore();
   const stableDispatch = useCallback(dispatch, []);
   const id = match.params.id;
 
@@ -527,10 +527,10 @@ export const Profile = ({ match }) => {
     if (+profile.info.id !== 0 && auth.userInfo.id !== 0) {
       recordVisitedProfiles(+profile.info.id);
       if (
-        socket.listeners("notification").length === 0 &&
+        socket.listeners("notify").length === 0 &&
         +profile.info.id !== auth.userInfo.id
       ) {
-        socket.emit("notification", { id: profile.info.id });
+        socket.emit("notify", { id: profile.info.id });
       }
     }
   }, [profile.info.id, auth.userInfo.id]);

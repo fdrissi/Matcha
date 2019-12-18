@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { UserProvider, useUserStore } from "./Context/appStore";
+import { useSocketStore } from "./Context/appStore";
 import { LoadUserComponent } from "./LoadUser";
 import { loadUser } from "./actions/userAction";
 import Navbar from "./Components/inc/Navbar";
@@ -10,9 +11,7 @@ import Routes from "./Components/routing/Routes";
 import Footer from "./Components/inc/Footer";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
-import io from "socket.io-client";
 import axios from "axios";
-const socket = io("http://localhost:5000");
 
 const theme = createMuiTheme({
   typography: {
@@ -48,11 +47,13 @@ axios.interceptors.response.use(
 
 function App() {
   const [{ auth }, dispatch] = useUserStore();
+  const socket = useSocketStore();
 
   useEffect(() => {
-    if (socket.listeners("login").length <= 1)
+    if (auth.isAuthenticated) {
       socket.emit("login", auth.userInfo.id);
-  }, [auth.userInfo.id]);
+    }
+  }, [auth.userInfo.id, auth.isAuthenticated]);
 
   return (
     <div

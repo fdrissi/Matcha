@@ -6,7 +6,7 @@ const chatModel = require("../../models/Chat");
 
 // @route   Get api/chat/:id/
 // @desc    Get all user matches
-// @access  Public
+// @access  Private
 router.get("/:id", [middleware.auth], async (req, res) => {
   try {
     const id = req.params.id;
@@ -28,7 +28,7 @@ router.get("/:id", [middleware.auth], async (req, res) => {
 
 // @route   Get api/chat/:uid/conversation/:pid
 // @desc    Get user specific chat
-// @access  Public
+// @access  Private
 router.get("/:uid/conversation/:pid", [middleware.auth], async (req, res) => {
   try {
     const uid = req.params.uid;
@@ -51,7 +51,7 @@ router.get("/:uid/conversation/:pid", [middleware.auth], async (req, res) => {
 
 // @route   Post api/chat/sendMessage
 // @desc    Send message
-// @access  Public
+// @access  Private
 router.post(
   "/sendMessage",
   [middleware.auth, middleware.chat],
@@ -74,9 +74,30 @@ router.post(
   }
 );
 
+// @route   Put api/chat/setSeen
+// @desc    Update seen message status
+// @access  Private
+router.put("/setSeen", [middleware.auth], async (req, res) => {
+  try {
+    const { uid, pid } = req.body;
+    if (+uid !== +req.user.id)
+      return res.json({
+        success: false
+      });
+    const result = await chatModel.setMessageSeen(uid, pid);
+    return res.json({
+      success: result
+    });
+  } catch (error) {
+    return res.json({
+      success: false
+    });
+  }
+});
+
 // @route   Delete api/chat/:uid/conversation/:pid
 // @desc    Delete conversation
-// @access  Public
+// @access  Private
 router.delete(
   "/:uid/conversation/:pid",
   [middleware.auth],
@@ -99,5 +120,50 @@ router.delete(
     }
   }
 );
+
+// @route   Get api/chat/unseenCount/:uid
+// @desc    Get Unread messages count
+// @access  Private
+router.get("/unseenCount/:uid", [middleware.auth], async (req, res) => {
+  try {
+    const uid = +req.params.uid;
+    if (+uid !== +req.user.id)
+      return res.json({
+        success: false
+      });
+    const result = await chatModel.getUnseenMessagesCount(uid);
+    return res.json({
+      success: true,
+      count: result
+    });
+  } catch (error) {
+    return res.json({
+      success: false
+    });
+  }
+});
+
+// @route   Get api/chat/:uid/unseen/:pid
+// @desc    Is conversation has unread message
+// @access  Private
+router.get("/:uid/unseen/:pid", [middleware.auth], async (req, res) => {
+  try {
+    const uid = +req.params.uid;
+    const pid = req.params.pid;
+    if (+uid !== +req.user.id)
+      return res.json({
+        success: false
+      });
+    const result = await chatModel.isConversationHasUnreadMessage(uid, pid);
+    return res.json({
+      success: true,
+      count: result
+    });
+  } catch (error) {
+    return res.json({
+      success: false
+    });
+  }
+});
 
 module.exports = router;
