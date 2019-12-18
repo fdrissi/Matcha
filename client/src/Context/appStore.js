@@ -11,8 +11,15 @@ import {
   tokenvalidationInitState
 } from "../Reducers/authReducer";
 import { profileReducer, profileInitState } from "../Reducers/profileReducer";
+import io from "socket.io-client";
+const socket = io("http://localhost:5000");
 
 export const appStore = React.createContext();
+export const socketStore = React.createContext();
+
+const StoreProvider = ({ children }) => {
+  return <socketStore.Provider value={socket}>{children}</socketStore.Provider>;
+};
 
 export const UserProvider = ({ children }) => {
   const globalReducers = useCombinedReducers({
@@ -23,8 +30,11 @@ export const UserProvider = ({ children }) => {
     token: useReducer(passeditReducer, tokenvalidationInitState)
   });
   return (
-    <appStore.Provider value={globalReducers}>{children}</appStore.Provider>
+    <StoreProvider>
+      <appStore.Provider value={globalReducers}>{children}</appStore.Provider>
+    </StoreProvider>
   );
 };
 
 export const useUserStore = () => useContext(appStore);
+export const useSocketStore = () => useContext(socketStore);
