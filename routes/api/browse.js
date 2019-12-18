@@ -32,7 +32,7 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
     const lat = await browseModel.getUserInfoByRow(id, "user_lat");
     const long = await browseModel.getUserInfoByRow(id, "user_lng");
     const gender = await browseModel.getUserInfoByRow(id, "user_gender");
-    const data = await browseModel.getAllUserForBrowser(
+    const newData = await browseModel.getAllUserForBrowser(
       id,
       interesting,
       gender
@@ -48,7 +48,7 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
         (c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p))) / 2;
       return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
     }
-    data.map(value => {
+    newData.map(value => {
       const destination = parseFloat(
         distance(lat, long, value.user_lat, value.user_lng).toFixed(2)
       );
@@ -58,9 +58,23 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
         JSON.parse(value.user_tags)
       ).length;
     });
-    for (let element of data) {
+    for (let element of newData) {
       element.isLiked = await profileModel.isUserLikedProfile(id, element.id);
+      element.is_Blocked = await profileModel.isOnOFUserBlockedBy(
+        id,
+        element.id
+      );
     }
+    console.log(newData);
+    const data = newData.filter(el => {
+      return !(
+        el.is_Blocked === true ||
+        el.destination > 30 ||
+        el.fame_rate < 20 ||
+        el.common_tags < 1
+      );
+    });
+
     data.sort((a, b) =>
       // a.destination > b.destination ? 1 : b.destination > a.destination ? -1 : 0
       a.destination > b.destination
@@ -116,6 +130,12 @@ router.get(
         return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
       }
 
+      for (let element of newData) {
+        element.is_Blocked = await profileModel.isOnOFUserBlockedBy(
+          id,
+          element.id
+        );
+      }
       const data = newData.filter(el => {
         const destination = parseFloat(
           distance(lat, long, el.user_lat, el.user_lng).toFixed(2)
@@ -123,6 +143,7 @@ router.get(
 
         if (el.fame_rate === 0) el.fame_rate = 1;
         return !(
+          el.is_Blocked === true ||
           destination > location_range ||
           !(
             el.fame_rate <= fame_rating * 20 &&
@@ -186,7 +207,7 @@ router.get(
         interesting,
         gender
       );
-      geocoder.geocode(location, function(err, responde) {
+      geocoder.geocode(location, async function(err, responde) {
         if (!err) {
           const { latitude, longitude } = responde[0];
           function distance(lat1, lon1, lat2, lon2) {
@@ -198,6 +219,12 @@ router.get(
               (c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p))) / 2;
             return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
           }
+          for (let element of newData) {
+            element.is_Blocked = await profileModel.isOnOFUserBlockedBy(
+              id,
+              element.id
+            );
+          }
           const data = newData.filter(el => {
             const destination = parseFloat(
               distance(latitude, longitude, el.user_lat, el.user_lng).toFixed(2)
@@ -205,6 +232,7 @@ router.get(
             if (el.fame_rate === 0) el.fame_rate = 1;
             return !(
               destination > 100 ||
+              el.is_Blocked === true ||
               !(
                 el.fame_rate <= fame_rating * 20 &&
                 el.fame_rate > fame_rating * 20 - 20

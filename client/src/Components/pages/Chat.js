@@ -18,6 +18,9 @@ import {
   Badge
 } from "@material-ui/core";
 import axios from "axios";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { useSocketStore } from "../../Context/appStore";
 
 const useStyles = makeStyles(() => ({
@@ -280,7 +283,6 @@ export const UserChat = ({ info, select }) => {
           }
         />
       </ListItem>
-      <Divider variant="inset" component="li" />
     </List>
   );
 };
@@ -299,6 +301,7 @@ const ListChats = ({ matched, select }) => {
 
 const ChatHolder = () => {
   const [{ auth }] = useUserStore();
+
   const [matched, setMatched] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(0);
@@ -318,7 +321,43 @@ const ChatHolder = () => {
   }, [auth.isAuthenticated, auth.userInfo.id]);
 
   if (loading) return null;
-  if (matched.length === 0) return <div>Not Matches</div>;
+  if (matched.length === 0)
+    return (
+      <Card style={{ backgroundColor: "transparent" }}>
+        <CardContent>
+          <Grid
+            container
+            direction="row"
+            justify="space-between"
+            alignItems="center"
+          >
+            <Grid xs={12} container item justify="center">
+              <Typography variant="subtitle1" gutterBottom>
+                <img
+                  src="./img/widget-title-border.png"
+                  alt="left"
+                  style={{ color: "rgb(231, 76, 60)" }}
+                />
+                {" Chat "}
+                <img
+                  src="./img/widget-title-border.png"
+                  alt="left"
+                  style={{ color: "rgb(231, 76, 60)", transform: "scaleX(-1)" }}
+                />
+              </Typography>
+            </Grid>
+            <Grid xs={12} container item justify="center">
+              <Typography variant="overline" id="range-slider" gutterBottom>
+                There is no user that matched with you yet 😥
+              </Typography>
+            </Grid>
+            <Grid xs={12} container item justify="center">
+              <CircularProgress disableShrink style={{ color: "#e74c3c" }} />
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+    );
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>

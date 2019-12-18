@@ -195,7 +195,6 @@ function EditProfile() {
   const handleChangeIndex = index => {
     setIndex(index);
   };
-  console.log(profile);
 
   const onImageChange = event => {
     event.persist();
@@ -234,6 +233,7 @@ function EditProfile() {
       }));
     }
   };
+  console.log(profile);
 
   if (alert.msg !== "")
     setTimeout(() => {
@@ -264,11 +264,14 @@ function EditProfile() {
   }, [profile.info]);
 
   useEffect(() => {
-    if (!isFirstRun.current) {
-      const formData = new FormData();
-      formData.append("myImage", myPhoto.file);
-      setUserImages(formData, myPhoto.id, stableDispatch);
+    async function testt() {
+      if (!isFirstRun.current) {
+        const formData = new FormData();
+        formData.append("myImage", myPhoto.file);
+        await setUserImages(formData, myPhoto.id, stableDispatch);
+      }
     }
+    testt();
     isFirstRun.current = false;
   }, [myPhoto.file, myPhoto.id, stableDispatch]);
 
@@ -740,9 +743,7 @@ function EditProfile() {
                 <label htmlFor="profileImage-button-file">
                   <IconButton component="span">
                     <Avatar
-                      src={
-                        `./uploads/${profile.photo.profile_Image}?` + Date.now()
-                      }
+                      src={`./uploads/${profile.photo.profile_Image}`}
                       style={{
                         margin: "10px",
                         width: "200px",

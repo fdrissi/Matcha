@@ -241,6 +241,11 @@ async function updatePassword(password, id) {
     return false;
   }
 }
+async function getTotalUser() {
+  let sql = "SELECT COUNT(*) AS total FROM users";
+  const [result] = await pool.query(sql);
+  return result[0];
+}
 
 module.exports = {
   login,
@@ -259,5 +264,6 @@ module.exports = {
   updateEmail,
   updatePassword,
   findByToken,
-  findUserByRecovery
+  findUserByRecovery,
+  getTotalUser
 };
