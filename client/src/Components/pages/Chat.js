@@ -14,8 +14,7 @@ import {
   ListItemText,
   ListItemAvatar,
   Avatar,
-  Typography,
-  Badge
+  Typography
 } from "@material-ui/core";
 import axios from "axios";
 import { useSocketStore } from "../../Context/appStore";
@@ -59,15 +58,13 @@ const LoadChat = ({ chat }) => {
   const [{ auth }] = useUserStore();
   const messagesEndRef = React.createRef();
   const socket = useSocketStore();
+  const msg = chat[0];
+  const uid = +auth.userInfo.id;
+  const pid = +msg.sender !== +auth.userInfo.id ? +msg.sender : +msg.receiver;
 
   useEffect(() => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     if (auth.userInfo.id && chat.length > 0) {
-      const msg = chat[0];
-      //console.log("loadChat");
-      const uid = +auth.userInfo.id;
-      const pid =
-        +msg.sender !== +auth.userInfo.id ? +msg.sender : +msg.receiver;
       (async () => {
         const config = {
           header: {

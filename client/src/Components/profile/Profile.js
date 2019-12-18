@@ -28,6 +28,7 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
 import ThumbDownAltIcon from "@material-ui/icons/ThumbDownAlt";
 import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
+import BookmarkIcon from "@material-ui/icons/Bookmark";
 import Image from "material-ui-image";
 import { useSocketStore } from "../../Context/appStore";
 
@@ -157,6 +158,18 @@ const UserInfo = () => {
             verticalAlign: "middle"
           }}
         />
+        {profile.info.matched && (
+          <BookmarkIcon
+            variant="static"
+            thickness={7}
+            value={circle}
+            size={30}
+            style={{
+              color: "#2e3c43",
+              verticalAlign: "middle"
+            }}
+          />
+        )}
       </h4>
     </>
   );
@@ -164,26 +177,8 @@ const UserInfo = () => {
 
 const ProfileImage = () => {
   const classes = useStyles();
-  const [{ auth, profile }] = useUserStore();
-  const socket = useSocketStore();
-  const [online, setOnline] = useState(false);
-
-  useEffect(() => {
-    let unmounted = false;
-    window.scrollTo(0, 0);
-    // Check if user logged in
-    if (socket.listeners("login").length <= 1) {
-      socket.on("login", data => {
-        const exist = data[profile.info.id];
-        if (exist && !unmounted) setOnline(true);
-      });
-    }
-    // if is the owner profile, set online true
-    if (auth.userInfo.id === profile.info.id) setOnline(true);
-    return () => {
-      unmounted = true;
-    };
-  }, [profile.info.id, auth.userInfo.id]);
+  const [{ profile }] = useUserStore();
+  console.log(profile.info);
 
   return (
     <>
@@ -194,7 +189,7 @@ const ProfileImage = () => {
         style={{
           border: profile.info.blocked
             ? "red 5px solid"
-            : online
+            : !!profile.info.user_online
             ? "green 5px solid"
             : "gray 5px solid"
         }}

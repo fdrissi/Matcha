@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
+import Landing from "../layouts/Landing";
 import Login from "../auth/Login";
 import Register from "../auth/Register";
 import Setting from "../user/Setting";
@@ -18,11 +19,14 @@ import Notfound from "../pages/Notfound";
 import PrivateRoute from "./PrivateRoute";
 
 const Routes = () => {
-  const [{ auth }] = useUserStore();
+  const [{ auth, profile }] = useUserStore();
   const access = auth.userInfo.info_verified;
+  console.log("profile", profile);
+  console.log("access", auth.userInfo.info_verified);
   return (
     <div style={{ flex: 1 }}>
       <Switch>
+        <Route exact path="/" component={Landing} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <PrivateRoute exact path="/setting" component={Setting} />

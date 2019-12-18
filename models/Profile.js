@@ -264,6 +264,18 @@ async function setInfoVerified(value, id) {
   }
 }
 
+async function isInfoVerified(id) {
+  try {
+    console.log("id", id);
+    let sql = "SELECT `info_verified` FROM user_info WHERE id = ?";
+    const [result] = await pool.query(sql, [id]);
+    console.log("isInfoVerified", result[0].info_verified);
+    return !!result[0].info_verified;
+  } catch (error) {
+    return false;
+  }
+}
+
 async function getResultByRow(row, id) {
   try {
     let sql = `SELECT ${row} from user_info WHERE id = ?`;
@@ -369,8 +381,13 @@ async function unmatch(userId, profileId) {
 async function areMatched(userId, profileId) {
   try {
     const sql =
-      "SELECT * FROM `user_match` WHERE `id_user` = ? AND `id_profile` = ?";
-    const [result] = await pool.query(sql, [userId, profileId]);
+      "SELECT * FROM `user_match` WHERE `id_user` = ? AND `id_profile` = ? OR `id_user` = ? AND `id_profile` = ?";
+    const [result] = await pool.query(sql, [
+      userId,
+      profileId,
+      profileId,
+      userId
+    ]);
     return result.length > 0 ? true : false;
   } catch (error) {
     return false;
@@ -583,6 +600,7 @@ module.exports = {
   getUserInfo,
   updateUserInfo,
   setInfoVerified,
+  isInfoVerified,
   getResultByRow,
   updateGeoLocation,
   likeProfile,

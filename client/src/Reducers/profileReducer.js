@@ -39,6 +39,7 @@ export const profileInitState = {
     user_city: "",
     user_current_occupancy: "",
     user_biography: "",
+    user_online: false,
     user_set_from_map: null,
     user_fame_rate: 0,
     user_location: {

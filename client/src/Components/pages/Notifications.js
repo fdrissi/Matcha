@@ -180,28 +180,13 @@ export const Notifications = () => {
     (async () => {
       const result = await axios.get("/api/profile/getUserNotifications");
       setNotifications(result.data.notifications);
-      //console.log(result);
       setLoad(false);
     })();
     (async () => {
       await axios.get("/api/profile/updateNotifications");
     })();
-    socket.emit("clearNotifications", { id: auth.userInfo.id });
   }, [auth.userInfo.id]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     let result = await axios.get("/api/profile/getUserNotifications");
-  //     if (result.data.success) {
-  //       setNotifications(result.data.notifications);
-  //       setLoad(false);
-  //       result = await axios.get("/api/profile/updateNotifications");
-  //       if (result.data.success) {
-  //         socket.emit("clearNotifications", { id: auth.userInfo.id });
-  //       }
-  //     }
-  //   })();
-  // }, [auth.userInfo.id]);
+  socket.emit("clearNotifications", { id: auth.userInfo.id });
 
   if (load) return null;
   return (
