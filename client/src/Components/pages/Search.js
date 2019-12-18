@@ -128,7 +128,7 @@ const ProfileDialog = ({ open, handleClose, info, classes }) => {
               <Grid container justify="center" alignItems="center">
                 <Grid item xs={12}>
                   <Avatar
-                    src={`./uploads/${info.id}/profile.png`}
+                    src={`./uploads/${info.profile_Image}`}
                     alt={info.first_name}
                     className={classes.avatar}
                   />
@@ -199,9 +199,9 @@ const Profile = () => {
     <>
       {profile.browser.result.map(inf => {
         return (
-          <Box key={inf.id} style={{ margin: "0 4%" }} flexGrow={1}>
+          <Box key={inf.id} width={300} style={{ margin: "0 4%" }} flexGrow={1}>
             <Avatar
-              src={`./uploads/${inf.id}/profile.png`}
+              src={`./uploads/${inf.profile_Image}`}
               alt={inf.first_name}
               className={classes.avatar}
               onClick={() => handleClickOpen(inf)}
@@ -210,15 +210,15 @@ const Profile = () => {
               {inf.first_name} {inf.last_name}
             </h5>
             <p style={{ textAlign: "center" }}>{inf.user_birth} years old</p>
-            <ProfileDialog
-              open={open}
-              handleClose={handleClose}
-              info={showCard.showCard}
-              classes={classes}
-            />
           </Box>
         );
       })}
+      <ProfileDialog
+        open={open}
+        handleClose={handleClose}
+        info={showCard.showCard}
+        classes={classes}
+      />
     </>
   );
 };

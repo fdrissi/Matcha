@@ -3,13 +3,11 @@ import { Cover } from "../profile/Profile";
 import NavigationIcon from "@material-ui/icons/Navigation";
 import Alert from "../inc/Alert";
 import { REMOVE_ALERT, CLEAR_PROFILE_INIT } from "../../actions/actionTypes";
-
 import {
   getBrowse,
   filterBrowser,
   sortProfiles
 } from "../../actions/browseAction";
-
 import {
   Box,
   Container,
@@ -22,21 +20,22 @@ import {
   DialogTitle,
   Slide,
   Grid,
-  Fab
+  Fab,
+  Button,
+  Divider,
+  RadioGroup,
+  Card,
+  CardContent,
+  Typography,
+  FormControl,
+  FormControlLabel,
+  Radio,
+  Slider
 } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
-import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Radio from "@material-ui/core/Radio";
-import Slider from "@material-ui/core/Slider";
 import Rating from "@material-ui/lab/Rating";
 import { useUserStore } from "../../Context/appStore";
 import { Link } from "react-router-dom";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -130,7 +129,7 @@ const ProfileDialog = ({ open, handleClose, info, classes }) => {
               <Grid container justify="center" alignItems="center">
                 <Grid item xs={12}>
                   <Avatar
-                    src={`./uploads/${info.id}/profile.png`}
+                    src={`./uploads/${info.profile_Image}`}
                     alt={info.first_name}
                     className={classes.avatar}
                   />
@@ -187,6 +186,7 @@ const Profile = () => {
   const [showCard, setShowCard] = React.useState({
     myinfo: {}
   });
+  console.log(profile.browser.result);
 
   const handleClickOpen = e => {
     setShowCard({
@@ -201,9 +201,9 @@ const Profile = () => {
     <>
       {profile.browser.result.map(inf => {
         return (
-          <Box key={inf.id} style={{ margin: "0 4%" }} flexGrow={1}>
+          <Box key={inf.id} width={300} style={{ margin: "0 4%" }} flexGrow={1}>
             <Avatar
-              src={`./uploads/${inf.id}/profile.png`}
+              src={`./uploads/${inf.profile_Image}`}
               alt={inf.first_name}
               className={classes.avatar}
               onClick={() => handleClickOpen(inf)}
@@ -212,15 +212,15 @@ const Profile = () => {
               {inf.first_name} {inf.last_name}
             </h5>
             <p style={{ textAlign: "center" }}>{inf.user_birth} years old</p>
-            <ProfileDialog
-              open={open}
-              handleClose={handleClose}
-              info={showCard.showCard}
-              classes={classes}
-            />
           </Box>
         );
       })}
+      <ProfileDialog
+        open={open}
+        handleClose={handleClose}
+        info={showCard.showCard}
+        classes={classes}
+      />
     </>
   );
 };
@@ -504,7 +504,7 @@ const Header = () => {
 const Browse = () => {
   const [{ profile }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
-
+  console.log(profile);
   useEffect(() => {
     async function gBrowse() {
       await getBrowse(stableDispatch);
@@ -518,7 +518,43 @@ const Browse = () => {
       });
     };
   }, [stableDispatch]);
-  if (profile.browser.loading) return null;
+  if (profile.browser.loading)
+    return (
+      <Card style={{ backgroundColor: "transparent" }}>
+        <CardContent>
+          <Grid
+            container
+            direction="row"
+            justify="space-between"
+            alignItems="center"
+          >
+            <Grid xs={12} container item justify="center">
+              <Typography variant="subtitle1" gutterBottom>
+                <img
+                  src="./img/widget-title-border.png"
+                  alt="left"
+                  style={{ color: "rgb(231, 76, 60)" }}
+                />
+                {" Browse "}
+                <img
+                  src="./img/widget-title-border.png"
+                  alt="left"
+                  style={{ color: "rgb(231, 76, 60)", transform: "scaleX(-1)" }}
+                />
+              </Typography>
+            </Grid>
+            <Grid xs={12} container item justify="center">
+              <Typography variant="overline" id="range-slider" gutterBottom>
+                Getting Result
+              </Typography>
+            </Grid>
+            <Grid xs={12} container item justify="center">
+              <CircularProgress disableShrink style={{ color: "#e74c3c" }} />
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+    );
   return (
     <div>
       <CssBaseline />
