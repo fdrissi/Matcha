@@ -1,6 +1,10 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const cookie = require("cookie");
+const jwt = require("jsonwebtoken");
+const config = require("config");
+const key = config.get("keyOrSecret");
 
 const app = express();
 app.use(cors());
@@ -37,35 +41,51 @@ const io = require("socket.io").listen(server, {
   pingTimeout: 60000
 });
 //Share it
-let users = [];
-io.on("connection", socket => {
+let users = {};
+io.use(function(socket, next) {
+  if (socket.handshake.headers && socket.handshake.headers.cookie) {
+    const cookies = cookie.parse(socket.handshake.headers.cookie);
+    jwt.verify(cookies.token, key, function(err, decoded) {
+      if (err) return next(new Error("Authentication error"));
+      socket.decoded = decoded;
+      next();
+    });
+  } else {
+    next(new Error("Authentication error"));
+  }
+}).on("connection", socket => {
+  console.log("new connection", socket.id);
   socket.on("login", user => {
-    if (users.findIndex(x => x.id === user) === -1 && user) {
-      socket.userId = user;
-      users.push({ id: user, notifications: 0 });
-    }
-    io.sockets.emit("login", { users });
-    io.sockets.emit("notification", { users });
+    socket.userId = user;
+    users[user] = socket.id;
+    console.log("new socket", socket.id);
+    console.log("connected users", users);
+    socket.emit("login", users);
   });
 
   socket.on("notification", data => {
-    users.find(x => {
-      if (x.id === data.id) x.notifications += 1;
-    });
-    io.sockets.emit("notification", { users });
+    console.log("notification received to backend", data);
+    socket.to(users[data.id]).emit("notification", { users });
   });
 
   socket.on("clearNotifications", data => {
-    users.find(x => {
-      if (x.id === data.id) x.notifications = 0;
-    });
-    io.sockets.emit("notification", { users });
+    socket.to(users[data.id]).emit("notification", { users });
   });
+
+  socket.on("newMessage", data => {
+    if (users[data.receiver]) {
+      socket.to(users[data.receiver]).emit("newMessage", data);
+      socket.to(users[data.receiver]).emit("notifMessage", data);
+    }
+  });
+
+  socket.on("seenUpdated", data => {
+    console.log("emit to ", users[data]);
+    io.sockets.to(users[data]).emit("notifMessage", data);
+  });
+
   socket.on("disconnect", () => {
-    users.find((o, i) => {
-      if (o && o.id === socket.userId) {
-        users.splice(i, 1);
-      }
-    });
+    //delete users[socket.userId];
+    console.log("disconnect", users);
   });
 });

@@ -371,7 +371,8 @@ router.post(
         user_location: {
           lat: parseFloat(result.user_lat, 10),
           lng: parseFloat(result.user_lng, 10)
-        }
+        },
+        user_set_from_map: result.set_from_map
       };
 
       if (check) {
@@ -747,4 +748,22 @@ router.get("/unseenNotificationsCount", middleware.auth, async (req, res) => {
   }
 });
 
+router.get("/forTest", middleware.auth, async (req, res) => {
+  const id = req.user.id;
+
+  const responde = await profileModel.getUserInfo(id);
+  let isEmpty = true;
+  Object.keys(responde).forEach(key => {
+    if (responde[key] === "") isEmpty = false;
+  });
+  if (
+    _.isEmpty(JSON.parse(responde.user_tags)) ||
+    responde.profile_Image === "photo_holder.png"
+  )
+    isEmpty = false;
+  return res.json({
+    success: true,
+    isVerified: isEmpty
+  });
+});
 module.exports = router;

@@ -13,8 +13,7 @@ import { CssBaseline, Container, Fab, Grid } from "@material-ui/core";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import DeleteIcon from "@material-ui/icons/Delete";
 import axios from "axios";
-import io from "socket.io-client";
-const socket = io("http://localhost:5000");
+import { useSocketStore } from "../../Context/appStore";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -172,24 +171,39 @@ const NotificationsHoler = ({ notifications, setNotifications }) => {
 };
 
 export const Notifications = () => {
-  const [load, setLoad] = useState(false);
+  const [load, setLoad] = useState(true);
   const [notifications, setNotifications] = useState([]);
   const [{ auth }] = useUserStore();
+  const socket = useSocketStore();
 
   useEffect(() => {
     (async () => {
-      let result = await axios.get("/api/profile/getUserNotifications");
-      if (result.data.success) {
-        setNotifications(result.data.notifications);
-        setLoad(true);
-        result = await axios.get("/api/profile/updateNotifications");
-        if (result.data.success)
-          socket.emit("clearNotifications", { id: auth.userInfo.id });
-      }
+      const result = await axios.get("/api/profile/getUserNotifications");
+      setNotifications(result.data.notifications);
+      console.log(result);
+      setLoad(false);
     })();
+    (async () => {
+      await axios.get("/api/profile/updateNotifications");
+    })();
+    socket.emit("clearNotifications", { id: auth.userInfo.id });
   }, [auth.userInfo.id]);
 
-  if (!load) return null;
+  // useEffect(() => {
+  //   (async () => {
+  //     let result = await axios.get("/api/profile/getUserNotifications");
+  //     if (result.data.success) {
+  //       setNotifications(result.data.notifications);
+  //       setLoad(false);
+  //       result = await axios.get("/api/profile/updateNotifications");
+  //       if (result.data.success) {
+  //         socket.emit("clearNotifications", { id: auth.userInfo.id });
+  //       }
+  //     }
+  //   })();
+  // }, [auth.userInfo.id]);
+
+  if (load) return null;
   return (
     <div>
       <NotificationsHoler
