@@ -186,7 +186,6 @@ const Profile = () => {
   const [showCard, setShowCard] = React.useState({
     myinfo: {}
   });
-  console.log(profile.browser.result);
 
   const handleClickOpen = e => {
     setShowCard({
@@ -504,7 +503,6 @@ const Header = () => {
 const Browse = () => {
   const [{ profile }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
-  console.log(profile);
   useEffect(() => {
     async function gBrowse() {
       await getBrowse(stableDispatch);

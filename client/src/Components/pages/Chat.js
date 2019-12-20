@@ -61,13 +61,16 @@ const LoadChat = ({ chat }) => {
   const [{ auth }] = useUserStore();
   const messagesEndRef = React.createRef();
   const socket = useSocketStore();
-  const msg = chat[0];
-  const uid = +auth.userInfo.id;
-  const pid = +msg.sender !== +auth.userInfo.id ? +msg.sender : +msg.receiver;
 
   useEffect(() => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+
     if (auth.userInfo.id && chat.length > 0) {
+      const msg = chat[0];
+      const uid = +auth.userInfo.id;
+      const pid =
+        +msg.sender !== +auth.userInfo.id ? +msg.sender : +msg.receiver;
+
       (async () => {
         const config = {
           header: {
@@ -77,7 +80,7 @@ const LoadChat = ({ chat }) => {
         await axios.put("/api/chat/setSeen", { uid, pid }, config);
       })();
     }
-  }, [messagesEndRef, auth.userInfo.id]);
+  }, [messagesEndRef, auth.userInfo.id, chat]);
 
   socket.emit("seenUpdated", auth.userInfo.id);
 
@@ -141,10 +144,17 @@ const SubmitBox = ({ selected }) => {
 
   if (socket.listeners("newMessage").length < 1) {
     socket.on("newMessage", data => {
+      console.log("client received socket");
       if (auth.isAuthenticated) {
         (async () => {
           const result = await axios.get(
             `api/chat/${auth.userInfo.id}/conversation/${profileId}`
+          );
+          console.log(
+            "new conversation",
+            auth.userInfo.id,
+            profileId,
+            result.data.conversations
           );
           if (result.data.success) {
             setChat(result.data.conversations);

@@ -394,7 +394,6 @@ router.post(
 router.get("/getTotal", async (req, res) => {
   const result = await userModel.getTotalUser();
   const { total } = result;
-  console.log(total);
   return res.json({
     total
   });

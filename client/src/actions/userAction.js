@@ -165,6 +165,7 @@ export const activation = async (username, token, dispatch) => {
     });
   }
 };
+
 export const checktoken = async (token, dispatch) => {
   const config = {
     header: {
@@ -251,6 +252,7 @@ export const register = async (mydata, dispatch) => {
     });
   }
 };
+
 export const loadUser = async dispatch => {
   try {
     const res = await axios.get("/api/users/current");

@@ -178,7 +178,6 @@ const UserInfo = () => {
 const ProfileImage = () => {
   const classes = useStyles();
   const [{ profile }] = useUserStore();
-  console.log(profile.info);
 
   return (
     <>

@@ -233,7 +233,6 @@ function EditProfile() {
       }));
     }
   };
-  console.log(profile);
 
   if (alert.msg !== "")
     setTimeout(() => {

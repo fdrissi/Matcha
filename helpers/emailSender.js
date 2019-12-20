@@ -10,7 +10,6 @@ const transporter = nodemailer.createTransport({
 const url = config.get("url");
 
 const sendActivation = async (email, userName, token) => {
-  //console.log(url);
   let mailOptions = {
     from: "ayoubebelomari@gmail.com",
     to: email,

@@ -65,7 +65,6 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
         element.id
       );
     }
-    console.log(newData);
     const data = newData.filter(el => {
       return !(
         el.is_Blocked === true ||

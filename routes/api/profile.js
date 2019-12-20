@@ -377,7 +377,8 @@ router.post(
         user_location: {
           lat: parseFloat(result.user_lat, 10),
           lng: parseFloat(result.user_lng, 10)
-        }
+        },
+        user_set_from_map: result.set_from_map
       };
 
       if (check) {

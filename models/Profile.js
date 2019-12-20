@@ -266,10 +266,8 @@ async function setInfoVerified(value, id) {
 
 async function isInfoVerified(id) {
   try {
-    console.log("id", id);
     let sql = "SELECT `info_verified` FROM user_info WHERE id = ?";
     const [result] = await pool.query(sql, [id]);
-    console.log("isInfoVerified", result[0].info_verified);
     return !!result[0].info_verified;
   } catch (error) {
     return false;

@@ -356,7 +356,6 @@ const SearchBy = () => {
     }
     searchFunc();
   };
-  //console.log(filter);
 
   const handleChange = name => (event, newValue) => {
     setFilter({

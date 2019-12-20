@@ -63,6 +63,7 @@ io.use(function(socket, next) {
       const [result] = await pool.query(sql, [true, user]);
       if (!!result.affectedRows) socket.emit("login", users);
     } catch (error) {}
+    console.log("logged In users", users);
     socket.emit("login", users);
   });
 
@@ -75,9 +76,11 @@ io.use(function(socket, next) {
   });
 
   socket.on("newMessage", data => {
+    console.log("new message received", data);
     if (users[data.receiver]) {
-      socket.to(users[data.receiver]).emit("newMessage", data);
-      socket.to(users[data.receiver]).emit("notifMessage", data);
+      console.log("emit to newMessage notifMessage", users[data.receiver]);
+      io.sockets.to(users[data.receiver]).emit("newMessage", data);
+      io.sockets.to(users[data.receiver]).emit("notifMessage", data);
     }
   });
 
@@ -90,8 +93,6 @@ io.use(function(socket, next) {
     try {
       const sql = "UPDATE `user_info` SET online = ? WHERE id = ?";
       const [result] = await pool.query(sql, [false, socket.userId]);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   });
 });
