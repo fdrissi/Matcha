@@ -129,7 +129,7 @@ const ProfileDialog = ({ open, handleClose, info, classes }) => {
               <Grid container justify="center" alignItems="center">
                 <Grid item xs={12}>
                   <Avatar
-                    src={`./uploads/${info.profile_Image}`}
+                    src={`/./uploads/${info.profile_Image}`}
                     alt={info.first_name}
                     className={classes.avatar}
                   />
@@ -202,7 +202,7 @@ const Profile = () => {
         return (
           <Box key={inf.id} width={300} style={{ margin: "0 4%" }} flexGrow={1}>
             <Avatar
-              src={`./uploads/${inf.profile_Image}`}
+              src={`/./uploads/${inf.profile_Image}`}
               alt={inf.first_name}
               className={classes.avatar}
               onClick={() => handleClickOpen(inf)}
@@ -245,7 +245,7 @@ const ProfilesContainer = ({ children }) => {
         {alert.msg && <Alert message={alert.msg} type={alert.alertType} />}
       </Grid>
       <Grid xs={12} container item justify="center">
-        <img src={"img/underTitleLine.png"} alt="wrap" />
+        <img src={"/./img/underTitleLine.png"} alt="wrap" />
       </Grid>
 
       <Box display="flex" flexWrap="wrap" alignItems="center" pt={5}>
@@ -284,13 +284,13 @@ const Sort = () => {
           <Grid xs={12} container item justify="center">
             <Typography variant="overline" gutterBottom>
               <img
-                src="./img/widget-title-border.png"
+                src="/./img/widget-title-border.png"
                 alt="left"
                 style={{ color: "rgb(231, 76, 60)" }}
               />
               {" Sort By "}
               <img
-                src="./img/widget-title-border.png"
+                src="/./img/widget-title-border.png"
                 alt="left"
                 style={{ color: "rgb(231, 76, 60)", transform: "scaleX(-1)" }}
               />
@@ -380,13 +380,13 @@ const Filter = () => {
             <Grid xs={12} container item justify="center">
               <Typography variant="overline" gutterBottom>
                 <img
-                  src="./img/widget-title-border.png"
+                  src="/./img/widget-title-border.png"
                   alt="left"
                   style={{ color: "rgb(231, 76, 60)" }}
                 />
                 {" Filter "}
                 <img
-                  src="./img/widget-title-border.png"
+                  src="/./img/widget-title-border.png"
                   alt="left"
                   style={{ color: "rgb(231, 76, 60)", transform: "scaleX(-1)" }}
                 />
@@ -474,9 +474,9 @@ const Header = () => {
               gutterBottom
               style={{ color: "#FFF", fontWeight: "900", fontSize: "30px" }}
             >
-              <img src="./img/t-left-img.png" alt="left" />
+              <img src="/./img/t-left-img.png" alt="left" />
               Browse
-              <img src="./img/t-right-img.png" alt="right" />
+              <img src="/./img/t-right-img.png" alt="right" />
             </Typography>
           </div>
         </Grid>
@@ -529,13 +529,13 @@ const Browse = () => {
             <Grid xs={12} container item justify="center">
               <Typography variant="subtitle1" gutterBottom>
                 <img
-                  src="./img/widget-title-border.png"
+                  src="/./img/widget-title-border.png"
                   alt="left"
                   style={{ color: "rgb(231, 76, 60)" }}
                 />
                 {" Browse "}
                 <img
-                  src="./img/widget-title-border.png"
+                  src="/./img/widget-title-border.png"
                   alt="left"
                   style={{ color: "rgb(231, 76, 60)", transform: "scaleX(-1)" }}
                 />

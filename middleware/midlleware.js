@@ -272,6 +272,7 @@ module.exports = middleware = {
     const { age_range, tags, location, fame_rating } = JSON.parse(filter);
     // check age_range Values
     if (
+      typeof age_range != "object" ||
       age_range[0] > age_range[1] ||
       typeof age_range[0] != "number" ||
       typeof age_range[1] != "number"
@@ -282,7 +283,7 @@ module.exports = middleware = {
       });
     }
     // check location Values
-    if (location.length === 0) {
+    if (typeof location != "string" || location.length === 0) {
       return res.json({
         success: false,
         errorMsg: "Please chose A Location 🤔"
@@ -296,10 +297,10 @@ module.exports = middleware = {
       });
     }
     // check fame_rating Values
-    if (typeof tags != "number" || fame_rating < 0 || fame_rating > 10) {
+    if (typeof tags != "object" || tags.length > 10) {
       return res.json({
         success: false,
-        errorMsg: "Something Goes Wrong On fame_rating 💩"
+        errorMsg: "Something Goes Wrong On tags 💩 no more than 10 tags"
       });
     }
     next();

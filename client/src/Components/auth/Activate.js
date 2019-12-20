@@ -10,7 +10,10 @@ const Activate = props => {
   let username = props.match.params.username;
   let token = props.match.params.token;
   useEffect(() => {
-    activation(username, token, stableDispatch);
+    async function funActivation() {
+      await activation(username, token, stableDispatch);
+    }
+    funActivation();
   }, [stableDispatch, username, token]);
   return <Redirect to="/login" />;
 };

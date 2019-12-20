@@ -9,7 +9,6 @@ var NodeGeocoder = require("node-geocoder");
 
 var options = {
   provider: "google",
-
   // Optional depending on the providers
   httpAdapter: "https", // Default
   apiKey: "AIzaSyAKq30EizjABPHYvcIRWtlQ08yWtQFBNTg", // for Mapquest, OpenCage, Google Premier
@@ -236,8 +235,7 @@ router.get(
                 el.fame_rate <= fame_rating * 20 &&
                 el.fame_rate > fame_rating * 20 - 20
               ) ||
-              _.intersection(JSON.parse(user_tags), JSON.parse(el.user_tags))
-                .length < tags ||
+              _.difference(tags, JSON.parse(el.user_tags)) != 0 ||
               el.user_birth < age_range[0] ||
               el.user_birth > age_range[1]
             );

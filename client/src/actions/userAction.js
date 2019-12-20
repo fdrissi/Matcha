@@ -11,7 +11,8 @@ import {
   SUCCESS_UPDATE_USER,
   FAILIED_UPDATE_USER,
   SUCCES_TOKEN,
-  WRONG_TOKEN
+  WRONG_TOKEN,
+  PROFILE_IS_VERIFIED
 } from "./actionTypes";
 
 export const login = async (email, password, remember, dispatch) => {
@@ -256,6 +257,7 @@ export const register = async (mydata, dispatch) => {
 export const loadUser = async dispatch => {
   try {
     const res = await axios.get("/api/users/current");
+
     if (res.data.success) {
       dispatch({
         type: USER_LOADED,

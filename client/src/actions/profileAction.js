@@ -6,7 +6,9 @@ import {
   FAILIED_UPDATE_USER,
   REMOVE_ERRORS,
   PROFILE_BLOCKED,
-  PROFILE_LIKED
+  PROFILE_LIKED,
+  PROFILE_MATCHED,
+  PROFILE_REPORTED
 } from "./actionTypes";
 
 export const setUserImages = async (formData, row, dispatch) => {
@@ -16,7 +18,11 @@ export const setUserImages = async (formData, row, dispatch) => {
     }
   };
   try {
-    const res = await axios.post(`api/profile/upload/${row}`, formData, config);
+    const res = await axios.post(
+      `/api/profile/upload/${row}`,
+      formData,
+      config
+    );
     if (res.data.success) {
       dispatch({
         type: PHOTO_SUCCESS,
@@ -50,7 +56,7 @@ export const setUserCover = async (filed, dispatch) => {
     }
   };
   try {
-    const res = await axios.post("api/profile/setCover", {
+    const res = await axios.post("/api/profile/setCover", {
       data: { filed: filed },
       config
     });
@@ -112,7 +118,7 @@ export const removeUserImage = async (photo, filed, dispatch) => {
   };
   try {
     const res = await axios.delete(
-      "api/profile/removeImage",
+      "/api/profile/removeImage",
       { data: { filed: filed, photo: photo } },
       config
     );
@@ -173,7 +179,7 @@ export const updateUserInfo = async (mydata, dispatch) => {
   };
   try {
     const res = await axios.post(
-      "api/profile/updateUserInfo",
+      "/api/profile/updateUserInfo",
       {
         data: mydata
       },
@@ -220,7 +226,7 @@ export const setUserLocation = async (latitude, longitude, error) => {
   };
 
   await axios.post(
-    "api/profile/setUserLocation",
+    "/api/profile/setUserLocation",
     { data: { latitude, longitude, error } },
     config
   );
