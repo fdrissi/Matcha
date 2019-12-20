@@ -4,4 +4,4 @@ dev.json
 prod.json
 default.json
 .gitignore
-uploads/
+**/uploads/
