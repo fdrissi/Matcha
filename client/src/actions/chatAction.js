@@ -79,7 +79,8 @@ export const updateSeen = async (pid, dispatch) => {
     const res = await axios.put("/api/chat/setSeen", { pid }, config);
     if (res.data.success) {
       dispatch({
-        type: MESSAGE_SEEN
+        type: MESSAGE_SEEN,
+        payload: 0
       });
     }
   } catch (error) {
@@ -109,11 +110,14 @@ export const unseenCountConversation = async (pid, dispatch) => {
   try {
     const res = await axios.get(`/api/chat/unseen/${pid}`);
     if (res.data.success) {
-      getUserChat(receiver);
+      dispatch({
+        type: MESSAGE_SEEN,
+        payload: res.data.count
+      });
     }
   } catch (error) {
     dispatch({
-      type: CONVERSATION_FAIL
+      type: MESSAGE_UNSEEN
     });
   }
 };
