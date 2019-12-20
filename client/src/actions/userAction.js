@@ -116,7 +116,7 @@ export const passwordEdit = async (
     dispatch({
       type: SUCCES_TOKEN,
       payload: {
-        message: res.data.updated,
+        updated: res.data.updated,
         valide: res.data.valide
       }
     });
@@ -177,6 +177,7 @@ export const checktoken = async (token, dispatch) => {
     { params: { token: token } },
     config
   );
+  console.log(res);
   if (!res.data.success) {
     dispatch({
       type: SET_ALERT,
