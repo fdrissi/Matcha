@@ -110,16 +110,12 @@ router.delete(
   }
 );
 
-// @route   Get api/chat/unseenCount/:uid
+// @route   Get api/chat/unseenCount/
 // @desc    Get Unread messages count
 // @access  Private
-router.get("/unseenCount/:uid", [middleware.auth], async (req, res) => {
+router.get("/unseenCount/", [middleware.auth], async (req, res) => {
   try {
-    const uid = +req.params.uid;
-    if (+uid !== +req.user.id)
-      return res.json({
-        success: false
-      });
+    const uid = req.user.id;
     const result = await chatModel.getUnseenMessagesCount(uid);
     return res.json({
       success: true,
@@ -132,17 +128,13 @@ router.get("/unseenCount/:uid", [middleware.auth], async (req, res) => {
   }
 });
 
-// @route   Get api/chat/:uid/unseen/:pid
+// @route   Get api/chat/unseen/:pid
 // @desc    Is conversation has unread message
 // @access  Private
-router.get("/:uid/unseen/:pid", [middleware.auth], async (req, res) => {
+router.get("/unseen/:pid", [middleware.auth], async (req, res) => {
   try {
-    const uid = +req.params.uid;
-    const pid = req.params.pid;
-    if (+uid !== +req.user.id)
-      return res.json({
-        success: false
-      });
+    const uid = +req.user.id;
+    const pid = +req.params.pid;
     const result = await chatModel.isConversationHasUnreadMessage(uid, pid);
     return res.json({
       success: true,

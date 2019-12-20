@@ -54,7 +54,7 @@ export const sendMessage = async (sender, receiver, message, dispatch) => {
   };
   try {
     const res = await axios.post(
-      "sendMessage",
+      "/api/chat/sendMessage",
       { sender, receiver, message },
       config
     );
@@ -68,18 +68,46 @@ export const sendMessage = async (sender, receiver, message, dispatch) => {
   }
 };
 
-export const updateSeen = async (sender, receiver, message, dispatch) => {
+// what to do after ?
+export const updateSeen = async (pid, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
     }
   };
   try {
-    const res = await axios.post(
-      "sendMessage",
-      { sender, receiver, message },
-      config
-    );
+    const res = await axios.put("/api/chat/setSeen", { pid }, config);
+    if (res.data.success) {
+      dispatch({
+        type: MESSAGE_SEEN
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: MESSAGE_UNSEEN
+    });
+  }
+};
+
+export const unseenCountGlobal = async (pid, dispatch) => {
+  try {
+    const res = await axios.get("/api/chat/unseenCount/", { pid }, config);
+    if (res.data.success) {
+      dispatch({
+        type: CHAT_UNSEEN,
+        payload: res.data.count
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: CHAT_SEEN
+    });
+  }
+};
+
+export const unseenCountConversation = async (pid, dispatch) => {
+  try {
+    const res = await axios.get(`/api/chat/unseen/${pid}`);
     if (res.data.success) {
       getUserChat(receiver);
     }

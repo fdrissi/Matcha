@@ -19,8 +19,9 @@ import Notfound from "../pages/Notfound";
 import PrivateRoute from "./PrivateRoute";
 
 const Routes = () => {
-  const [{ auth }] = useUserStore();
+  const [{ auth, profile }] = useUserStore();
   const access = auth.userInfo.info_verified;
+  console.log(auth, profile);
   return (
     <div style={{ flex: 1 }}>
       <Switch>
