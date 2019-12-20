@@ -7,7 +7,8 @@ import {
   BROWSER_RETURN,
   SORT_BY_BACK,
   SET_NEW_ISLIK,
-  CLEAR_PROFILE_INIT
+  CLEAR_PROFILE_INIT,
+  PROFILE_IS_VERIFIED
 } from "../actions/actionTypes";
 
 export const profileInitState = {
@@ -25,6 +26,7 @@ export const profileInitState = {
     liked: false,
     matched: false,
     blocked: false,
+    isVrified: false,
     id: "",
     user_first_name: "",
     user_last_name: "",
@@ -50,6 +52,9 @@ export const profileInitState = {
     loading: true,
     result: [],
     sort_by: ""
+  },
+  Verification: {
+    isVrified: false
   }
 };
 
@@ -66,6 +71,11 @@ export const profileReducer = (state, action) => {
       return { ...state, info: { ...state.info, liked: payload } };
     case PROFILE_MATCHED:
       return { ...state, info: { ...state.info, matched: payload } };
+    case PROFILE_IS_VERIFIED:
+      return {
+        ...state,
+        Verification: { ...state.Verification, isVrified: payload }
+      };
     case BROWSER_RETURN:
       return {
         ...state,

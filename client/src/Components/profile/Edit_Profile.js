@@ -217,6 +217,7 @@ function EditProfile() {
   };
 
   const handleAddChip = chip => {
+    if (chip.length > 10) return false;
     setData(previousData => ({
       ...previousData,
       user_tags: previousData.user_tags.concat(chip)
@@ -233,14 +234,17 @@ function EditProfile() {
       }));
     }
   };
-  console.log(profile);
 
-  if (alert.msg !== "")
-    setTimeout(() => {
+  useEffect(() => {
+    let timer = setTimeout(() => {
       stableDispatch({
         type: REMOVE_ALERT
       });
     }, 2000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [alert.msg]);
 
   useEffect(() => {
     async function getUser() {
@@ -253,9 +257,9 @@ function EditProfile() {
       setRelation(predefined[3]);
       setisLoading(false);
     }
-    stableDispatch({
-      type: REMOVE_ALERT
-    });
+    // stableDispatch({
+    //   type: REMOVE_ALERT
+    // });
     if (auth.isAuthenticated) getUser();
   }, [stableDispatch, auth]);
 

@@ -215,6 +215,7 @@ router.post("/passedit", [middleware.register], async (req, res) => {
   }
 });
 
+
 // @route POST /api/users/checktoken
 // @desc checktoken
 // @access public
@@ -395,7 +396,6 @@ router.post(
 router.get("/getTotal", async (req, res) => {
   const result = await userModel.getTotalUser();
   const { total } = result;
-  console.log(total);
   return res.json({
     total
   });

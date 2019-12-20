@@ -25,25 +25,25 @@ const theme = createMuiTheme({
   }
 });
 
-axios.interceptors.response.use(
-  function(response) {
-    if (
-      response.data.errorMsg === "Access denied" &&
-      window.location.pathname !== "/login" &&
-      window.location.pathname !== "/" &&
-      window.location.pathname !== "/register" &&
-      window.location.pathname !== "/recover" &&
-      window.location.pathname !== "/editpass/"
-    )
-      window.location = "/login";
-    return response;
-  },
-  function(error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
-    return Promise.reject(error);
-  }
-);
+// axios.interceptors.response.use(
+//   function(response) {
+//     if (
+//       response.data.errorMsg === "Access denied" &&
+//       window.location.pathname !== "/login" &&
+//       window.location.pathname !== "/" &&
+//       window.location.pathname !== "/register" &&
+//       window.location.pathname !== "/recover" &&
+//       window.location.pathname !== "/editpass/"
+//     )
+//       window.location = "/login";
+//     return response;
+//   },
+//   function(error) {
+//     // Any status codes that falls outside the range of 2xx cause this function to trigger
+//     // Do something with response error
+//     return Promise.reject(error);
+//   }
+// );
 
 function App() {
   const [{ auth }, dispatch] = useUserStore();

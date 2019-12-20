@@ -21,7 +21,7 @@ import {
   Grid,
   Fab
 } from "@material-ui/core";
-
+import ChipInput from "material-ui-chip-input";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
 import RadioGroup from "@material-ui/core/RadioGroup";
@@ -128,7 +128,7 @@ const ProfileDialog = ({ open, handleClose, info, classes }) => {
               <Grid container justify="center" alignItems="center">
                 <Grid item xs={12}>
                   <Avatar
-                    src={`./uploads/${info.profile_Image}`}
+                    src={`/./uploads/${info.profile_Image}`}
                     alt={info.first_name}
                     className={classes.avatar}
                   />
@@ -201,7 +201,7 @@ const Profile = () => {
         return (
           <Box key={inf.id} width={300} style={{ margin: "0 4%" }} flexGrow={1}>
             <Avatar
-              src={`./uploads/${inf.profile_Image}`}
+              src={`/./uploads/${inf.profile_Image}`}
               alt={inf.first_name}
               className={classes.avatar}
               onClick={() => handleClickOpen(inf)}
@@ -244,7 +244,7 @@ const ProfilesContainer = ({ children }) => {
         {alert.msg && <Alert message={alert.msg} type={alert.alertType} />}
       </Grid>
       <Grid xs={12} container item justify="center">
-        <img src={"img/underTitleLine.png"} alt="wrap" />
+        <img src={"/./img/underTitleLine.png"} alt="wrap" />
       </Grid>
 
       <Box display="flex" flexWrap="wrap" alignItems="center" pt={5}>
@@ -273,7 +273,7 @@ const Sort = () => {
   }, [sort, stableDispatch, profile.browser.result]);
   return (
     <Card style={{ backgroundColor: "transparent" }}>
-      <CardContent style={{ height: "264px" }}>
+      <CardContent style={{ height: "274px" }}>
         <Grid
           container
           direction="row"
@@ -283,13 +283,13 @@ const Sort = () => {
           <Grid xs={12} container item justify="center">
             <Typography variant="overline" gutterBottom>
               <img
-                src="./img/widget-title-border.png"
+                src="/./img/widget-title-border.png"
                 alt="left"
                 style={{ color: "rgb(231, 76, 60)" }}
               />
               {" Sort By "}
               <img
-                src="./img/widget-title-border.png"
+                src="/./img/widget-title-border.png"
                 alt="left"
                 style={{ color: "rgb(231, 76, 60)", transform: "scaleX(-1)" }}
               />
@@ -344,7 +344,7 @@ const SearchBy = () => {
   const classes = useStyles();
   const [filter, setFilter] = React.useState({
     age_range: [16, 80],
-    tags: 0,
+    tags: [],
     location: "",
     fame_rating: 1
   });
@@ -356,7 +356,25 @@ const SearchBy = () => {
     }
     searchFunc();
   };
-  console.log(filter);
+
+  const handleAddChip = chip => {
+    if (chip.length > 10) return false;
+    setFilter(previousData => ({
+      ...previousData,
+      tags: previousData.tags.concat(chip)
+    }));
+  };
+
+  const handleDeleteChip = (chip, index) => {
+    if (index > -1) {
+      const res = filter.tags;
+      res.splice(index, 1);
+      setFilter(previousData => ({
+        ...previousData,
+        tags: res
+      }));
+    }
+  };
 
   const handleChange = name => (event, newValue) => {
     setFilter({
@@ -381,20 +399,20 @@ const SearchBy = () => {
             <Grid xs={12} container item justify="center">
               <Typography variant="overline" gutterBottom>
                 <img
-                  src="./img/widget-title-border.png"
+                  src="/./img/widget-title-border.png"
                   alt="left"
                   style={{ color: "rgb(231, 76, 60)" }}
                 />
                 {" Filter "}
                 <img
-                  src="./img/widget-title-border.png"
+                  src="/./img/widget-title-border.png"
                   alt="left"
                   style={{ color: "rgb(231, 76, 60)", transform: "scaleX(-1)" }}
                 />
               </Typography>
             </Grid>
 
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={5}>
               <Grid xs={12} container item justify="center">
                 <Typography variant="overline" id="range-slider" gutterBottom>
                   Age range
@@ -414,26 +432,7 @@ const SearchBy = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={3}>
-              <Grid xs={12} container item justify="center">
-                <Typography variant="overline" id="range-slider" gutterBottom>
-                  Tags
-                </Typography>
-              </Grid>
-
-              <Slider
-                className={classes.slider}
-                max={10}
-                min={0}
-                step={1}
-                value={filter.tags}
-                onChange={handleChange("tags")}
-                valueLabelDisplay="auto"
-                aria-labelledby="range-slider"
-                getAriaValueText={valuetext}
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={5}>
               <Grid xs={12} container item justify="center">
                 <Typography variant="overline" id="range-slider" gutterBottom>
                   Fame Rating
@@ -448,32 +447,54 @@ const SearchBy = () => {
               </Grid>
             </Grid>
           </Grid>
-
-          <Grid xs={12} container item justify="center">
-            <Typography variant="overline" id="range-slider" gutterBottom>
-              Location
-            </Typography>
-          </Grid>
-
           <Grid
-            xs={12}
             container
-            item
-            justify="center"
-            style={{ paddingBottom: "10px" }}
+            direction="row"
+            justify="space-around"
+            alignItems="center"
           >
-            <Places search={filter} setFilter={setFilter} />
-          </Grid>
-          <Grid xs={12} container item justify="center">
-            <Button
-              type="submit"
-              size="medium"
-              variant="contained"
-              color="primary"
-              className={classes.submit}
+            <Grid item xs={12} md={5}>
+              <Grid xs={12} container item justify="center">
+                <Typography variant="overline" id="range-slider" gutterBottom>
+                  Tags
+                </Typography>
+              </Grid>
+              <Grid xs={12} container item justify="center">
+                <ChipInput
+                  value={filter.tags}
+                  onAdd={chip => handleAddChip(chip)}
+                  onDelete={(chip, index) => handleDeleteChip(chip, index)}
+                />
+              </Grid>
+            </Grid>
+            <Grid item xs={12} md={5}>
+              <Grid xs={12} container item justify="center">
+                <Typography variant="overline" id="range-slider" gutterBottom>
+                  Location
+                </Typography>
+              </Grid>
+              <Grid xs={12} container item justify="center">
+                <Places search={filter} setFilter={setFilter} />
+              </Grid>
+            </Grid>
+
+            <Grid
+              xs={12}
+              container
+              item
+              justify="center"
+              style={{ paddingTop: "20px" }}
             >
-              Search
-            </Button>
+              <Button
+                type="submit"
+                size="medium"
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Search
+              </Button>
+            </Grid>
           </Grid>
         </CardContent>
       </Card>
@@ -493,9 +514,9 @@ const Header = () => {
               gutterBottom
               style={{ color: "#FFF", fontWeight: "900", fontSize: "30px" }}
             >
-              <img src="./img/t-left-img.png" alt="left" />
+              <img src="/./img/t-left-img.png" alt="left" />
               Search
-              <img src="./img/t-right-img.png" alt="right" />
+              <img src="/./img/t-right-img.png" alt="right" />
             </Typography>
           </div>
         </Grid>
@@ -521,7 +542,6 @@ const Header = () => {
 
 const Search = () => {
   const [{ profile }, dispatch] = useUserStore();
-  console.log(profile);
   // dont remove it im gonna work with later for clearing result when leaving page
   const stableDispatch = useCallback(dispatch, []);
   useEffect(() => {
