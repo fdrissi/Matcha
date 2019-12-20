@@ -95,7 +95,7 @@ export const filterBrowser = async (filter, dispatch) => {
 };
 
 export const getSearch = async (filter, dispatch) => {
-  console.log(filter);
+  //console.log(filter);
   const config = {
     header: {
       "Content-Type": "application/json"

@@ -281,10 +281,15 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
 // @access  Private
 router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
   try {
-    const id =
+    let id =
       req.query.id && (await userModel.findById(+req.query.id))
         ? +req.query.id
         : req.user.id;
+    id =
+      (await profileModel.isUserBlockedProfile(+req.user.id, id)) ||
+      (await profileModel.isUserBlockedProfile(id, +req.user.id))
+        ? req.user.id
+        : id;
     id !== req.user.id &&
       (await profileModel.setNotification(id, req.user.id, "visit"));
     const result = await profileModel.getUserInfo(+id);
@@ -319,6 +324,7 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
       user_age: age,
       user_city: result.user_city,
       user_biography: result.user_biography,
+      user_online: result.online,
       user_location: {
         lat: parseFloat(result.user_lat, 10),
         lng: parseFloat(result.user_lng, 10)
@@ -475,29 +481,33 @@ router.get("/getpreedefined", async (req, res) => {
 // @route   Post api/profle/likeUser
 // @desc    Like, unlike profile
 // @access  Private
-router.post("/userLikeProfile", middleware.auth, async (req, res) => {
-  const { profile } = req.body;
-  const id = req.user.id;
-  if (id === parseInt(profile.id))
-    return res.json({
-      success: false
-    });
-  try {
-    //if user already liked this profile, unlike it, else like
-    let result = await profileModel.isUserLikedProfile(+id, +profile.id);
-    result = result
-      ? await profileModel.unlikeProfile(+id, +profile.id)
-      : await profileModel.likeProfile(+id, +profile.id);
+router.post(
+  "/userLikeProfile",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const { profile } = req.body;
+    const id = req.user.id;
+    if (id === parseInt(profile.id))
+      return res.json({
+        success: false
+      });
+    try {
+      //if user already liked this profile, unlike it, else like
+      let result = await profileModel.isUserLikedProfile(+id, +profile.id);
+      result = result
+        ? await profileModel.unlikeProfile(+id, +profile.id)
+        : await profileModel.likeProfile(+id, +profile.id);
 
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Post api/profle/isUserLikeProfile
 // @desc    is user already liked specific profile
@@ -748,7 +758,7 @@ router.get("/unseenNotificationsCount", middleware.auth, async (req, res) => {
   }
 });
 
-router.get("/forTest", middleware.auth, async (req, res) => {
+router.get("/checkIsVerified", middleware.auth, async (req, res) => {
   const id = req.user.id;
 
   const responde = await profileModel.getUserInfo(id);
@@ -761,6 +771,8 @@ router.get("/forTest", middleware.auth, async (req, res) => {
     responde.profile_Image === "photo_holder.png"
   )
     isEmpty = false;
+  await profileModel.setInfoVerified(isEmpty, id);
+
   return res.json({
     success: true,
     isVerified: isEmpty

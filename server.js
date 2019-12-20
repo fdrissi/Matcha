@@ -5,6 +5,7 @@ const cookie = require("cookie");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const key = config.get("keyOrSecret");
+const { pool } = require("./config/db");
 
 const app = express();
 app.use(cors());
@@ -54,17 +55,19 @@ io.use(function(socket, next) {
     next(new Error("Authentication error"));
   }
 }).on("connection", socket => {
-  console.log("new connection", socket.id);
-  socket.on("login", user => {
+  socket.on("login", async user => {
     socket.userId = user;
     users[user] = socket.id;
-    console.log("new socket", socket.id);
-    console.log("connected users", users);
+    try {
+      const sql = "UPDATE `user_info` SET online = ? WHERE id = ?";
+      const [result] = await pool.query(sql, [true, user]);
+      if (!!result.affectedRows) socket.emit("login", users);
+    } catch (error) {}
+    console.log("logged In users", users);
     socket.emit("login", users);
   });
 
   socket.on("notification", data => {
-    console.log("notification received to backend", data);
     socket.to(users[data.id]).emit("notification", { users });
   });
 
@@ -73,19 +76,23 @@ io.use(function(socket, next) {
   });
 
   socket.on("newMessage", data => {
+    console.log("new message received", data);
     if (users[data.receiver]) {
-      socket.to(users[data.receiver]).emit("newMessage", data);
-      socket.to(users[data.receiver]).emit("notifMessage", data);
+      console.log("emit to newMessage notifMessage", users[data.receiver]);
+      io.sockets.to(users[data.receiver]).emit("newMessage", data);
+      io.sockets.to(users[data.receiver]).emit("notifMessage", data);
     }
   });
 
   socket.on("seenUpdated", data => {
-    console.log("emit to ", users[data]);
     io.sockets.to(users[data]).emit("notifMessage", data);
   });
 
-  socket.on("disconnect", () => {
-    //delete users[socket.userId];
-    console.log("disconnect", users);
+  socket.on("disconnect", async () => {
+    delete users[socket.userId];
+    try {
+      const sql = "UPDATE `user_info` SET online = ? WHERE id = ?";
+      const [result] = await pool.query(sql, [false, socket.userId]);
+    } catch (error) {}
   });
 });

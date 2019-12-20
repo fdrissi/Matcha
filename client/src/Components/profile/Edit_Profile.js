@@ -281,7 +281,7 @@ function EditProfile() {
 
   useEffect(() => {
     if (latitude || longitude || error) {
-      setUserLocation(latitude, longitude, error);
+      setUserLocation(latitude, longitude, error, stableDispatch);
     }
   }, [latitude, longitude, error]);
   if (isLoading)

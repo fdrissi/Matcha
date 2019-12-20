@@ -7,8 +7,6 @@ import {
   REMOVE_ERRORS,
   PROFILE_BLOCKED,
   PROFILE_LIKED,
-  PROFILE_MATCHED,
-  PROFILE_REPORTED,
   PROFILE_IS_VERIFIED
 } from "./actionTypes";
 
@@ -24,7 +22,7 @@ export const setUserImages = async (formData, row, dispatch) => {
       formData,
       config
     );
-    const respond = await axios.get('/api/profile/checkIsVerified');
+    const respond = await axios.get("/api/profile/checkIsVerified");
     if (res.data.success) {
       dispatch({
         type: PHOTO_SUCCESS,
@@ -49,7 +47,7 @@ export const setUserImages = async (formData, row, dispatch) => {
     dispatch({
       type: PROFILE_IS_VERIFIED,
       payload: respond.data.isVerified
-    })
+    });
   } catch (error) {
     return false;
   }
@@ -66,7 +64,7 @@ export const setUserCover = async (filed, dispatch) => {
       data: { filed: filed },
       config
     });
-    const respond = await axios.get('/api/profile/checkIsVerified');
+    const respond = await axios.get("/api/profile/checkIsVerified");
     if (res.data.success) {
       dispatch({
         type: PHOTO_SUCCESS,
@@ -91,7 +89,7 @@ export const setUserCover = async (filed, dispatch) => {
     dispatch({
       type: PROFILE_IS_VERIFIED,
       payload: respond.data.isVerified
-    })
+    });
   } catch (error) {
     return false;
   }
@@ -133,7 +131,7 @@ export const removeUserImage = async (photo, filed, dispatch) => {
       { data: { filed: filed, photo: photo } },
       config
     );
-    const respond = await axios.get('/api/profile/checkIsVerified');
+    const respond = await axios.get("/api/profile/checkIsVerified");
     if (!res.data.success)
       dispatch({
         type: SET_ALERT,
@@ -158,7 +156,7 @@ export const removeUserImage = async (photo, filed, dispatch) => {
     dispatch({
       type: PROFILE_IS_VERIFIED,
       payload: respond.data.isVerified
-    })
+    });
   } catch (error) {
     return false;
   }
@@ -201,7 +199,7 @@ export const updateUserInfo = async (mydata, dispatch) => {
       },
       config
     );
-    const respond = await axios.get('/api/profile/checkIsVerified');
+    const respond = await axios.get("/api/profile/checkIsVerified");
     if (res.data.success) {
       dispatch({
         type: SET_ALERT,
@@ -233,13 +231,13 @@ export const updateUserInfo = async (mydata, dispatch) => {
     dispatch({
       type: PROFILE_IS_VERIFIED,
       payload: respond.data.isVerified
-    })
+    });
   } catch (error) {
     return false;
   }
 };
 
-export const setUserLocation = async (latitude, longitude, error) => {
+export const setUserLocation = async (latitude, longitude, error, dispatch) => {
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -251,13 +249,12 @@ export const setUserLocation = async (latitude, longitude, error) => {
     { data: { latitude, longitude, error } },
     config
   );
-  const respond = await axios.get('/api/profile/checkIsVerified');
-  if (respond.data.success)
-  {
+  const respond = await axios.get("/api/profile/checkIsVerified");
+  if (respond.data.success) {
     dispatch({
       type: PROFILE_IS_VERIFIED,
       payload: respond.data.isVerified
-    })
+    });
   }
 };
 

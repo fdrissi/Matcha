@@ -43,6 +43,11 @@ export const login = async (email, password, remember, dispatch) => {
       }, 5000);
     } else {
       res = await axios.get("/api/users/current");
+      const respond = await axios.get("/api/profile/checkIsVerified");
+      dispatch({
+        type: PROFILE_IS_VERIFIED,
+        payload: respond.data.isVerified
+      });
       dispatch({
         type: LOGIN_SUCCESS,
         payload: res.data.user
@@ -253,11 +258,17 @@ export const register = async (mydata, dispatch) => {
     });
   }
 };
+
 export const loadUser = async dispatch => {
   try {
     const res = await axios.get("/api/users/current");
 
     if (res.data.success) {
+      const respond = await axios.get("/api/profile/checkIsVerified");
+      dispatch({
+        type: PROFILE_IS_VERIFIED,
+        payload: respond.data.isVerified
+      });
       dispatch({
         type: USER_LOADED,
         payload: res.data.user
@@ -268,6 +279,7 @@ export const loadUser = async dispatch => {
       });
     }
   } catch (error) {
+    console.log(error);
     dispatch({
       type: AUTH_ERROR
     });

@@ -6,7 +6,7 @@ import { useSocketStore } from "./Context/appStore";
 import { LoadUserComponent } from "./LoadUser";
 import { loadUser } from "./actions/userAction";
 import Navbar from "./Components/inc/Navbar";
-import Landing from "./Components/layouts/Landing";
+
 import Routes from "./Components/routing/Routes";
 import Footer from "./Components/inc/Footer";
 import { createMuiTheme } from "@material-ui/core/styles";
@@ -63,7 +63,6 @@ function App() {
       <Router>
         <Navbar />
         <Switch>
-          <Route exact path="/" component={Landing} />
           <Route component={Routes} />
         </Switch>
         <Footer style={{ flex: 1 }} />

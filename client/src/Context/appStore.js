@@ -11,6 +11,7 @@ import {
   tokenvalidationInitState
 } from "../Reducers/authReducer";
 import { profileReducer, profileInitState } from "../Reducers/profileReducer";
+import { matchedReducer, matchedInitState } from "../Reducers/matchedReducer";
 import io from "socket.io-client";
 const socket = io("http://localhost:5000");
 
@@ -27,7 +28,8 @@ export const UserProvider = ({ children }) => {
     auth: useReducer(authReducer, authInitState),
     operations: useReducer(operationsReducer, errorsInitState),
     profile: useReducer(profileReducer, profileInitState),
-    token: useReducer(passeditReducer, tokenvalidationInitState)
+    token: useReducer(passeditReducer, tokenvalidationInitState),
+    matches: useReducer(matchedReducer, matchedInitState)
   });
   return (
     <StoreProvider>

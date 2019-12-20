@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const config = require("config");
 const userModel = require("../models/User");
+const profileModel = require("../models/Profile");
 const escapeSpecialChars = require("../helpers/escapeSpecialChars");
 const bcrypt = require("bcryptjs");
 const predefined = require("../routes/globals");
@@ -92,6 +93,17 @@ module.exports = middleware = {
       next();
     } catch (error) {
       return res.json({ success: false, errorMsg: "Access denied" });
+    }
+  },
+  infoVerified: async function(req, res, next) {
+    try {
+      const id = req.user;
+      const result = await profileModel.isInfoVerified(id);
+      if (!result)
+        return res.json({ success: false, errorMsg: "Verify Profile Info" });
+      next();
+    } catch (error) {
+      return res.json({ success: false, errorMsg: "Verify Profile Info" });
     }
   },
   chat: async function(req, res, next) {
