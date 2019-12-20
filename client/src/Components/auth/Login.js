@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: "#e74c3c"
+    background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
   },
   form: {
     width: "100%",
@@ -40,7 +40,8 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(3, 0, 2),
     backgroundColor: "#e74c3c",
     "&:hover": {
-      backgroundColor: "transparent",
+      background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
+
       color: "#e74c3c",
       border: "1px solid #e74c3c"
     }

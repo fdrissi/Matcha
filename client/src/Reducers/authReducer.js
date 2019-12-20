@@ -117,7 +117,7 @@ export const operationsReducer = (state = errorsInitState, action) => {
 };
 
 export const tokenvalidationInitState = {
-  token_valide_message: "",
+  token_valide_message: false,
   token_valide: false,
   is_loading: true
 };

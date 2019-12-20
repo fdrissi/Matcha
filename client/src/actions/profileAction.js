@@ -7,20 +7,22 @@ import {
   REMOVE_ERRORS,
   PROFILE_BLOCKED,
   PROFILE_LIKED,
-  PROFILE_IS_VERIFIED
+  PROFILE_MATCHED,
+  PROFILE_REPORTED
 } from "./actionTypes";
 
 export const setUserImages = async (formData, row, dispatch) => {
-  console.log("13");
-
   const config = {
     header: {
       "Content-Type": "multipart/form-data"
     }
   };
   try {
-    const res = await axios.post(`api/profile/upload/${row}`, formData, config);
-    const responde = await axios.get("api/profile/forTest");
+    const res = await axios.post(
+      `/api/profile/upload/${row}`,
+      formData,
+      config
+    );
     if (res.data.success) {
       dispatch({
         type: PHOTO_SUCCESS,
@@ -33,11 +35,6 @@ export const setUserImages = async (formData, row, dispatch) => {
           msg: res.data.errorMsg
         }
       });
-      if (responde.data.success)
-        dispatch({
-          type: PROFILE_IS_VERIFIED,
-          payload: responde.data.isVerified
-        });
     } else {
       dispatch({
         type: SET_ALERT,
@@ -46,33 +43,23 @@ export const setUserImages = async (formData, row, dispatch) => {
           msg: res.data.errorMsg
         }
       });
-      if (responde.data.success)
-        dispatch({
-          type: PROFILE_IS_VERIFIED,
-          payload: responde.data.isVerified
-        });
     }
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
 
 export const setUserCover = async (filed, dispatch) => {
-  console.log("12");
-
   const config = {
     header: {
       "Content-Type": "application/json"
     }
   };
   try {
-    const res = await axios.post("api/profile/setCover", {
+    const res = await axios.post("/api/profile/setCover", {
       data: { filed: filed },
       config
     });
-    const responde = await axios.get("api/profile/forTest");
-
     if (res.data.success) {
       dispatch({
         type: PHOTO_SUCCESS,
@@ -85,11 +72,6 @@ export const setUserCover = async (filed, dispatch) => {
           msg: res.data.errorMsg
         }
       });
-      if (responde.data.success)
-        dispatch({
-          type: PROFILE_IS_VERIFIED,
-          payload: responde.data.isVerified
-        });
     } else {
       dispatch({
         type: SET_ALERT,
@@ -98,11 +80,6 @@ export const setUserCover = async (filed, dispatch) => {
           msg: res.data.errorMsg
         }
       });
-      if (responde.data.success)
-        dispatch({
-          type: PROFILE_IS_VERIFIED,
-          payload: responde.data.isVerified
-        });
     }
   } catch (error) {
     return false;
@@ -110,8 +87,6 @@ export const setUserCover = async (filed, dispatch) => {
 };
 
 export const getUserImages = async (dispatch, id = null) => {
-  console.log("11");
-
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -123,7 +98,6 @@ export const getUserImages = async (dispatch, id = null) => {
       { params: { id } },
       config
     );
-
     if (res.data.success) {
       dispatch({
         type: PHOTO_SUCCESS,
@@ -137,8 +111,6 @@ export const getUserImages = async (dispatch, id = null) => {
 };
 
 export const removeUserImage = async (photo, filed, dispatch) => {
-  console.log("10");
-
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -146,12 +118,11 @@ export const removeUserImage = async (photo, filed, dispatch) => {
   };
   try {
     const res = await axios.delete(
-      "api/profile/removeImage",
+      "/api/profile/removeImage",
       { data: { filed: filed, photo: photo } },
       config
     );
-    const responde = await axios.get("api/profile/forTest");
-    if (!res.data.success) {
+    if (!res.data.success)
       dispatch({
         type: SET_ALERT,
         payload: {
@@ -159,12 +130,7 @@ export const removeUserImage = async (photo, filed, dispatch) => {
           msg: res.data.errorMsg
         }
       });
-      if (responde.data.success)
-        dispatch({
-          type: PROFILE_IS_VERIFIED,
-          payload: responde.data.isVerified
-        });
-    } else {
+    else {
       dispatch({
         type: SET_ALERT,
         payload: {
@@ -176,11 +142,6 @@ export const removeUserImage = async (photo, filed, dispatch) => {
         type: PHOTO_SUCCESS,
         payload: res.data.result
       });
-      if (responde.data.success)
-        dispatch({
-          type: PROFILE_IS_VERIFIED,
-          payload: responde.data.isVerified
-        });
     }
   } catch (error) {
     return false;
@@ -188,7 +149,6 @@ export const removeUserImage = async (photo, filed, dispatch) => {
 };
 
 export const getUserInfo = async (dispatch, id = null) => {
-  console.log("9");
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -212,8 +172,6 @@ export const getUserInfo = async (dispatch, id = null) => {
 };
 
 export const updateUserInfo = async (mydata, dispatch) => {
-  console.log("8");
-
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -221,13 +179,12 @@ export const updateUserInfo = async (mydata, dispatch) => {
   };
   try {
     const res = await axios.post(
-      "api/profile/updateUserInfo",
+      "/api/profile/updateUserInfo",
       {
         data: mydata
       },
       config
     );
-    const responde = await axios.get("api/profile/forTest");
     if (res.data.success) {
       dispatch({
         type: SET_ALERT,
@@ -243,11 +200,6 @@ export const updateUserInfo = async (mydata, dispatch) => {
       dispatch({
         type: REMOVE_ERRORS
       });
-      if (responde.data.success)
-        dispatch({
-          type: PROFILE_IS_VERIFIED,
-          payload: responde.data.isVerified
-        });
     } else {
       dispatch({
         type: FAILIED_UPDATE_USER,
@@ -260,11 +212,6 @@ export const updateUserInfo = async (mydata, dispatch) => {
           msg: res.data.errorMsg
         }
       });
-      if (responde.data.success)
-        dispatch({
-          type: PROFILE_IS_VERIFIED,
-          payload: responde.data.isVerified
-        });
     }
   } catch (error) {
     return false;
@@ -272,23 +219,20 @@ export const updateUserInfo = async (mydata, dispatch) => {
 };
 
 export const setUserLocation = async (latitude, longitude, error) => {
-  console.log("7");
-
   const config = {
     header: {
       "Content-Type": "application/json"
     }
   };
+
   await axios.post(
-    "api/profile/setUserLocation",
+    "/api/profile/setUserLocation",
     { data: { latitude, longitude, error } },
     config
   );
 };
 
 export const getpreedefined = async () => {
-  console.log("6");
-
   const res = await axios.get("api/profile/getpreedefined");
   if (res.data.success) {
     return res.data.predefined;
@@ -296,8 +240,6 @@ export const getpreedefined = async () => {
 };
 
 export const likeProfile = async (profileId, dispatch) => {
-  console.log("5");
-
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -319,8 +261,6 @@ export const likeProfile = async (profileId, dispatch) => {
 };
 
 export const isUserLikedProfile = async (profileId, dispatch) => {
-  console.log("4");
-
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -344,8 +284,6 @@ export const isUserLikedProfile = async (profileId, dispatch) => {
 };
 
 export const blockProfile = async (profileId, dispatch) => {
-  console.log("3");
-
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -366,8 +304,6 @@ export const blockProfile = async (profileId, dispatch) => {
 };
 
 export const isProfileBlocked = async (profileId, dispatch) => {
-  console.log("2");
-
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -392,8 +328,6 @@ export const isProfileBlocked = async (profileId, dispatch) => {
 };
 
 export const reportProfile = async profileId => {
-  console.log("1");
-
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -414,8 +348,6 @@ export const reportProfile = async profileId => {
 };
 
 export const recordVisitedProfiles = async profileId => {
-  console.log("0");
-
   const config = {
     header: {
       "Content-Type": "application/json"

@@ -60,7 +60,6 @@ export const profileInitState = {
 
 export const profileReducer = (state, action) => {
   const { type, payload } = action;
-  console.log("paylod", type);
   switch (type) {
     case PHOTO_SUCCESS:
       return { ...state, photo: payload };

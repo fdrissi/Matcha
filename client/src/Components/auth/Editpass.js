@@ -22,6 +22,7 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -112,9 +113,13 @@ const Editpass = params => {
   };
 
   useEffect(() => {
-    let token = params.params.token;
-    checktoken(token, stableDispatch);
+    async function funcCheckToken() {
+      let token = params.params.token;
+      await checktoken(token, stableDispatch);
+    }
+    funcCheckToken();
   }, [params.params.token, stableDispatch]);
+
   useEffect(() => {
     return () => {
       if (!operations.success && token_valide) {
@@ -130,7 +135,13 @@ const Editpass = params => {
 
   if (auth.isAuthenticated && !auth.loading) return <Redirect to="/profile" />;
   if (is_loading) {
-    return null;
+    return (
+      <Container component="main" maxWidth="md">
+        <div className={classes.paper}>
+          <CircularProgress />
+        </div>
+      </Container>
+    );
   } else {
     if (!token_valide || token_valide_message === "done") {
       return <Redirect to="/login" />;

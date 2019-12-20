@@ -217,6 +217,7 @@ function EditProfile() {
   };
 
   const handleAddChip = chip => {
+    if (chip.length > 10) return false;
     setData(previousData => ({
       ...previousData,
       user_tags: previousData.user_tags.concat(chip)
@@ -233,7 +234,6 @@ function EditProfile() {
       }));
     }
   };
-  console.log(profile);
 
   useEffect(() => {
     let timer = setTimeout(() => {

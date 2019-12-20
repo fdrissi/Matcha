@@ -7,7 +7,7 @@ export const getBrowse = async dispatch => {
       "Content-Type": "application/json"
     }
   };
-  const res = await axios.get(`api/browse/getBrowse`, config);
+  const res = await axios.get(`/api/browse/getBrowse`, config);
   dispatch({
     type: BROWSER_RETURN,
     payload: res.data.data
@@ -66,7 +66,7 @@ export const filterBrowser = async (filter, dispatch) => {
     }
   };
   const res = await axios.get(
-    `api/browse/getFilter`,
+    `/api/browse/getFilter`,
     {
       params: {
         filter: filter
@@ -102,7 +102,7 @@ export const getSearch = async (filter, dispatch) => {
     }
   };
   const res = await axios.get(
-    `api/browse/getSearch`,
+    `/api/browse/getSearch`,
     {
       params: {
         filter: filter
