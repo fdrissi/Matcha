@@ -26,7 +26,6 @@ export const profileInitState = {
     liked: false,
     matched: false,
     blocked: false,
-    isVrified: false,
     id: "",
     user_first_name: "",
     user_last_name: "",
@@ -55,7 +54,8 @@ export const profileInitState = {
     sort_by: ""
   },
   Verification: {
-    isVrified: false
+    isVrified: false,
+    loading: true
   }
 };
 
@@ -75,7 +75,11 @@ export const profileReducer = (state, action) => {
     case PROFILE_IS_VERIFIED:
       return {
         ...state,
-        Verification: { ...state.Verification, isVrified: payload }
+        Verification: {
+          ...state.Verification,
+          isVrified: payload,
+          loading: false
+        }
       };
     case BROWSER_RETURN:
       return {

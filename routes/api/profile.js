@@ -758,7 +758,7 @@ router.get("/unseenNotificationsCount", middleware.auth, async (req, res) => {
   }
 });
 
-router.get("/forTest", middleware.auth, async (req, res) => {
+router.get("/checkIsVerified", middleware.auth, async (req, res) => {
   const id = req.user.id;
 
   const responde = await profileModel.getUserInfo(id);
@@ -771,6 +771,8 @@ router.get("/forTest", middleware.auth, async (req, res) => {
     responde.profile_Image === "photo_holder.png"
   )
     isEmpty = false;
+  await profileModel.setInfoVerified(isEmpty, id);
+
   return res.json({
     success: true,
     isVerified: isEmpty
