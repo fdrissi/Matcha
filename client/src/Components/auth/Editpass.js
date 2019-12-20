@@ -113,13 +113,9 @@ const Editpass = params => {
   };
 
   useEffect(() => {
-    async function funcCheckToken() {
-      let token = params.params.token;
-      await checktoken(token, stableDispatch);
-    }
-    funcCheckToken();
+    let token = params.params.token;
+    checktoken(token, stableDispatch);
   }, [params.params.token, stableDispatch]);
-
   useEffect(() => {
     return () => {
       if (!operations.success && token_valide) {
@@ -135,13 +131,7 @@ const Editpass = params => {
 
   if (auth.isAuthenticated && !auth.loading) return <Redirect to="/profile" />;
   if (is_loading) {
-    return (
-      <Container component="main" maxWidth="md">
-        <div className={classes.paper}>
-          <CircularProgress />
-        </div>
-      </Container>
-    );
+    return null;
   } else {
     if (!token_valide || token_valide_message === "done") {
       return <Redirect to="/login" />;

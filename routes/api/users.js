@@ -108,6 +108,7 @@ router.post("/recover", async (req, res) => {
         const resultFromSr = userModel.setRecovery(result.email, token);
         if (resultFromSr) {
           // here we gonna send the email of the recovery
+          console.log("url", url);
           if (sendRecovery(result, token, url)) {
             return res.json({
               success: true,
@@ -189,7 +190,7 @@ router.post("/passedit", [middleware.register], async (req, res) => {
           res.json({
             success: true,
             errorMsg: "Your password has ben updated",
-            updated: true,
+            updated: "done",
             valide: true
           });
         else
@@ -200,8 +201,7 @@ router.post("/passedit", [middleware.register], async (req, res) => {
       } else {
         res.json({
           success: false,
-          errorMsg:
-            "Something goes wrong please lets know (* UPDAITING WITH NEW PASSWORD)"
+          errorMsg: "Something goes wrong please lets know"
         });
       }
     } else {
@@ -214,6 +214,7 @@ router.post("/passedit", [middleware.register], async (req, res) => {
     return res.json({ success: false, errorMsg: "Error Occured" });
   }
 });
+
 
 // @route POST /api/users/checktoken
 // @desc checktoken
@@ -233,7 +234,6 @@ router.get("/checktoken", async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
     return res.json({ success: false, errorMsg: "Error Occured" });
   }
 });
