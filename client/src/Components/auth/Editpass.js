@@ -86,7 +86,7 @@ const Editpass = params => {
   const stableDispatch = useCallback(dispatch, []);
 
   const { is_loading, token_valide, token_valide_message } = token;
-
+  console.log(operations);
   const submitForm = async form => {
     form.preventDefault();
     let token = params.params.token;
@@ -150,7 +150,7 @@ const Editpass = params => {
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
-                    error={operations.errors.password.length > 0 ? true : false}
+                    error={operations.errors.password ? true : false}
                     variant="outlined"
                     required
                     fullWidth
@@ -178,7 +178,7 @@ const Editpass = params => {
                       )
                     }}
                   />
-                  {operations.errors.password.length > 0 && (
+                  {operations.errors.password && (
                     <FormHelperText className={classes.helperText}>
                       <sup>*</sup> {operations.errors.password}
                     </FormHelperText>
@@ -186,11 +186,7 @@ const Editpass = params => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    error={
-                      operations.errors.confirmPassword.length > 0
-                        ? true
-                        : false
-                    }
+                    error={operations.errors.confirmPassword ? true : false}
                     variant="outlined"
                     required
                     fullWidth
@@ -218,7 +214,7 @@ const Editpass = params => {
                       )
                     }}
                   />
-                  {operations.errors.confirmPassword.length > 0 && (
+                  {operations.errors.confirmPassword && (
                     <FormHelperText className={classes.helperText}>
                       <sup>*</sup> {operations.errors.confirmPassword}
                     </FormHelperText>

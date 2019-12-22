@@ -99,13 +99,19 @@ export const operationsReducer = (state = errorsInitState, action) => {
         ...state,
         register_message: payload.message,
         success: false,
-        errors: payload.errors === undefined ? state : payload.errors
+        errors:
+          payload.errors === undefined
+            ? state
+            : { ...state.errors, ...payload.errors }
       };
     case FAILIED_UPDATE_USER:
       return {
         ...state,
         success: false,
-        errors: payload.errors === undefined ? state : payload.errors
+        errors:
+          payload.errors === undefined
+            ? state
+            : { ...state.errors, ...payload.errors }
       };
     case REMOVE_ERRORS:
       return (state = errorsInitState);
