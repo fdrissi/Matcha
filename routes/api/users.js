@@ -16,7 +16,7 @@ const url = config.get("url");
 // @route   POST api/users/login
 // @desc    Login User
 // @access  Public
-router.post("/login", async (req, res) => {
+router.post("/login", [middleware.login], async (req, res) => {
   try {
     const { email, password, remember } = req.body;
     const user = await userModel.login(email);
@@ -95,7 +95,7 @@ router.post("/register", [middleware.register], async (req, res) => {
 // @route Post api/user/recover
 // @desc Recover User
 // @access PUBLIC
-router.post("/recover", async (req, res) => {
+router.post("/recover", [middleware.recover], async (req, res) => {
   try {
     const { data } = req.body;
     // first of all we have to check if the input is valide
@@ -174,7 +174,7 @@ router.post("/recover", async (req, res) => {
 // @route POST /api/users/passedit
 // @desc Edit password
 // @access public
-router.post("/passedit", [middleware.register], async (req, res) => {
+router.post("/passedit", [middleware.passedit], async (req, res) => {
   try {
     // first of all we have to make sure that we already have that token
     const { token, password } = req.body;

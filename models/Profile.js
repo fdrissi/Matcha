@@ -1,5 +1,7 @@
 const { pool } = require("../config/db");
 const empty = require("is-empty");
+const publicIp = require("public-ip");
+const iplocation = require("iplocation").default;
 
 async function SetImage(id, photoname, counter) {
   try {
@@ -222,28 +224,52 @@ async function updateUserInfo(data, id) {
       user_biography,
       user_location
     } = data;
-    const set_from_map = user_location.lat && user_location.lng ? true : false;
+    const ipAddress = await publicIp.v4();
+    let responde = await iplocation(ipAddress);
+    let set_from_map =
+      user_location.lat === responde.latitude &&
+      user_location.lng === responde.longitude
+        ? false
+        : true;
     const tags = JSON.stringify(user_tags);
     if (user_birth_day && user_birth_month && user_birth_day)
       user_bith = `${user_birth_year}-${user_birth_month}-${user_birth_day}`;
     else user_bith = null;
-    let sql =
-      "update user_info SET user_gender = ?  ,user_gender_interest = ? ,user_relationship = ? , user_tags = ? , user_birth = ?, user_city = ?, user_lat = ?, user_lng = ? , user_current_occupancy = ?, user_biography = ? , set_from_map = ?   WHERE id = ?";
-    const [result] = await pool.query(sql, [
-      user_gender,
-      user_gender_interest,
-      user_relationship,
-      tags,
-      user_bith,
-      user_city,
-      user_location.lat,
-      user_location.lng,
-      user_current_occupancy,
-      user_biography,
-      set_from_map,
-      id
-    ]);
-    if (result.changedRows) {
+    let result;
+    if (!set_from_map) {
+      let sql =
+        "update user_info SET user_gender = ?  ,user_gender_interest = ? ,user_relationship = ? , user_tags = ? , user_birth = ?, user_city = ?, user_current_occupancy = ?, user_biography = ? , set_from_map = ?   WHERE id = ?";
+      [result] = await pool.query(sql, [
+        user_gender,
+        user_gender_interest,
+        user_relationship,
+        tags,
+        user_bith,
+        user_city,
+        user_current_occupancy,
+        user_biography,
+        set_from_map,
+        id
+      ]);
+    } else {
+      let sql =
+        "update user_info SET user_gender = ?  ,user_gender_interest = ? ,user_relationship = ? , user_tags = ? , user_birth = ?, user_city = ?, user_lat = ?, user_lng = ? , user_current_occupancy = ?, user_biography = ? , set_from_map = ?   WHERE id = ?";
+      [result] = await pool.query(sql, [
+        user_gender,
+        user_gender_interest,
+        user_relationship,
+        tags,
+        user_bith,
+        user_city,
+        user_location.lat,
+        user_location.lng,
+        user_current_occupancy,
+        user_biography,
+        set_from_map,
+        id
+      ]);
+    }
+    if (result.changedRows >= 1) {
       return true;
     } else {
       return false;
