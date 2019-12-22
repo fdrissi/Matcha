@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Switch } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import Landing from "../layouts/Landing";
@@ -20,8 +20,10 @@ import PrivateRoute from "./PrivateRoute";
 
 const Routes = () => {
   const [{ auth, profile }] = useUserStore();
-  const access = auth.userInfo.info_verified;
-  console.log(auth, profile);
+  const access = profile.Verification.isVrified;
+  useEffect(() => {
+    console.log(profile.Verification.isVrified);
+  }, [profile.Verification.isVrified]);
   return (
     <div style={{ flex: 1 }}>
       <Switch>

@@ -214,7 +214,6 @@ router.post("/passedit", [middleware.register], async (req, res) => {
   }
 });
 
-
 // @route POST /api/users/checktoken
 // @desc checktoken
 // @access public

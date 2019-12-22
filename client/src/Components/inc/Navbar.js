@@ -19,6 +19,7 @@ import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import axios from "axios";
+import { unseenCountGlobal } from "../../actions/chatAction";
 
 const useStyles = makeStyles(theme => ({
   menuButton: {
@@ -66,7 +67,6 @@ const useStyles = makeStyles(theme => ({
 const NavNotifications = () => {
   const classes = useStyles();
   const [dbNotif, setDbNotif] = useState(0);
-  const [{ auth }] = useUserStore();
   const socket = useSocketStore();
 
   if (socket.listeners("notification").length <= 1) {
@@ -82,29 +82,18 @@ const NavNotifications = () => {
 
   //if (socket.listeners("notification").length < 1) {
 
-  // useEffect(() => {
-  //   socket.on("notify", async data => {
-  //     console.log(data);
-  //     const result = await axios.get("/api/profile/unseenNotificationsCount");
-  //     console.log("navbar notif coun", result.data);
-  //     if (result.data.success) {
-  //       setDbNotif(result.data.count);
-  //     }
-  //   });
-  //   (async () => {
-  //     const result = await axios.get("/api/profile/unseenNotificationsCount");
-  //     console.log("navbar notif coun", result.data);
-  //     if (result.data.success) {
-  //       setDbNotif(result.data.count);
-  //     }
-  //   })();
-  // }, [auth.userInfo.id]);
-  //}
+  useEffect(() => {
+    (async () => {
+      const result = await axios.get("/api/profile/unseenNotificationsCount");
+      if (result.data.success) {
+        setDbNotif(result.data.count);
+      }
+    })();
+  }, []);
 
-  // socket.on("clearNotifications", data => {
-  //   console.log("clear recieved");
-  //   setDbNotif(0);
-  // });
+  socket.on("clearNotifications", data => {
+    setDbNotif(0);
+  });
 
   return (
     <>
@@ -128,34 +117,17 @@ const NavNotifications = () => {
 
 const NavMessage = () => {
   const classes = useStyles();
-  const [dbNotif, setDbNotif] = useState(0);
-  const [{ auth }] = useUserStore();
+  const [{ auth, chat }, dispatch] = useUserStore();
   const socket = useSocketStore();
 
   if (socket.listeners("newMessage").length < 1)
     socket.on("notifMessage", data => {
-      (async () => {
-        const result = await axios.get(
-          `/api/chat/unseenCount/${auth.userInfo.id}`
-        );
-        if (result.data.success) {
-          setDbNotif(result.data.count);
-        }
-      })();
+      unseenCountGlobal(auth.userInfo.id, dispatch, socket);
     });
 
   useEffect(() => {
-    if (auth.userInfo.id) {
-      (async () => {
-        const result = await axios.get(
-          `/api/chat/unseenCount/${auth.userInfo.id}`
-        );
-        if (result.data.success) {
-          setDbNotif(result.data.count);
-        }
-      })();
-    }
-  }, [auth.userInfo.id]);
+    unseenCountGlobal(auth.userInfo.id, dispatch, socket);
+  }, []);
 
   return (
     <>
@@ -165,7 +137,7 @@ const NavMessage = () => {
           color="inherit"
           style={{ height: "100%" }}
         >
-          <Badge badgeContent={dbNotif} color="secondary">
+          <Badge badgeContent={chat.unseenGlobal} color="secondary">
             <MailIcon className={classes.actions} />
           </Badge>
         </IconButton>
