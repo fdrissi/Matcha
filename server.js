@@ -74,7 +74,6 @@ io.use(function(socket, next) {
   });
 
   socket.on("clearNotifications", data => {
-    console.log("clearNotifications Fired");
     if (users[data.id]) {
       users[data.id].map(rec =>
         io.sockets.to(rec).emit("clearNotifications", data)

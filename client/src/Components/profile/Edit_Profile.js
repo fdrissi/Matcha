@@ -154,7 +154,7 @@ function EditProfile() {
     third_Image: "",
     fourth_Image: ""
   });
-  console.log(profile);
+
   const [mydata, setData] = useState({
     user_gender: "",
     user_relationship: "",
