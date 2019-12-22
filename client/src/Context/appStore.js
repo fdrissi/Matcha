@@ -12,6 +12,7 @@ import {
 } from "../Reducers/authReducer";
 import { profileReducer, profileInitState } from "../Reducers/profileReducer";
 import { matchedReducer, matchedInitState } from "../Reducers/matchedReducer";
+import { chatReducer, chatInitState } from "../Reducers/chatReducer";
 import io from "socket.io-client";
 const socket = io("http://localhost:5000");
 
@@ -29,7 +30,8 @@ export const UserProvider = ({ children }) => {
     operations: useReducer(operationsReducer, errorsInitState),
     profile: useReducer(profileReducer, profileInitState),
     token: useReducer(passeditReducer, tokenvalidationInitState),
-    matches: useReducer(matchedReducer, matchedInitState)
+    matches: useReducer(matchedReducer, matchedInitState),
+    chat: useReducer(chatReducer, chatInitState)
   });
   return (
     <StoreProvider>

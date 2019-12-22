@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link, Redirect } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import { login } from "../../actions/userAction";
-import { REMOVE_ALERT } from "../../actions/actionTypes";
+import { REMOVE_ALERT, SET_ALERT } from "../../actions/actionTypes";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -38,13 +38,7 @@ const useStyles = makeStyles(theme => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-    backgroundColor: "#e74c3c",
-    "&:hover": {
-      background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)",
-
-      color: "#e74c3c",
-      border: "1px solid #e74c3c"
-    }
+    background: "linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)"
   }
 }));
 
@@ -64,8 +58,15 @@ const SignIn = () => {
 
   const submitForm = async form => {
     form.preventDefault();
-
-    login(email, password, remember, dispatch);
+    if (!email || !password) {
+      stableDispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "danger",
+          msg: "Email and password required"
+        }
+      });
+    } else login(email, password, remember, dispatch);
   };
 
   useEffect(() => {

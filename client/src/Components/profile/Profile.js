@@ -307,7 +307,7 @@ const ProfileHeader = () => {
   const handleClick = async () => {
     const result = await likeProfile(profile.info.id, dispatch);
     if (result) {
-      socket.emit("notify", { id: profile.info.id });
+      socket.emit("notification", { id: profile.info.id });
     }
   };
 
@@ -340,7 +340,7 @@ const ProfileHeader = () => {
                         )
                       }
                     />
-                    <ButtonRed icon={<QuestionAnswerIcon />} />
+                    {/*<ButtonRed icon={<QuestionAnswerIcon />} />*/}
                     <LongMenu />
                   </>
                 )}
@@ -520,11 +520,8 @@ export const Profile = ({ match }) => {
   useEffect(() => {
     if (+profile.info.id !== 0 && auth.userInfo.id !== 0) {
       recordVisitedProfiles(+profile.info.id);
-      if (
-        socket.listeners("notify").length === 0 &&
-        +profile.info.id !== auth.userInfo.id
-      ) {
-        socket.emit("notify", { id: profile.info.id });
+      if (+profile.info.id !== auth.userInfo.id) {
+        socket.emit("notification", { id: profile.info.id });
       }
     }
   }, [profile.info.id, auth.userInfo.id]);
@@ -549,7 +546,6 @@ export const Profile = ({ match }) => {
   ];
 
   if (profile.photo.loading || profile.info.loading) return null;
-  if (!auth.userInfo.info_verified) return <Redirect to="/edit-profile" />;
   return (
     <div style={{ flex: 1 }}>
       <CssBaseline />

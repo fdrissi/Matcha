@@ -7,46 +7,54 @@ const chatModel = require("../../models/Chat");
 // @route   Get api/chat/
 // @desc    Get all user matches
 // @access  Private
-router.get("/", [middleware.auth], async (req, res) => {
-  try {
-    const id = +req.user.id;
-    const result = await chatModel.getUserAllMatches(id);
-    return res.json({
-      success: true,
-      conversations: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.get(
+  "/",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    try {
+      const id = +req.user.id;
+      const result = await chatModel.getUserAllMatches(id);
+      return res.json({
+        success: true,
+        conversations: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Get api/chat/conversation/:pid
 // @desc    Get user specific chat
 // @access  Private
-router.get("/conversation/:pid", [middleware.auth], async (req, res) => {
-  try {
-    const uid = +req.user.id;
-    const pid = req.params.pid;
-    const result = await chatModel.getUserConversations(uid, pid);
-    return res.json({
-      success: true,
-      conversations: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.get(
+  "/conversation/:pid",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    try {
+      const uid = +req.user.id;
+      const pid = req.params.pid;
+      const result = await chatModel.getUserConversations(uid, pid);
+      return res.json({
+        success: true,
+        conversations: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Post api/chat/sendMessage
 // @desc    Send message
 // @access  Private
 router.post(
   "/sendMessage",
-  [middleware.auth, middleware.chat],
+  [middleware.auth, middleware.chat, middleware.infoVerified],
   async (req, res) => {
     try {
       const { sender, receiver, message } = req.body;
@@ -69,20 +77,24 @@ router.post(
 // @route   Put api/chat/setSeen
 // @desc    Update seen message status
 // @access  Private
-router.put("/setSeen", [middleware.auth], async (req, res) => {
-  try {
-    const uid = req.user.id;
-    const { pid } = req.body;
-    const result = await chatModel.setMessageSeen(uid, pid);
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.put(
+  "/setSeen",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    try {
+      const uid = req.user.id;
+      const { pid } = req.body;
+      const result = await chatModel.setMessageSeen(uid, pid);
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Delete api/chat/:uid/conversation/:pid
 // @desc    Delete conversation

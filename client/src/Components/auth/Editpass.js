@@ -86,7 +86,6 @@ const Editpass = params => {
   const stableDispatch = useCallback(dispatch, []);
 
   const { is_loading, token_valide, token_valide_message } = token;
-  console.log(operations);
   const submitForm = async form => {
     form.preventDefault();
     let token = params.params.token;

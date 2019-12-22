@@ -183,6 +183,7 @@ export const checktoken = async (token, dispatch) => {
     { params: { token: token } },
     config
   );
+  console.log("res", res);
   if (!res.data.success) {
     dispatch({
       type: SET_ALERT,
@@ -279,7 +280,6 @@ export const loadUser = async dispatch => {
       });
     }
   } catch (error) {
-    console.log(error);
     dispatch({
       type: AUTH_ERROR
     });

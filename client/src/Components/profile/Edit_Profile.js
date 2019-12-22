@@ -154,7 +154,7 @@ function EditProfile() {
     third_Image: "",
     fourth_Image: ""
   });
-  console.log(profile);
+
   const [mydata, setData] = useState({
     user_gender: "",
     user_relationship: "",
@@ -753,7 +753,7 @@ function EditProfile() {
                 <label htmlFor="profileImage-button-file">
                   <IconButton component="span">
                     <Avatar
-                      src={`./uploads/${profile.photo.profile_Image}`}
+                      src={`/uploads/${profile.photo.profile_Image}`}
                       style={{
                         margin: "10px",
                         width: "200px",
@@ -810,7 +810,7 @@ function EditProfile() {
                     >
                       <Avatar
                         variant="square"
-                        src={`./uploads/${profile.photo.first_Image}`}
+                        src={`/uploads/${profile.photo.first_Image}`}
                         style={{
                           borderRadius: 0,
                           width: "100%",
@@ -887,7 +887,7 @@ function EditProfile() {
                     >
                       <Avatar
                         variant="square"
-                        src={`./uploads/${profile.photo.second_Image}`}
+                        src={`/uploads/${profile.photo.second_Image}`}
                         style={{
                           borderRadius: 0,
                           width: "100%",
@@ -968,7 +968,7 @@ function EditProfile() {
                   >
                     <Avatar
                       variant="square"
-                      src={`./uploads/${profile.photo.third_Image}`}
+                      src={`/uploads/${profile.photo.third_Image}`}
                       style={{
                         borderRadius: 0,
                         width: "100%",
@@ -1043,7 +1043,7 @@ function EditProfile() {
                     <Avatar
                       variant="square"
                       key="1"
-                      src={`./uploads/${profile.photo.fourth_Image}`}
+                      src={`/uploads/${profile.photo.fourth_Image}`}
                       style={{
                         borderRadius: 0,
                         width: "100%",

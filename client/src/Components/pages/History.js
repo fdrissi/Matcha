@@ -162,8 +162,10 @@ export const History = () => {
   useEffect(() => {
     (async () => {
       const result = await axios.get("/api/profile/getUserHistory");
-      setHistory(result.data.history);
-      setLoad(true);
+      if (result.data.success) {
+        setHistory(result.data.history);
+        setLoad(true);
+      }
     })();
   }, []);
   if (!load) return null;

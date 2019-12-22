@@ -87,6 +87,7 @@ export const errorsInitState = {
 
 export const operationsReducer = (state = errorsInitState, action) => {
   const { type, payload } = action;
+  console.log("type operation", type);
   switch (type) {
     case SUCCESS_REGISTRATION:
     case SUCCESS_UPDATE_USER:

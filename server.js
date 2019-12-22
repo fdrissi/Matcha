@@ -57,35 +57,45 @@ io.use(function(socket, next) {
 }).on("connection", socket => {
   socket.on("login", async user => {
     socket.userId = user;
-    users[user] = socket.id;
+    if (users[user]) users[user].push(socket.id);
+    else users[user] = [socket.id];
     try {
       const sql = "UPDATE `user_info` SET online = ? WHERE id = ?";
       const [result] = await pool.query(sql, [true, user]);
       if (!!result.affectedRows) socket.emit("login", users);
     } catch (error) {}
-    console.log("logged In users", users);
     socket.emit("login", users);
   });
 
   socket.on("notification", data => {
-    socket.to(users[data.id]).emit("notification", { users });
+    if (users[data.id]) {
+      users[data.id].map(rec => io.sockets.to(rec).emit("notification", data));
+    }
   });
 
   socket.on("clearNotifications", data => {
-    socket.to(users[data.id]).emit("notification", { users });
+    if (users[data.id]) {
+      users[data.id].map(rec =>
+        io.sockets.to(rec).emit("clearNotifications", data)
+      );
+    }
   });
 
   socket.on("newMessage", data => {
-    console.log("new message received", data);
     if (users[data.receiver]) {
-      console.log("emit to newMessage notifMessage", users[data.receiver]);
-      io.sockets.to(users[data.receiver]).emit("newMessage", data);
-      io.sockets.to(users[data.receiver]).emit("notifMessage", data);
+      users[data.receiver].map(rec =>
+        io.sockets.to(rec).emit("newMessage", data)
+      );
+      users[data.receiver].map(rec =>
+        io.sockets.to(rec).emit("notifMessage", data)
+      );
     }
   });
 
   socket.on("seenUpdated", data => {
-    io.sockets.to(users[data]).emit("notifMessage", data);
+    if (users[data.id]) {
+      io.sockets.to(users[data.id]).emit("notifMessage", data);
+    }
   });
 
   socket.on("disconnect", async () => {
