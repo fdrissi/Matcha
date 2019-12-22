@@ -354,6 +354,7 @@ router.post(
   "/updateUserInfo",
   [middleware.auth, middleware.edit_profile],
   async (req, res) => {
+    console.log("1");
     try {
       const { data } = req.body;
       const id = req.user.id;
@@ -380,8 +381,9 @@ router.post(
         },
         user_set_from_map: result.set_from_map
       };
-
+      console.log("check", check);
       if (check) {
+        console.log("done");
         // that mean that there is a change
         // her we gonna verified if the user set all the info on his profile
         let isEmpty = false;
@@ -450,6 +452,7 @@ router.post("/setUserLocation", [middleware.auth], async (req, res) => {
       }
     } else {
       if (!result) {
+        console.log("true");
         if (await profileModel.updateGeoLocation(latitude, longitude, id)) {
           return res.status(200).send("USER ACCEPTE");
         }

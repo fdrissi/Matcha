@@ -154,6 +154,7 @@ function EditProfile() {
     third_Image: "",
     fourth_Image: ""
   });
+  console.log(profile);
   const [mydata, setData] = useState({
     user_gender: "",
     user_relationship: "",
@@ -300,7 +301,12 @@ function EditProfile() {
           <AccountCircle />
         </Avatar>
         <Typography variant="h5">Edit Profile</Typography>
-        <Box textAlign="center">Edit Your Personnal info</Box>
+        <Box textAlign="center">Edit Your Personnal info:</Box>
+        <Box variant="h5">
+          <sup>*</sup>You need to set all your info and at least profile image
+          so u can start using our website Thank You
+        </Box>
+
         <Divider className={classes.divider} />
 
         <AppBar position="static" color="default">

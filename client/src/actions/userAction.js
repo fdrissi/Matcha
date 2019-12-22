@@ -107,7 +107,7 @@ export const passwordEdit = async (
       type: SET_ALERT,
       payload: {
         alertType: "danger",
-        msg: "password error"
+        msg: res.data.errorMsg
       }
     });
     dispatch({
