@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useUserStore } from "../../Context/appStore";
 import { useSocketStore } from "../../Context/appStore";
-import { loadUser } from "../../actions/userAction";
 import { Route, Link } from "react-router-dom";
 import {
   IconButton,
@@ -176,9 +175,6 @@ const NavCircle = () => {
   const handleLogout = async () => {
     handleClose();
     const result = await axios.get("/api/users/logout");
-    if (result.data.success) {
-      loadUser(dispatch);
-    }
   };
 
   if (auth.loading) return null;

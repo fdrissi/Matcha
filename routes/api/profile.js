@@ -512,31 +512,35 @@ router.post(
 // @route   Post api/profle/isUserLikeProfile
 // @desc    is user already liked specific profile
 // @access  Private
-router.post("/isUserLikedProfile", middleware.auth, async (req, res) => {
-  const { profile } = req.body;
-  const id = req.user.id;
-  if (id === parseInt(profile.id))
-    return res.json({
-      success: false
-    });
-  try {
-    //return true if user already liked profile
-    const result = await profileModel.isUserLikedProfile(+id, +profile.id);
+router.post(
+  "/isUserLikedProfile",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const { profile } = req.body;
+    const id = req.user.id;
+    if (id === parseInt(profile.id))
+      return res.json({
+        success: false
+      });
+    try {
+      //return true if user already liked profile
+      const result = await profileModel.isUserLikedProfile(+id, +profile.id);
 
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Post api/profle/areMatched
 // @desc    are users matched
 // @access  Private
-router.post("/areMatched", middleware.auth, async (req, res) => {
+router.post("/areMatched", [middleware.auth], async (req, res) => {
   const { profile } = req.body;
   const id = req.user.id;
   if (id === parseInt(profile.id))
@@ -559,33 +563,37 @@ router.post("/areMatched", middleware.auth, async (req, res) => {
 // @route   Post api/profile/userBlockProfile
 // @desc    Block or unblock profile
 // @access  Private
-router.post("/userBlockProfile", middleware.auth, async (req, res) => {
-  const { profile } = req.body;
-  const id = req.user.id;
-  if (id === parseInt(profile.id))
-    return res.json({
-      success: false
-    });
-  try {
-    //If user already blocked profile, ublock, else block it
-    let result = await profileModel.isUserBlockedProfile(id, profile.id);
-    result = result
-      ? await profileModel.unblockProfile(id, profile.id)
-      : await profileModel.blockProfile(id, profile.id);
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.post(
+  "/userBlockProfile",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const { profile } = req.body;
+    const id = req.user.id;
+    if (id === parseInt(profile.id))
+      return res.json({
+        success: false
+      });
+    try {
+      //If user already blocked profile, ublock, else block it
+      let result = await profileModel.isUserBlockedProfile(id, profile.id);
+      result = result
+        ? await profileModel.unblockProfile(id, profile.id)
+        : await profileModel.blockProfile(id, profile.id);
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Post api/profle/isUserBlockedProfile
 // @desc    is user already Blocked a specific profile
 // @access  Private
-router.post("/isUserBlockedProfile", middleware.auth, async (req, res) => {
+router.post("/isUserBlockedProfile", [middleware.auth], async (req, res) => {
   const { profile } = req.body;
   const id = req.user.id;
   if (id === parseInt(profile.id))
@@ -609,141 +617,169 @@ router.post("/isUserBlockedProfile", middleware.auth, async (req, res) => {
 // @route   Post api/profle/isUserBlockedProfile
 // @desc    Report a specific profile
 // @access  Private
-router.post("/reportProfile", middleware.auth, async (req, res) => {
-  const { profile } = req.body;
-  const id = req.user.id;
-  if (id === parseInt(profile.id))
-    return res.json({
-      success: false
-    });
-  try {
-    //if profile not already reported, report it
-    let result = await profileModel.reportProfile(id, profile.id);
+router.post(
+  "/reportProfile",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const { profile } = req.body;
+    const id = req.user.id;
+    if (id === parseInt(profile.id))
+      return res.json({
+        success: false
+      });
+    try {
+      //if profile not already reported, report it
+      let result = await profileModel.reportProfile(id, profile.id);
 
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Post api/profle/recordVisitedProfiles
 // @desc    Save each profile user visited
 // @access  Private
-router.post("/recordVisitedProfiles", middleware.auth, async (req, res) => {
-  const { profile } = req.body;
-  const id = req.user.id;
-  if (id === parseInt(profile.id))
-    return res.json({
-      success: false
-    });
-  try {
-    const result = await profileModel.recordVisitedProfiles(id, profile.id);
-    await profileModel.getHistory(id);
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.post(
+  "/recordVisitedProfiles",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const { profile } = req.body;
+    const id = req.user.id;
+    if (id === parseInt(profile.id))
+      return res.json({
+        success: false
+      });
+    try {
+      const result = await profileModel.recordVisitedProfiles(id, profile.id);
+      await profileModel.getHistory(id);
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Get api/profile/getUserHistory
 // @desc    Get History
 // @access  Private
-router.get("/getUserHistory", middleware.auth, async (req, res) => {
-  const id = req.user.id;
-  try {
-    const result = await profileModel.getHistory(id);
-    return res.json({
-      success: true,
-      history: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.get(
+  "/getUserHistory",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const id = req.user.id;
+    try {
+      const result = await profileModel.getHistory(id);
+      return res.json({
+        success: true,
+        history: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Get api/profile/clearUserHistory
 // @desc    Clear History
 // @access  Private
-router.get("/clearUserHistory", middleware.auth, async (req, res) => {
-  const id = req.user.id;
-  try {
-    const result = await profileModel.clearHistory(id);
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.get(
+  "/clearUserHistory",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const id = req.user.id;
+    try {
+      const result = await profileModel.clearHistory(id);
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Get api/profile/getUserNotifications
 // @desc    get User Notifications
 // @access  Private
-router.get("/getUserNotifications", middleware.auth, async (req, res) => {
-  const id = req.user.id;
-  try {
-    const result = await profileModel.getUserNotifications(id);
-    return res.json({
-      success: true,
-      notifications: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.get(
+  "/getUserNotifications",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const id = req.user.id;
+    try {
+      const result = await profileModel.getUserNotifications(id);
+      return res.json({
+        success: true,
+        notifications: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Get api/profile/clearUserNotifications
 // @desc    Clear user notifications
 // @access  Private
-router.get("/clearUserNotifications", middleware.auth, async (req, res) => {
-  const id = req.user.id;
-  try {
-    const result = await profileModel.clearUserNotifications(id);
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.get(
+  "/clearUserNotifications",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const id = req.user.id;
+    try {
+      const result = await profileModel.clearUserNotifications(id);
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Get api/profile/updateNotifications
 // @desc    Update notifications, seen or not
 // @access  Private
-router.get("/updateNotifications", middleware.auth, async (req, res) => {
-  const id = req.user.id;
-  try {
-    const result = await profileModel.updateNotifications(id);
-    return res.json({
-      success: result
-    });
-  } catch (error) {
-    return res.json({
-      success: false
-    });
+router.get(
+  "/updateNotifications",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    const id = req.user.id;
+    try {
+      const result = await profileModel.updateNotifications(id);
+      return res.json({
+        success: result
+      });
+    } catch (error) {
+      return res.json({
+        success: false
+      });
+    }
   }
-});
+);
 
 // @route   Get api/profile/unseenNotificationsCount
 // @desc    Get number of unseen notifications
 // @access  Private
-router.get("/unseenNotificationsCount", middleware.auth, async (req, res) => {
+router.get("/unseenNotificationsCount", [middleware.auth], async (req, res) => {
   const id = req.user.id;
   try {
     const result = await profileModel.getUnseenNotificationsCount(id);

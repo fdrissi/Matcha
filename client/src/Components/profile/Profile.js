@@ -340,7 +340,7 @@ const ProfileHeader = () => {
                         )
                       }
                     />
-                    <ButtonRed icon={<QuestionAnswerIcon />} />
+                    {/*<ButtonRed icon={<QuestionAnswerIcon />} />*/}
                     <LongMenu />
                   </>
                 )}
@@ -546,7 +546,6 @@ export const Profile = ({ match }) => {
   ];
 
   if (profile.photo.loading || profile.info.loading) return null;
-  if (!auth.userInfo.info_verified) return <Redirect to="/edit-profile" />;
   return (
     <div style={{ flex: 1 }}>
       <CssBaseline />

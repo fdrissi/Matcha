@@ -179,8 +179,10 @@ export const Notifications = () => {
   useEffect(() => {
     (async () => {
       const result = await axios.get("/api/profile/getUserNotifications");
-      setNotifications(result.data.notifications);
-      setLoad(false);
+      if (result.data.success) {
+        setNotifications(result.data.notifications);
+        setLoad(false);
+      }
     })();
     (async () => {
       await axios.get("/api/profile/updateNotifications");

@@ -8,7 +8,8 @@ import {
   SORT_BY_BACK,
   SET_NEW_ISLIK,
   CLEAR_PROFILE_INIT,
-  PROFILE_IS_VERIFIED
+  PROFILE_IS_VERIFIED,
+  PROFILE_IS_VERIFIED_LOADING
 } from "../actions/actionTypes";
 
 export const profileInitState = {
@@ -81,10 +82,22 @@ export const profileReducer = (state, action) => {
           loading: false
         }
       };
+    case PROFILE_IS_VERIFIED_LOADING:
+      return {
+        ...state,
+        Verification: {
+          ...state.Verification,
+          loading: true
+        }
+      };
     case BROWSER_RETURN:
       return {
         ...state,
-        browser: { ...state.browser, result: payload, loading: false }
+        browser: {
+          ...state.browser,
+          result: payload,
+          loading: !payload ? true : false
+        }
       };
     case SORT_BY_BACK:
       return { ...state, browser: { ...state.browser, sort_by: payload } };

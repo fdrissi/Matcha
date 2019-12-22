@@ -13,7 +13,7 @@ import Container from "@material-ui/core/Container";
 import { useUserStore } from "../../Context/appStore";
 import Alert from "../inc/Alert";
 import { recover } from "../../actions/userAction";
-import { REMOVE_ALERT } from "../../actions/actionTypes";
+import { REMOVE_ALERT, SET_ALERT } from "../../actions/actionTypes";
 
 const useStyles = makeStyles(theme => ({
   "@global": {
@@ -62,7 +62,15 @@ function Recover() {
 
   const submitForm = async form => {
     form.preventDefault();
-    recover(MyForm.data, dispatch);
+    if (!MyForm.data)
+      stableDispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "danger",
+          msg: "Email is Required"
+        }
+      });
+    else recover(MyForm.data, dispatch);
   };
   const handleInputChange = event => {
     event.persist();

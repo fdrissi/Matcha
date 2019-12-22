@@ -19,7 +19,8 @@ import Alert from "../inc/Alert";
 import {
   REMOVE_ERRORS,
   REMOVE_ALERT,
-  REMOVE_SPECIFIC_ERROR
+  REMOVE_SPECIFIC_ERROR,
+  SET_ALERT
 } from "../../actions/actionTypes";
 
 const useStyles = makeStyles(theme => ({
@@ -99,7 +100,15 @@ const Form = () => {
 
   const handleSubmit = form => {
     form.preventDefault();
-    if (oldPassword) {
+    if (newPassword !== confirmPassword)
+      stableDispatch({
+        type: SET_ALERT,
+        payload: {
+          alertType: "danger",
+          msg: "Passwords not matche"
+        }
+      });
+    else if (oldPassword) {
       updateUser(formData, dispatch);
     }
   };
