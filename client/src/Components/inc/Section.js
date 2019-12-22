@@ -85,7 +85,7 @@ const Section = () => {
   const [totalMembers, setTotalMembers] = useState();
   useEffect(() => {
     async function setTotal() {
-      const res = await axios.get("api/users/getTotal");
+      const res = await axios.get("/api/users/getTotal");
       setTotalMembers(res.data.total);
     }
     setTotal();

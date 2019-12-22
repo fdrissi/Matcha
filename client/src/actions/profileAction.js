@@ -259,7 +259,7 @@ export const setUserLocation = async (latitude, longitude, error, dispatch) => {
 };
 
 export const getpreedefined = async () => {
-  const res = await axios.get("api/profile/getpreedefined");
+  const res = await axios.get("/api/profile/getpreedefined");
   if (res.data.success) {
     return res.data.predefined;
   }
