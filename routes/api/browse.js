@@ -21,73 +21,78 @@ var geocoder = NodeGeocoder(options);
 // @desc    get Browser data
 // @access  Private
 
-router.get("/getBrowse/", [middleware.auth], async (req, res) => {
-  try {
-    const id = req.user.id;
-    const interesting = await browseModel.getUserInfoByRow(
-      id,
-      "user_gender_interest"
-    );
-    const lat = await browseModel.getUserInfoByRow(id, "user_lat");
-    const long = await browseModel.getUserInfoByRow(id, "user_lng");
-    const gender = await browseModel.getUserInfoByRow(id, "user_gender");
-    const newData = await browseModel.getAllUserForBrowser(
-      id,
-      interesting,
-      gender
-    );
-    const user_tags = await browseModel.getUserInfoByRow(id, "user_tags");
-    const sort_by = "Location";
-    function distance(lat1, lon1, lat2, lon2) {
-      var p = 0.017453292519943295; // Math.PI / 180
-      var c = Math.cos;
-      var a =
-        0.5 -
-        c((lat2 - lat1) * p) / 2 +
-        (c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p))) / 2;
-      return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
-    }
-    newData.map(value => {
-      const destination = parseFloat(
-        distance(lat, long, value.user_lat, value.user_lng).toFixed(2)
-      );
-      value.destination = destination;
-      value.common_tags = _.intersection(
-        JSON.parse(user_tags),
-        JSON.parse(value.user_tags)
-      ).length;
-    });
-    for (let element of newData) {
-      element.isLiked = await profileModel.isUserLikedProfile(id, element.id);
-      element.is_Blocked = await profileModel.isOnOFUserBlockedBy(
+router.get(
+  "/getBrowse/",
+  [middleware.auth, middleware.infoVerified],
+  async (req, res) => {
+    try {
+      const id = req.user.id;
+      const interesting = await browseModel.getUserInfoByRow(
         id,
-        element.id
+        "user_gender_interest"
       );
-    }
-    const data = newData.filter(el => {
-      return !(
-        el.is_Blocked === true ||
-        el.destination > 30 ||
-        el.fame_rate < 20 ||
-        el.common_tags < 1
+      const lat = await browseModel.getUserInfoByRow(id, "user_lat");
+      const long = await browseModel.getUserInfoByRow(id, "user_lng");
+      const gender = await browseModel.getUserInfoByRow(id, "user_gender");
+      const newData = await browseModel.getAllUserForBrowser(
+        id,
+        interesting,
+        gender
       );
-    });
+      const user_tags = await browseModel.getUserInfoByRow(id, "user_tags");
+      const sort_by = "Location";
+      function distance(lat1, lon1, lat2, lon2) {
+        var p = 0.017453292519943295; // Math.PI / 180
+        var c = Math.cos;
+        var a =
+          0.5 -
+          c((lat2 - lat1) * p) / 2 +
+          (c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p))) / 2;
+        return 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+      }
+      newData.map(value => {
+        const destination = parseFloat(
+          distance(lat, long, value.user_lat, value.user_lng).toFixed(2)
+        );
+        value.destination = destination;
+        value.common_tags = _.intersection(
+          JSON.parse(user_tags),
+          JSON.parse(value.user_tags)
+        ).length;
+      });
+      for (let element of newData) {
+        element.isLiked = await profileModel.isUserLikedProfile(id, element.id);
+        element.is_Blocked = await profileModel.isOnOFUserBlockedBy(
+          id,
+          element.id
+        );
+      }
+      const data = newData.filter(el => {
+        return !(
+          el.is_Blocked === true ||
+          el.destination > 30 ||
+          el.fame_rate < 20 ||
+          el.common_tags < 1
+        );
+      });
 
-    data.sort((a, b) =>
-      // a.destination > b.destination ? 1 : b.destination > a.destination ? -1 : 0
-      a.destination > b.destination
-        ? 1
-        : b.destination > a.destination
-        ? -1
-        : a.common_tags > b.common_tags
-        ? -1
-        : 1
-    );
-    return res.json({ data, sort_by });
-  } catch (error) {
-    return false;
+      data.sort((a, b) =>
+        // a.destination > b.destination ? 1 : b.destination > a.destination ? -1 : 0
+        a.destination > b.destination
+          ? 1
+          : b.destination > a.destination
+          ? -1
+          : a.common_tags > b.common_tags
+          ? -1
+          : 1
+      );
+      return res.json({ data, sort_by });
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
   }
-});
+);
 
 //  Workibng on the browser
 // @route   Post api/profle/getFilter
@@ -96,7 +101,7 @@ router.get("/getBrowse/", [middleware.auth], async (req, res) => {
 
 router.get(
   "/getFilter",
-  [middleware.auth, middleware.browse_filter],
+  [middleware.auth, middleware.browse_filter, middleware.infoVerified],
   async (req, res) => {
     try {
       const id = req.user.id;
@@ -187,7 +192,7 @@ router.get(
 // @access  Private
 router.get(
   "/getSearch",
-  [middleware.auth, middleware.search_filter],
+  [middleware.auth, middleware.search_filter, middleware.infoVerified],
   async (req, res) => {
     try {
       const id = req.user.id;

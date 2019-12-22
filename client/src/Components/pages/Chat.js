@@ -10,17 +10,21 @@ import {
   Button,
   List,
   ListItem,
-  Divider,
   ListItemText,
   ListItemAvatar,
   Avatar,
   Typography
 } from "@material-ui/core";
-import axios from "axios";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { useSocketStore } from "../../Context/appStore";
+import {
+  getMatched,
+  getUserChat,
+  sendMessage,
+  updateSeen
+} from "../../actions/chatAction";
 
 const useStyles = makeStyles(() => ({
   item: {
@@ -41,9 +45,11 @@ const useStyles = makeStyles(() => ({
 
 const UserInfo = ({ info }) => {
   const [{ auth }] = useUserStore();
+
   const classes = useStyles();
   const profileId =
     auth.userInfo.id === info.id_user ? info.id_profile : info.id_user;
+
   if (auth.loading) return null;
   return (
     <div className={classes.border}>
@@ -57,39 +63,23 @@ const UserInfo = ({ info }) => {
   );
 };
 
-const LoadChat = ({ chat }) => {
-  const [{ auth }] = useUserStore();
+const LoadChat = ({ chat, pid }) => {
+  const [{ auth }, dispatch] = useUserStore();
   const messagesEndRef = React.createRef();
-  const socket = useSocketStore();
 
   useEffect(() => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-
-    if (auth.userInfo.id && chat.length > 0) {
-      const msg = chat[0];
-      const uid = +auth.userInfo.id;
-      const pid =
-        +msg.sender !== +auth.userInfo.id ? +msg.sender : +msg.receiver;
-
-      (async () => {
-        const config = {
-          header: {
-            "Content-Type": "application/json"
-          }
-        };
-        await axios.put("/api/chat/setSeen", { uid, pid }, config);
-      })();
+    if (chat.unseenConversation) {
+      updateSeen(auth.userInfo.id, pid, dispatch);
     }
-  }, [messagesEndRef, auth.userInfo.id, chat]);
-
-  socket.emit("seenUpdated", auth.userInfo.id);
+  }, [chat]);
 
   return (
     <div>
       <div style={{ height: "70vh", overflowY: "scroll" }}>
-        {chat.length === 0
+        {chat.conversation.length === 0
           ? "Conversation Empty"
-          : chat.map(msg => (
+          : chat.conversation.map(msg => (
               <li
                 key={msg.id}
                 style={{
@@ -117,94 +107,29 @@ const LoadChat = ({ chat }) => {
 };
 
 const SubmitBox = ({ selected }) => {
-  const [{ auth }] = useUserStore();
+  const [{ auth, chat }, dispatch] = useUserStore();
   const socket = useSocketStore();
   const [message, setMessage] = useState("");
-  const [chat, setChat] = useState([]);
-  const [loading, setLoading] = useState(true);
   const profileId =
     auth.userInfo.id === selected.id_user
       ? selected.id_profile
       : selected.id_user;
 
-  useEffect(() => {
-    if (auth.isAuthenticated) {
-      (async () => {
-        const result = await axios.get(
-          `api/chat/${auth.userInfo.id}/conversation/${profileId}`
-        );
-        if (result.data.success) {
-          setChat(result.data.conversations);
-        }
-        setLoading(false);
-      })();
-    }
-  }, [auth.isAuthenticated, profileId, auth.userInfo.id]);
   const handleChange = e => setMessage(e.target.value);
-
-  if (socket.listeners("newMessage").length < 1) {
-    socket.on("newMessage", data => {
-      console.log("client received socket");
-      if (auth.isAuthenticated) {
-        (async () => {
-          const result = await axios.get(
-            `api/chat/${auth.userInfo.id}/conversation/${profileId}`
-          );
-          console.log(
-            "new conversation",
-            auth.userInfo.id,
-            profileId,
-            result.data.conversations
-          );
-          if (result.data.success) {
-            setChat(result.data.conversations);
-          }
-        })();
-      }
-    });
-  }
 
   const handleSubmit = form => {
     form.preventDefault();
-    (async () => {
-      let config = {
-        header: {
-          "Content-Type": "application/json"
-        }
-      };
-      const result = await axios.post(
-        `api/chat/sendMessage`,
-        {
-          sender: auth.userInfo.id,
-          receiver: profileId,
-          message
-        },
-        config
-      );
-      if (result.data.success) {
-        let oldChat = chat;
-        oldChat.push({
-          id: Date.now(),
-          sender: auth.userInfo.id,
-          receiver: profileId,
-          message
-        });
-        setChat(oldChat);
-        setMessage("");
-        socket.emit("newMessage", {
-          id: Date.now(),
-          sender: auth.userInfo.id,
-          receiver: profileId,
-          message
-        });
-      }
-    })();
+    if (message) {
+      sendMessage(auth.userInfo.id, profileId, message, dispatch, socket);
+      setMessage("");
+    }
   };
-  if (loading) return null;
+
+  if (!selected) return null;
   return (
     <>
       <UserInfo info={selected} />
-      <LoadChat chat={chat} />
+      <LoadChat chat={chat} pid={profileId} />
       <form onSubmit={form => handleSubmit(form)}>
         <Box display="flex" flexWrap="wrap" alignItems="center">
           <Box flexGrow={1}>
@@ -234,6 +159,24 @@ const SubmitBox = ({ selected }) => {
 };
 
 const Conversation = ({ selected }) => {
+  const [{ auth }, dispatch] = useUserStore();
+  const socket = useSocketStore();
+  const profileId =
+    auth.userInfo.id === selected.id_user
+      ? selected.id_profile
+      : selected.id_user;
+  localStorage.setItem("pid", profileId);
+  useEffect(() => {
+    getUserChat(profileId, dispatch);
+  }, [profileId]);
+
+  if (socket.listeners("newMessage").length < 1) {
+    socket.on("newMessage", data => {
+      if (+data.sender === +localStorage.getItem("pid"))
+        getUserChat(localStorage.getItem("pid"), dispatch);
+    });
+  }
+
   return (
     <Grid container>
       <Grid item xs={12}>
@@ -245,19 +188,8 @@ const Conversation = ({ selected }) => {
 
 export const UserChat = ({ info, select }) => {
   const classes = useStyles();
-  const [{ auth }] = useUserStore();
+  //const [{ auth }] = useUserStore();
   const [incommingMessage, setIncommingMessage] = useState(0);
-
-  useEffect(() => {
-    (async () => {
-      const profileId =
-        auth.userInfo.id === info.id_user ? info.id_profile : info.id_user;
-      const result = await axios.get(
-        `/api/chat/${auth.userInfo.id}/unseen/${profileId}`
-      );
-      setIncommingMessage(result.data.count);
-    })();
-  });
 
   return (
     <List className={classes.root}>
@@ -307,28 +239,14 @@ const ListChats = ({ matched, select }) => {
 };
 
 const ChatHolder = () => {
-  const [{ auth }] = useUserStore();
-
-  const [matched, setMatched] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [{ matches }, dispatch] = useUserStore();
   const [selected, setSelected] = useState(0);
 
   useEffect(() => {
-    if (auth.isAuthenticated) {
-      (async () => {
-        const result = await axios.get(`api/chat/${auth.userInfo.id}`);
-        if (result.data.success) {
-          setMatched(result.data.conversations);
+    getMatched(dispatch);
+  }, []);
 
-          setSelected(result.data.conversations[0]);
-        }
-        setLoading(false);
-      })();
-    }
-  }, [auth.isAuthenticated, auth.userInfo.id]);
-
-  if (loading) return null;
-  if (matched.length === 0)
+  if (matches.matched.length === 0 || matches.loading)
     return (
       <Card style={{ backgroundColor: "transparent" }}>
         <CardContent>
@@ -368,7 +286,7 @@ const ChatHolder = () => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={4}>
-        <ListChats matched={matched} select={setSelected} />
+        <ListChats matched={matches.matched} select={setSelected} />
       </Grid>
       <Grid item xs={8}>
         <Conversation selected={selected} />

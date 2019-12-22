@@ -7,7 +7,8 @@ export const alertInitState = {
 
 export const alertReducer = (state = alertInitState, action) => {
   const { type, payload } = action;
-
+  console.log("type", type);
+  console.log("payload", payload);
   switch (type) {
     case SET_ALERT:
       return { ...state, alertType: payload.alertType, msg: payload.msg };
