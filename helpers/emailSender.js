@@ -17,13 +17,7 @@ const sendActivation = async (email, userName, token) => {
     text: `Please Click On This link <a href="http://${url}/activate/${userName}/${token}">Link</a> to activate  your account.`
   };
 
-  await transporter.sendMail(mailOptions, function(error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Email sent: " + info.response);
-    }
-  });
+  await transporter.sendMail(mailOptions, function(error, info) {});
 };
 
 const sendRecovery = async (info, token) => {

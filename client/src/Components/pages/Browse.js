@@ -196,7 +196,6 @@ const Profile = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  console.log("map", profile.browser.result, profile.browser.loading);
   return (
     <>
       {profile.browser.result.map(inf => {

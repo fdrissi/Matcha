@@ -59,7 +59,6 @@ export const sendMessage = async (
   dispatch,
   socket
 ) => {
-  //console.log("sendMessage");
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -84,7 +83,6 @@ export const sendMessage = async (
 };
 
 export const updateSeen = async (uid, pid, dispatch, socket) => {
-  //console.log("updateSeen", pid);
   const config = {
     header: {
       "Content-Type": "application/json"
@@ -119,7 +117,6 @@ export const unseenCountGlobal = async (uid, dispatch, socket) => {
 };
 
 export const unseenCountConversation = async (pid, dispatch) => {
-  //console.log("unseenCountConversation");
   try {
     const res = await axios.get(`/api/chat/unseen/${pid}`);
     if (res.data.success) {

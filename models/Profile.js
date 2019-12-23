@@ -251,7 +251,7 @@ async function updateUserInfo(data, id) {
         set_from_map,
         id
       ]);
-    } else {
+    } else if (set_from_map && user_location.lat && user_location.lng) {
       let sql =
         "update user_info SET user_gender = ?  ,user_gender_interest = ? ,user_relationship = ? , user_tags = ? , user_birth = ?, user_city = ?, user_lat = ?, user_lng = ? , user_current_occupancy = ?, user_biography = ? , set_from_map = ?   WHERE id = ?";
       [result] = await pool.query(sql, [
@@ -266,6 +266,20 @@ async function updateUserInfo(data, id) {
         user_current_occupancy,
         user_biography,
         set_from_map,
+        id
+      ]);
+    } else {
+      let sql =
+        "update user_info SET user_gender = ?  ,user_gender_interest = ? ,user_relationship = ? , user_tags = ? , user_birth = ?, user_city = ? , user_current_occupancy = ?, user_biography = ? WHERE id = ?";
+      [result] = await pool.query(sql, [
+        user_gender,
+        user_gender_interest,
+        user_relationship,
+        tags,
+        user_bith,
+        user_city,
+        user_current_occupancy,
+        user_biography,
         id
       ]);
     }
