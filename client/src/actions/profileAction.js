@@ -244,7 +244,6 @@ export const setUserLocation = async (latitude, longitude, error, dispatch) => {
       "Content-Type": "application/json"
     }
   };
-
   await axios.post(
     "/api/profile/setUserLocation",
     { data: { latitude, longitude, error } },
