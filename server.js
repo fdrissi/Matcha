@@ -42,7 +42,7 @@ app.get("*", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => console.log("Backend server Started.."));
+const server = app.listen(PORT);
 // Init socket io
 const io = require("socket.io").listen(server, {
   pingInterval: 60000,

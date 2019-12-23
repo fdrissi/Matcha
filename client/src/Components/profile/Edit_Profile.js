@@ -174,6 +174,9 @@ function EditProfile() {
   });
 
   const handleChange = event => {
+    stableDispatch({
+      type: REMOVE_ALERT
+    });
     setData({
       ...mydata,
       [event.target.name]: event.target.value
@@ -190,15 +193,24 @@ function EditProfile() {
   };
 
   const handleIndexChange = (event, newValue) => {
+    stableDispatch({
+      type: REMOVE_ALERT
+    });
     setIndex(newValue);
   };
 
   const handleChangeIndex = index => {
+    stableDispatch({
+      type: REMOVE_ALERT
+    });
     setIndex(index);
   };
 
   const onImageChange = event => {
     event.persist();
+    stableDispatch({
+      type: REMOVE_ALERT
+    });
     if (event.target.files && event.target.files[0]) {
       let filee = event.target.files[0];
       setPhoto({
@@ -218,6 +230,9 @@ function EditProfile() {
   };
 
   const handleAddChip = chip => {
+    stableDispatch({
+      type: REMOVE_ALERT
+    });
     if (chip.length > 10) return false;
     setData(previousData => ({
       ...previousData,
@@ -226,6 +241,9 @@ function EditProfile() {
   };
 
   const handleDeleteChip = (chip, index) => {
+    stableDispatch({
+      type: REMOVE_ALERT
+    });
     if (index > -1) {
       const res = mydata.user_tags;
       res.splice(index, 1);
@@ -237,15 +255,12 @@ function EditProfile() {
   };
 
   useEffect(() => {
-    let timer = setTimeout(() => {
+    return () => {
       stableDispatch({
         type: REMOVE_ALERT
       });
-    }, 2000);
-    return () => {
-      clearTimeout(timer);
     };
-  }, [alert.msg, stableDispatch]);
+  }, [stableDispatch]);
 
   useEffect(() => {
     async function getUser() {
@@ -659,7 +674,7 @@ function EditProfile() {
                     name="user_biography"
                     fullWidth
                     onChange={handleChange}
-                    defaultValue={mydata.user_biography}
+                    value={mydata.user_biography}
                     className={classes.textField}
                     margin="normal"
                     variant="outlined"

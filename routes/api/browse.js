@@ -71,7 +71,7 @@ router.get(
         return !(
           el.is_Blocked === true ||
           el.destination > 30 ||
-          el.fame_rate < 20 ||
+          el.fame_rate < 0 ||
           el.common_tags < 1
         );
       });

@@ -280,7 +280,7 @@ export const likeProfile = async (profileId, dispatch) => {
       config
     );
     await isUserLikedProfile(profileId, dispatch);
-    //await areMatched(profileId, dispatch);
+    await areMatched(profileId, dispatch);
     return result;
   } catch (error) {
     return false;
