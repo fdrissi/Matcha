@@ -88,7 +88,6 @@ router.get(
       );
       return res.json({ data, sort_by });
     } catch (error) {
-      console.log(error);
       return false;
     }
   }

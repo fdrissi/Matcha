@@ -56,15 +56,18 @@ io.use(function(socket, next) {
   }
 }).on("connection", socket => {
   socket.on("login", async user => {
-    socket.userId = user;
-    if (users[user]) users[user].push(socket.id);
-    else users[user] = [socket.id];
-    try {
-      const sql = "UPDATE `user_info` SET online = ? WHERE id = ?";
-      const [result] = await pool.query(sql, [true, user]);
-      if (!!result.affectedRows) socket.emit("login", users);
-    } catch (error) {}
-    socket.emit("login", users);
+    if (user) {
+      socket.userId = user;
+      if (users[user] && users[user].indexOf(socket.id) === -1) {
+        users[user].push(socket.id);
+      } else users[user] = [socket.id];
+      try {
+        const sql = "UPDATE `user_info` SET online = ? WHERE id = ?";
+        const [result] = await pool.query(sql, [true, user]);
+        if (!!result.affectedRows) socket.emit("login", users);
+      } catch (error) {}
+      socket.emit("login", users);
+    }
   });
 
   socket.on("notification", data => {
@@ -99,10 +102,16 @@ io.use(function(socket, next) {
   });
 
   socket.on("disconnect", async () => {
-    delete users[socket.userId];
-    try {
-      const sql = "UPDATE `user_info` SET online = ? WHERE id = ?";
-      const [result] = await pool.query(sql, [false, socket.userId]);
-    } catch (error) {}
+    if (users[socket.userId]) {
+      if (users[socket.userId].length > 1) {
+        users[socket.userId].splice(users[socket.userId].indexOf(socket.id), 1);
+      } else {
+        delete users[socket.userId];
+        try {
+          const sql = "UPDATE `user_info` SET online = ? WHERE id = ?";
+          const [result] = await pool.query(sql, [false, socket.userId]);
+        } catch (error) {}
+      }
+    }
   });
 });

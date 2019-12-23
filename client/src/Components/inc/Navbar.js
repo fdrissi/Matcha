@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useUserStore } from "../../Context/appStore";
 import { useSocketStore } from "../../Context/appStore";
 import { Route, Link } from "react-router-dom";
@@ -117,16 +117,18 @@ const NavNotifications = () => {
 const NavMessage = () => {
   const classes = useStyles();
   const [{ auth, chat }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
   const socket = useSocketStore();
 
   if (socket.listeners("newMessage").length < 1)
     socket.on("notifMessage", data => {
-      unseenCountGlobal(auth.userInfo.id, dispatch, socket);
+      unseenCountGlobal(auth.userInfo.id, stableDispatch, socket);
     });
 
   useEffect(() => {
-    unseenCountGlobal(auth.userInfo.id, dispatch, socket);
-  }, []);
+    if (auth.userInfo.id)
+      unseenCountGlobal(auth.userInfo.id, stableDispatch, socket);
+  }, [auth.userInfo.id, stableDispatch, socket]);
 
   return (
     <>
@@ -162,7 +164,7 @@ const NavBtn = ({ text, link }) => (
 const NavCircle = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const [{ auth }, dispatch] = useUserStore();
+  const [{ auth }] = useUserStore();
 
   const handleMenu = event => {
     setAnchorEl(event.currentTarget);
@@ -175,6 +177,7 @@ const NavCircle = () => {
   const handleLogout = async () => {
     handleClose();
     const result = await axios.get("/api/users/logout");
+    if (result.data.success) window.location.reload();
   };
 
   if (auth.loading) return null;

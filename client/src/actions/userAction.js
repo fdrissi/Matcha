@@ -5,7 +5,6 @@ import {
   USER_LOADED,
   AUTH_ERROR,
   SET_ALERT,
-  REMOVE_ALERT,
   FAILIED_REGISTRATION,
   SUCCESS_REGISTRATION,
   SUCCESS_UPDATE_USER,
@@ -15,7 +14,7 @@ import {
   PROFILE_IS_VERIFIED
 } from "./actionTypes";
 
-export const login = async (email, password, remember, dispatch) => {
+export const login = async (email, password, remember, dispatch, socket) => {
   let config = {
     header: {
       "Content-Type": "application/json"
@@ -36,11 +35,6 @@ export const login = async (email, password, remember, dispatch) => {
           msg: res.data.errorMsg
         }
       });
-      setTimeout(() => {
-        dispatch({
-          type: REMOVE_ALERT
-        });
-      }, 5000);
     } else {
       res = await axios.get("/api/users/current");
       const respond = await axios.get("/api/profile/checkIsVerified");
@@ -52,6 +46,8 @@ export const login = async (email, password, remember, dispatch) => {
         type: LOGIN_SUCCESS,
         payload: res.data.user
       });
+      socket.emit("login", res.data.user.id);
+      window.location.reload();
     }
   } catch (error) {
     dispatch({
@@ -183,7 +179,6 @@ export const checktoken = async (token, dispatch) => {
     { params: { token: token } },
     config
   );
-  console.log("res", res);
   if (!res.data.success) {
     dispatch({
       type: SET_ALERT,
@@ -260,7 +255,7 @@ export const register = async (mydata, dispatch) => {
   }
 };
 
-export const loadUser = async dispatch => {
+export const loadUser = async (dispatch, socket) => {
   try {
     const res = await axios.get("/api/users/current");
 
@@ -274,6 +269,7 @@ export const loadUser = async dispatch => {
         type: USER_LOADED,
         payload: res.data.user
       });
+      socket.emit("login", res.data.user.id);
     } else {
       dispatch({
         type: AUTH_ERROR

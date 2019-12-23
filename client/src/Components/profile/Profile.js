@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Redirect } from "react-router-dom";
+import React, { useEffect, useCallback } from "react";
 import { useUserStore } from "../../Context/appStore";
 import {
   getUserInfo,
@@ -27,7 +26,6 @@ import {
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
 import ThumbDownAltIcon from "@material-ui/icons/ThumbDownAlt";
-import QuestionAnswerIcon from "@material-ui/icons/QuestionAnswer";
 import BookmarkIcon from "@material-ui/icons/Bookmark";
 import Image from "material-ui-image";
 import { useSocketStore } from "../../Context/appStore";
@@ -524,7 +522,7 @@ export const Profile = ({ match }) => {
         socket.emit("notification", { id: profile.info.id });
       }
     }
-  }, [profile.info.id, auth.userInfo.id]);
+  }, [profile.info.id, auth.userInfo.id, socket]);
 
   const imgs = [
     {

@@ -41,6 +41,7 @@ const getUserConversations = async (uid, pid) => {
 };
 
 const sendMessage = async (sender, receiver, message) => {
+  if (!(await areMatched(sender, receiver))) return false;
   try {
     const sql =
       "INSERT INTO `user_messages` (`sender`, `receiver`, `message`)  Values (?, ?, ?)";
@@ -50,6 +51,22 @@ const sendMessage = async (sender, receiver, message) => {
     return false;
   }
 };
+
+async function areMatched(userId, profileId) {
+  try {
+    const sql =
+      "SELECT * FROM `user_match` WHERE `id_user` = ? AND `id_profile` = ? OR `id_user` = ? AND `id_profile` = ?";
+    const [result] = await pool.query(sql, [
+      userId,
+      profileId,
+      profileId,
+      userId
+    ]);
+    return result.length > 0 ? true : false;
+  } catch (error) {
+    return false;
+  }
+}
 
 const setMessageSeen = async (uid, pid) => {
   try {

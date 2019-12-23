@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, Redirect } from "react-router-dom";
-import { useUserStore } from "../../Context/appStore";
+import { useUserStore, useSocketStore } from "../../Context/appStore";
 import { login } from "../../actions/userAction";
 import { REMOVE_ALERT, SET_ALERT } from "../../actions/actionTypes";
 import Avatar from "@material-ui/core/Avatar";
@@ -45,6 +45,7 @@ const useStyles = makeStyles(theme => ({
 const SignIn = () => {
   const classes = useStyles();
   const [state, dispatch] = useUserStore();
+  const socket = useSocketStore();
   const stableDispatch = useCallback(dispatch, []);
   const [formData, setFormData] = useState({
     email: "",
@@ -66,7 +67,7 @@ const SignIn = () => {
           msg: "Email and password required"
         }
       });
-    } else login(email, password, remember, dispatch);
+    } else login(email, password, remember, dispatch, socket);
   };
 
   useEffect(() => {

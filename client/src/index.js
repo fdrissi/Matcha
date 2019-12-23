@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import axios from "axios";
@@ -35,8 +35,9 @@ axios.interceptors.response.use(
       window.location.pathname.split("/")[1] !== "editpass"
     ) {
       window.location = "/login";
-    } else if (response.data.errorMsg === "Verify Profile Info")
+    } else if (response.data.errorMsg === "Verify Profile Info") {
       window.location = "/edit-profile";
+    }
     return response;
   },
   function(error) {
@@ -47,20 +48,17 @@ axios.interceptors.response.use(
 );
 
 function App() {
-  const [{ auth }, dispatch] = useUserStore();
+  const [, dispatch] = useUserStore();
   const socket = useSocketStore();
-
-  useEffect(() => {
-    if (auth.isAuthenticated) {
-      socket.emit("login", auth.userInfo.id);
-    }
-  }, [auth.userInfo.id, auth.isAuthenticated]);
-
   return (
     <div
       style={{ display: "flex", minHeight: "100vh", flexDirection: "column" }}
     >
-      <LoadUserComponent loadUser={loadUser} dispatch={dispatch} />
+      <LoadUserComponent
+        loadUser={loadUser}
+        dispatch={dispatch}
+        socket={socket}
+      />
       <Router>
         <Navbar />
         <Switch>

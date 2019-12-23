@@ -53,9 +53,9 @@ router.post("/login", [middleware.login], async (req, res) => {
 router.get("/logout", [middleware.auth], async (req, res) => {
   try {
     res.clearCookie("token");
-    return res.json({ success: true, errorMsg: "Access denied" });
+    return res.json({ success: true });
   } catch (error) {
-    return res.json({ success: false, errorMsg: "Access denied" });
+    return res.json({ success: false });
   }
 });
 

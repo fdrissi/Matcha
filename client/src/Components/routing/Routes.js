@@ -1,7 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Route, Switch } from "react-router-dom";
-import { createBrowserHistory } from "history";
-import { useUserStore } from "../../Context/appStore";
 import Landing from "../layouts/Landing";
 import Login from "../auth/Login";
 import Register from "../auth/Register";

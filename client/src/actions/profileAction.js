@@ -1,5 +1,6 @@
 import axios from "axios";
 import {
+  PROFILE_MATCHED,
   PHOTO_SUCCESS,
   SET_ALERT,
   INFO_SUCCESS,
@@ -280,6 +281,20 @@ export const likeProfile = async (profileId, dispatch) => {
       config
     );
     await isUserLikedProfile(profileId, dispatch);
+    //await areMatched(profileId, dispatch);
+    return result;
+  } catch (error) {
+    return false;
+  }
+};
+
+export const areMatched = async (profileId, dispatch) => {
+  try {
+    const result = await axios.get(`/api/profile/areMatched/${profileId}`);
+    dispatch({
+      type: PROFILE_MATCHED,
+      payload: result.data.success
+    });
     return result;
   } catch (error) {
     return false;

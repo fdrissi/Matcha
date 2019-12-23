@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useUserStore } from "../../Context/appStore";
+import { useUserStore, useSocketStore } from "../../Context/appStore";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -56,6 +56,7 @@ const useStyles = makeStyles(theme => ({
 
 const Form = () => {
   const [{ auth, alert, operations }, dispatch] = useUserStore();
+  const socket = useSocketStore();
   const stableDispatch = useCallback(dispatch, []);
   const classes = useStyles();
 
@@ -132,8 +133,8 @@ const Form = () => {
       confirmPassword: "",
       oldPassword: ""
     }));
-    loadUser(stableDispatch);
-  }, [alert.msg, stableDispatch]);
+    loadUser(stableDispatch, socket);
+  }, [alert.msg, stableDispatch, socket]);
 
   useEffect(() => {
     return () => {

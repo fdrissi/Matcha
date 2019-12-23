@@ -245,7 +245,7 @@ function EditProfile() {
     return () => {
       clearTimeout(timer);
     };
-  }, [alert.msg]);
+  }, [alert.msg, stableDispatch]);
 
   useEffect(() => {
     async function getUser() {
@@ -284,7 +284,7 @@ function EditProfile() {
     if (latitude || longitude || error) {
       setUserLocation(latitude, longitude, error, stableDispatch);
     }
-  }, [latitude, longitude, error]);
+  }, [latitude, longitude, error, stableDispatch]);
   if (isLoading)
     return (
       <Container component="main" maxWidth="md">
