@@ -535,7 +535,7 @@ module.exports = middleware = {
       if (typeof data === "undefined") {
         return res.json({
           success: false,
-          errorMsg: "You need to Set Data 🤥",
+          errorMsg: "You need to Set Data 🤥 2",
           errors
         });
       }
@@ -554,7 +554,7 @@ module.exports = middleware = {
       )
         return res.json({
           success: false,
-          errorMsg: "You need to Set Data",
+          errorMsg: "You need to Set Data 1",
           errors
         });
       // validate lat and lng
@@ -564,7 +564,7 @@ module.exports = middleware = {
       )
         return res.json({
           success: false,
-          errorMsg: "You need to Set Data",
+          errorMsg: "You need to Set Data 0",
           errors
         });
       // validate user gender

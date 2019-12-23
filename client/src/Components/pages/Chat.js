@@ -204,26 +204,31 @@ export const UserChat = ({ info, select }) => {
         className={classes.item}
         onClick={() => select(info)}
       >
-        <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src={`/uploads/${info.profile_Image}`} />
-        </ListItemAvatar>
-
-        <ListItemText
-          primary={`${info.first_name} ${info.last_name}`}
-          secondary={
-            <React.Fragment>
-              <Typography
-                component="span"
-                variant="body2"
-                className={classes.inline}
-                color="textPrimary"
-              >
-                Click to Chat
-                <span style={{ color: "#BA0000", fontSize: "8px" }}> </span>
-              </Typography>
-            </React.Fragment>
-          }
-        />
+        <Grid container>
+          <Grid item sm={2} xs={12}>
+            <ListItemAvatar>
+              <Avatar alt="Remy Sharp" src={`/uploads/${info.profile_Image}`} />
+            </ListItemAvatar>
+          </Grid>
+          <Grid item sm={10} xs={12}>
+            <ListItemText
+              primary={`${info.first_name} ${info.last_name}`}
+              secondary={
+                <React.Fragment>
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    className={classes.inline}
+                    color="textPrimary"
+                  >
+                    Click to Chat
+                    <span style={{ color: "#BA0000", fontSize: "8px" }}> </span>
+                  </Typography>
+                </React.Fragment>
+              }
+            />
+          </Grid>
+        </Grid>
       </ListItem>
     </List>
   );

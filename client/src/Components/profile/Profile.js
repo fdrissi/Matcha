@@ -176,6 +176,9 @@ const UserInfo = () => {
 const ProfileImage = () => {
   const classes = useStyles();
   const [{ profile }] = useUserStore();
+  let color = "gray 5px solid";
+  if (profile.info.blocked) color = "red 5px solid";
+  else if (profile.info.user_online) color = "green 5px solid";
 
   return (
     <>
@@ -184,11 +187,7 @@ const ProfileImage = () => {
         src={`/uploads/${profile.photo.profile_Image}`}
         className={classes.avatar}
         style={{
-          border: profile.info.blocked
-            ? "red 5px solid"
-            : !!profile.info.user_online
-            ? "green 5px solid"
-            : "gray 5px solid"
+          border: color
         }}
       />
     </>
@@ -254,7 +253,7 @@ const LongMenu = () => {
   );
 };
 
-export const ButtonRed = ({ icon = false }) => {
+export const ButtonRed = ({ icon = false, clickFn }) => {
   const classes = useStyles();
   return (
     <Fab
@@ -262,6 +261,7 @@ export const ButtonRed = ({ icon = false }) => {
       color="primary"
       aria-label="add"
       className={classes.btn}
+      onClick={clickFn}
     >
       <div style={{ width: "100%" }}>
         <span style={{ verticalAlign: "center", fontSize: "28px" }}>
@@ -332,11 +332,12 @@ const ProfileHeader = () => {
                     <ButtonRed
                       icon={
                         profile.info.liked ? (
-                          <ThumbDownAltIcon onClick={() => handleClick()} />
+                          <ThumbDownAltIcon />
                         ) : (
-                          <ThumbUpAltIcon onClick={() => handleClick()} />
+                          <ThumbUpAltIcon />
                         )
                       }
+                      clickFn={handleClick}
                     />
                     {/*<ButtonRed icon={<QuestionAnswerIcon />} />*/}
                     <LongMenu />
