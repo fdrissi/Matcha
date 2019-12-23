@@ -7,7 +7,6 @@
     "start": "node server",
     "server": "nodemon server",
     "client": "npm start --prefix client",
-    "fbuild": "npm run-script build --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "postbuild": "NPM_CONFIG_PRODUCTION=false && npm run build --prefix client && npm run start"
   },
