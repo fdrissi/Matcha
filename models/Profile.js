@@ -306,7 +306,7 @@ async function setInfoVerified(value, id) {
 
 async function isInfoVerified(id) {
   try {
-    let sql = "SELECT `info_verified` FROM user_info WHERE id = ?";
+    let sql = "SELECT info_verified FROM user_info WHERE id = ?";
     const [result] = await pool.query(sql, [id]);
     return !!result[0].info_verified;
   } catch (error) {
@@ -355,9 +355,11 @@ async function unlikeProfile(userId, profileId) {
     const sql =
       "DELETE FROM `user_likes` WHERE `id_user` = ? AND `id_profile` = ?";
     const [result] = await pool.query(sql, [userId, profileId]);
-    await unmatch(userId, profileId);
-    await fameRate(profileId, "unlike");
-    await setNotification(profileId, userId, "unlike");
+    if (!!result.affectedRows) {
+      await unmatch(userId, profileId);
+      await fameRate(profileId, "unlike");
+      await setNotification(profileId, userId, "unlike");
+    }
     return !!result.affectedRows;
   } catch (error) {
     return false;
@@ -401,7 +403,7 @@ async function unmatch(userId, profileId) {
       !(await isUserLikedProfile(profileId, userId))
     ) {
       const sql =
-        "DELETE FROM `user_match` WHERE `id_user` = ? AND `id_profile` = ? OR `id_user` = ? AND `id_profile`";
+        "DELETE FROM `user_match` WHERE (`id_user` = ? AND `id_profile` = ?) OR (`id_user` = ? AND `id_profile` = ?)";
       const [result] = await pool.query(sql, [
         userId,
         profileId,

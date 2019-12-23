@@ -121,7 +121,7 @@ module.exports = middleware = {
   },
   infoVerified: async function(req, res, next) {
     try {
-      const id = req.user;
+      const id = req.user.id;
       const result = await profileModel.isInfoVerified(id);
       if (!result)
         return res.json({ success: false, errorMsg: "Verify Profile Info" });

@@ -541,7 +541,7 @@ const Header = () => {
 };
 
 const Search = () => {
-  const [{ profile }, dispatch] = useUserStore();
+  const [, dispatch] = useUserStore();
   // dont remove it im gonna work with later for clearing result when leaving page
   const stableDispatch = useCallback(dispatch, []);
   useEffect(() => {

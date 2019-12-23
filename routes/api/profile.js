@@ -537,19 +537,15 @@ router.post(
   }
 );
 
-// @route   Post api/profle/areMatched
+// @route   Get api/profle/areMatched
 // @desc    are users matched
 // @access  Private
-router.post("/areMatched", [middleware.auth], async (req, res) => {
-  const { profile } = req.body;
+router.get("/areMatched/:pid", [middleware.auth], async (req, res) => {
   const id = req.user.id;
-  if (id === parseInt(profile.id))
-    return res.json({
-      success: false
-    });
+  const pid = req.params.pid;
   try {
-    //return true if user already liked profile
-    let result = await profileModel.areMatched(id, profile.id);
+    //return true user and profile matched
+    let result = await profileModel.areMatched(id, pid);
     return res.json({
       success: result
     });

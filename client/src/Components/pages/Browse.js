@@ -503,6 +503,7 @@ const Header = () => {
 const Browse = () => {
   const [{ profile }, dispatch] = useUserStore();
   const stableDispatch = useCallback(dispatch, []);
+
   useEffect(() => {
     async function gBrowse() {
       await getBrowse(stableDispatch);

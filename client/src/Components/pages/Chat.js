@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useUserStore } from "../../Context/appStore";
 import {
@@ -65,14 +65,21 @@ const UserInfo = ({ info }) => {
 
 const LoadChat = ({ chat, pid }) => {
   const [{ auth }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
   const messagesEndRef = React.createRef();
 
   useEffect(() => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     if (chat.unseenConversation) {
-      updateSeen(auth.userInfo.id, pid, dispatch);
+      updateSeen(auth.userInfo.id, pid, stableDispatch);
     }
-  }, [chat]);
+  }, [
+    messagesEndRef,
+    chat.unseenConversation,
+    auth.userInfo.id,
+    pid,
+    stableDispatch
+  ]);
 
   return (
     <div>
@@ -160,6 +167,7 @@ const SubmitBox = ({ selected }) => {
 
 const Conversation = ({ selected }) => {
   const [{ auth }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
   const socket = useSocketStore();
   const profileId =
     auth.userInfo.id === selected.id_user
@@ -167,8 +175,8 @@ const Conversation = ({ selected }) => {
       : selected.id_user;
   localStorage.setItem("pid", profileId);
   useEffect(() => {
-    getUserChat(profileId, dispatch);
-  }, [profileId]);
+    getUserChat(profileId, stableDispatch);
+  }, [profileId, stableDispatch]);
 
   if (socket.listeners("newMessage").length < 1) {
     socket.on("newMessage", data => {
@@ -188,8 +196,6 @@ const Conversation = ({ selected }) => {
 
 export const UserChat = ({ info, select }) => {
   const classes = useStyles();
-  //const [{ auth }] = useUserStore();
-  const [incommingMessage, setIncommingMessage] = useState(0);
 
   return (
     <List className={classes.root}>
@@ -213,10 +219,7 @@ export const UserChat = ({ info, select }) => {
                 color="textPrimary"
               >
                 Click to Chat
-                <span style={{ color: "#BA0000", fontSize: "8px" }}>
-                  {" "}
-                  {incommingMessage > 0 && "New message"}
-                </span>
+                <span style={{ color: "#BA0000", fontSize: "8px" }}> </span>
               </Typography>
             </React.Fragment>
           }
@@ -240,11 +243,12 @@ const ListChats = ({ matched, select }) => {
 
 const ChatHolder = () => {
   const [{ matches }, dispatch] = useUserStore();
+  const stableDispatch = useCallback(dispatch, []);
   const [selected, setSelected] = useState(0);
 
   useEffect(() => {
-    getMatched(dispatch);
-  }, []);
+    getMatched(stableDispatch);
+  }, [stableDispatch]);
 
   if (matches.matched.length === 0 || matches.loading)
     return (
@@ -273,7 +277,7 @@ const ChatHolder = () => {
             </Grid>
             <Grid xs={12} container item justify="center">
               <Typography variant="overline" id="range-slider" gutterBottom>
-                There is no user that matched with you yet 😥
+                There is no user that matched with you yet
               </Typography>
             </Grid>
             <Grid xs={12} container item justify="center">

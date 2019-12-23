@@ -23,33 +23,6 @@ const useStyle = makeStyles({
   }
 });
 
-const images = [
-  {
-    id: 1,
-    img: "./img/members.png",
-    title: "1611",
-    text: "Total Members"
-  },
-  {
-    id: 2,
-    img: "./img/online.png",
-    title: "500",
-    text: "Online"
-  },
-  {
-    id: 3,
-    img: "./img/men.png",
-    title: "300",
-    text: "Men Online"
-  },
-  {
-    id: 4,
-    img: "./img/women.png",
-    title: "200",
-    text: "Women  Online"
-  }
-];
-
 const Widget = ({ classes, img, title, text }) => {
   return (
     <>
