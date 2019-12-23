@@ -13,13 +13,14 @@ const predefined = require("../globals");
 const iplocation = require("iplocation").default;
 const moment = require("moment");
 var _ = require("lodash");
-
+const config = require("config");
+const uploadPath = config.get("uploadPath");
 const unlinkAsync = promisify(fs.unlink);
 
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
     const { id } = req.user;
-    const dir = `./client/public/uploads/${id}/`;
+    const dir = `${uploadPath}/uploads/${id}/`;
     fs.exists(dir, exists => {
       if (!exists) {
         return fs.mkdir(dir, error => cb(error, dir));
@@ -68,7 +69,7 @@ router.post(
           const cover = await profileModel.getImageByRow(id, "cover_Image");
           if (check) {
             if (remove !== "photo_holder.png") {
-              await unlinkAsync(`./client/public/uploads/${remove}`);
+              await unlinkAsync(`${uploadPath}/uploads/${remove}`);
               if (remove === cover)
                 await profileModel.setImageCover(id, "cover_holder.png");
             }
@@ -161,41 +162,41 @@ router.post("/setCover", [middleware.auth], async (req, res) => {
         errorMsg: "You Cant Set The Holder As Cover 🤔"
       });
     } else {
-      const image = new Jimp(
-        `./client/public/uploads/${result}`,
-        async function(err, image) {
-          if (!err) {
-            var w = image.bitmap.width; //  width of the image
-            var h = image.bitmap.height; // height of the image
-            if (w < 850 || h < 315) {
-              return res.json({
-                success: false,
-                errorMsg:
-                  "Your Cover Mut Be equal or mor than 850px width and 315 height 😮"
-              });
-            }
-            const response = await profileModel.setImageCover(id, result);
-            if (response) {
-              const result = await profileModel.getImage(id);
-              return res.json({
-                success: true,
-                errorMsg: "Your Cover hass been Set 🤘",
-                result
-              });
-            } else {
-              return res.json({
-                success: false,
-                errorMsg: "There is an error on uploading this cover 😱"
-              });
-            }
+      const image = new Jimp(`${uploadPath}/uploads/${result}`, async function(
+        err,
+        image
+      ) {
+        if (!err) {
+          var w = image.bitmap.width; //  width of the image
+          var h = image.bitmap.height; // height of the image
+          if (w < 850 || h < 315) {
+            return res.json({
+              success: false,
+              errorMsg:
+                "Your Cover Mut Be equal or mor than 850px width and 315 height 😮"
+            });
+          }
+          const response = await profileModel.setImageCover(id, result);
+          if (response) {
+            const result = await profileModel.getImage(id);
+            return res.json({
+              success: true,
+              errorMsg: "Your Cover hass been Set 🤘",
+              result
+            });
           } else {
             return res.json({
               success: false,
-              errorMsg: "Error On Checking The Image 🤘"
+              errorMsg: "There is an error on uploading this cover 😱"
             });
           }
+        } else {
+          return res.json({
+            success: false,
+            errorMsg: "Error On Checking The Image 🤘"
+          });
         }
-      );
+      });
     }
   } catch (error) {
     return res.json({
@@ -251,7 +252,7 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
         if (result) {
           if (filed !== "profile_Image")
             profileModel.imagesCounter(id, "delete");
-          await unlinkAsync(`./client/public/uploads/${photo}`);
+          await unlinkAsync(`${uploadPath}/uploads/${photo}`);
           await profileModel.setImageCover(id, "cover_holder.png");
           return res.json({
             success: true,
