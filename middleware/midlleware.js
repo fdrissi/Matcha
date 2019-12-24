@@ -16,7 +16,7 @@ async function validateEmail(req) {
       return "Email already exists";
     else {
       let regex = /\S+@\S+\.\S+/;
-      if (!regex.test(req.body.email) || req.body.email.length >= 256)
+      if (!regex.test(req.body.email) || req.body.email.length > 100)
         return "Enter valid Email";
     }
   }
@@ -30,7 +30,7 @@ async function validateUsername(req) {
     if (await userModel.findByUsername(req.body.userName))
       return "Username already exists";
     else {
-      let regex = /^[a-z0-9]{3,20}$/;
+      let regex = /^[a-z0-9]{3,15}$/;
       if (!regex.test(req.body.userName)) return "Enter valid Username";
     }
   }
@@ -51,7 +51,7 @@ function validatePassword(req) {
 function validateFirstName(req) {
   req.body.firstName = req.body.firstName.trim();
   let firstName = "";
-  let regex = /^[A-Za-z]{3,30}$/;
+  let regex = /^[A-Za-z]{3,20}$/;
   firstName = !regex.test(req.body.firstName) ? "Enter valid First Name" : "";
   return firstName;
 }
@@ -59,7 +59,7 @@ function validateFirstName(req) {
 function validateLastName(req) {
   req.body.lastName = req.body.lastName.trim();
   let lastName = "";
-  let regex = /^[A-Za-z]{3,30}$/;
+  let regex = /^[A-Za-z]{3,20}$/;
   lastName = !regex.test(req.body.lastName) ? "Enter valid Last Name" : "";
   return lastName;
 }
@@ -136,7 +136,9 @@ module.exports = middleware = {
     if (
       !sender ||
       !receiver ||
+      !message ||
       !message.trim() ||
+      message.length > 255 ||
       !(await userModel.findById(receiver))
     )
       return res.json({
@@ -147,21 +149,6 @@ module.exports = middleware = {
   setting: async function(req, res, next) {
     try {
       req.body = escapeSpecialChars(req.body);
-      if (
-        typeof req.body.firstName !== "string" ||
-        typeof req.body.lastName !== "string" ||
-        typeof req.body.userName !== "string" ||
-        typeof req.body.email !== "string" ||
-        typeof req.body.email !== "string" ||
-        typeof req.body.newPassword !== "string" ||
-        typeof req.body.oldPassword !== "string"
-      )
-        return res.json({
-          success: false,
-          errors,
-          errorMsg: "Update User Info Unsuccess"
-        });
-
       const errors = {
         firstName: "",
         lastName: "",
@@ -171,6 +158,19 @@ module.exports = middleware = {
         password: "",
         confirmPassword: ""
       };
+      if (
+        typeof req.body.firstName !== "string" ||
+        typeof req.body.lastName !== "string" ||
+        typeof req.body.userName !== "string" ||
+        typeof req.body.email !== "string" ||
+        typeof req.body.newPassword !== "string" ||
+        typeof req.body.oldPassword !== "string"
+      )
+        return res.json({
+          success: false,
+          errors,
+          errorMsg: "Update User Info Unsuccess"
+        });
 
       const user = await userModel.findById(req.user.id);
       const isMatched = bcrypt.compareSync(req.body.oldPassword, user.password);
@@ -325,7 +325,8 @@ module.exports = middleware = {
           errors.email = "This email is taken by another user";
         } else {
           let regex = /\S+@\S+\.\S+/;
-          if (!regex.test(req.body.email)) errors.email = "enter valid email";
+          if (!regex.test(req.body.email) || req.body.email.length > 100)
+            errors.email = "enter valid email";
         }
       }
 
@@ -337,7 +338,7 @@ module.exports = middleware = {
         if (await userModel.findByUsername(req.body.userName)) {
           errors.userName = "This User Name is taken by another user";
         } else {
-          let regex = /^[a-z0-9]{3,10}$/;
+          let regex = /^[a-z0-9]{3,15}$/;
           if (!regex.test(req.body.userName))
             errors.userName =
               "user name must be between 3 and 10 characters without special characters";
@@ -371,7 +372,8 @@ module.exports = middleware = {
         errors.password = "this field is requird";
       } else {
         // let regex = /(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=.*[0-9]).{8,20}/i;
-        let regex = /(?=.*[a-z]).{3,20}/i;
+        //let regex = /(?=.*[a-z]).{3,20}/i;
+        let regex = /(?=.*[a-zA-Z])(?=.*[0-9]).{8,30}/i;
         if (!regex.test(req.body.password))
           errors.password =
             "password should be between 8-20 characters in length and should include at least one upper case letter, one number or one special character.";
@@ -535,7 +537,7 @@ module.exports = middleware = {
       if (typeof data === "undefined") {
         return res.json({
           success: false,
-          errorMsg: "You need to Set Data 🤥 2",
+          errorMsg: "You need to Set Data 🤥",
           errors
         });
       }
@@ -554,7 +556,7 @@ module.exports = middleware = {
       )
         return res.json({
           success: false,
-          errorMsg: "You need to Set Data 1",
+          errorMsg: "You need to Set Data",
           errors
         });
       // validate lat and lng
@@ -564,7 +566,7 @@ module.exports = middleware = {
       )
         return res.json({
           success: false,
-          errorMsg: "You need to Set Data 0",
+          errorMsg: "You need to Set Data",
           errors
         });
       // validate user gender

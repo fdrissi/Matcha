@@ -12,8 +12,12 @@ router.get(
   [middleware.auth, middleware.infoVerified],
   async (req, res) => {
     try {
-      const id = +req.user.id;
-      const result = await chatModel.getUserAllMatches(id);
+      const uid = +req.user.id;
+      if (!uid)
+        return res.json({
+          success: false
+        });
+      const result = await chatModel.getUserAllMatches(uid);
       return res.json({
         success: true,
         conversations: result
@@ -36,9 +40,13 @@ router.get(
     try {
       const uid = +req.user.id;
       const pid = req.params.pid;
+      if (!pid || !uid)
+        return res.json({
+          success: false
+        });
       const result = await chatModel.getUserConversations(uid, pid);
       return res.json({
-        success: true,
+        success: result.length > 0 ? true : false,
         conversations: result
       });
     } catch (error) {
@@ -84,6 +92,10 @@ router.put(
     try {
       const uid = req.user.id;
       const { pid } = req.body;
+      if (!pid || !uid)
+        return res.json({
+          success: false
+        });
       const result = await chatModel.setMessageSeen(uid, pid);
       return res.json({
         success: result
@@ -106,7 +118,7 @@ router.delete(
     try {
       const uid = req.params.uid;
       const pid = req.params.pid;
-      if (+uid !== +req.user.id || +uid === +pid)
+      if (!uid || !pid || +uid !== +req.user.id || +uid === +pid)
         return res.json({
           success: false
         });
@@ -128,6 +140,10 @@ router.delete(
 router.get("/unseenCount/", [middleware.auth], async (req, res) => {
   try {
     const uid = req.user.id;
+    if (!uid)
+      return res.json({
+        success: false
+      });
     const result = await chatModel.getUnseenMessagesCount(uid);
     return res.json({
       success: true,
@@ -147,6 +163,10 @@ router.get("/unseen/:pid", [middleware.auth], async (req, res) => {
   try {
     const uid = +req.user.id;
     const pid = +req.params.pid;
+    if (!pid || !uid)
+      return res.json({
+        success: false
+      });
     const result = await chatModel.isConversationHasUnreadMessage(uid, pid);
     return res.json({
       success: true,

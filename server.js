@@ -73,8 +73,8 @@ io.use(function(socket, next) {
         const [result] = await pool.query(sql, [true, user]);
         if (!!result.affectedRows) socket.emit("login", users);
       } catch (error) {}
-      socket.emit("login", users);
     }
+    socket.emit("login", users);
   });
 
   socket.on("notification", data => {

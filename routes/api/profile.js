@@ -488,7 +488,12 @@ router.post(
   async (req, res) => {
     const { profile } = req.body;
     const id = req.user.id;
-    if (id === parseInt(profile.id))
+    if (
+      !profile ||
+      !profile.id ||
+      id === parseInt(profile.id) ||
+      !(await profileModel.isProfileExists(profile.id))
+    )
       return res.json({
         success: false
       });
@@ -519,7 +524,7 @@ router.post(
   async (req, res) => {
     const { profile } = req.body;
     const id = req.user.id;
-    if (id === parseInt(profile.id))
+    if (!profile || !profile.id || id === parseInt(profile.id))
       return res.json({
         success: false
       });
@@ -566,7 +571,12 @@ router.post(
   async (req, res) => {
     const { profile } = req.body;
     const id = req.user.id;
-    if (id === parseInt(profile.id))
+    if (
+      !profile ||
+      !profile.id ||
+      id === parseInt(profile.id) ||
+      !(await profileModel.isProfileExists(profile.id))
+    )
       return res.json({
         success: false
       });
@@ -593,7 +603,7 @@ router.post(
 router.post("/isUserBlockedProfile", [middleware.auth], async (req, res) => {
   const { profile } = req.body;
   const id = req.user.id;
-  if (id === parseInt(profile.id))
+  if (!profile || !profile.id || id === parseInt(profile.id))
     return res.json({
       success: false
     });
@@ -620,7 +630,12 @@ router.post(
   async (req, res) => {
     const { profile } = req.body;
     const id = req.user.id;
-    if (id === parseInt(profile.id))
+    if (
+      !profile ||
+      !profile.id ||
+      id === parseInt(profile.id) ||
+      !(await profileModel.isProfileExists(profile.id))
+    )
       return res.json({
         success: false
       });
@@ -648,7 +663,12 @@ router.post(
   async (req, res) => {
     const { profile } = req.body;
     const id = req.user.id;
-    if (id === parseInt(profile.id))
+    if (
+      !profile ||
+      !profile.id ||
+      id === parseInt(profile.id) ||
+      !(await profileModel.isProfileExists(profile.id))
+    )
       return res.json({
         success: false
       });
@@ -780,6 +800,23 @@ router.get("/unseenNotificationsCount", [middleware.auth], async (req, res) => {
   const id = req.user.id;
   try {
     const result = await profileModel.getUnseenNotificationsCount(id);
+    return res.json({
+      success: true,
+      count: result
+    });
+  } catch (error) {
+    return res.json({
+      success: false
+    });
+  }
+});
+
+// @route   Get api/profile/online
+// @desc    Get number of online users
+// @access  Public
+router.get("/online", async (req, res) => {
+  try {
+    const result = await profileModel.getOnline();
     return res.json({
       success: true,
       count: result

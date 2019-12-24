@@ -441,6 +441,24 @@ async function blockProfile(userId, profileId) {
     const sql =
       "INSERT INTO `user_block` (`id_user`, `id_profile`) VALUES(?, ?)";
     const [result] = await pool.query(sql, [userId, profileId]);
+    if (!!result.affectedRows) clearMessageNotifications(userId, profileId);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function clearMessageNotifications(userId, profileId) {
+  const sql =
+    "UPDATE `user_messages` SET `seen` = ? WHERE (`sender` = ? AND `receiver` = ?) OR (`sender` = ? AND `receiver` = ?)";
+  try {
+    const [result] = await pool.query(sql, [
+      true,
+      userId,
+      profileId,
+      profileId,
+      userId
+    ]);
     return !!result.affectedRows;
   } catch (error) {
     return false;
@@ -502,6 +520,16 @@ async function isUserReportedProfile(userId, profileId) {
     const sql =
       "SELECT * FROM `user_reports` WHERE `id_user` = ? AND `id_profile` = ?";
     const [result] = await pool.query(sql, [userId, profileId]);
+    return result.length > 0 ? true : false;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function isProfileExists(profileId) {
+  try {
+    const sql = "SELECT * FROM `user_info` WHERE `id` = ?";
+    const [result] = await pool.query(sql, [profileId]);
     return result.length > 0 ? true : false;
   } catch (error) {
     return false;
@@ -588,6 +616,11 @@ async function getHistory(userId) {
 }
 
 async function setNotification(userId, profileId, type) {
+  if (
+    (await isUserBlockedProfile(userId, profileId)) ||
+    (await isUserBlockedProfile(profileId, userId))
+  )
+    return false;
   try {
     const sql =
       "INSERT INTO user_notifications (`id_user`, `id_profile`, `notification`) VALUES (?, ?, ?)";
@@ -641,6 +674,16 @@ async function getUnseenNotificationsCount(userId) {
   }
 }
 
+async function getOnline() {
+  try {
+    const sql = "SELECT count(*) as count FROM `user_info` WHERE `online` = ? ";
+    const [result] = await pool.query(sql, [true]);
+    return result[0].count;
+  } catch (error) {
+    return false;
+  }
+}
+
 module.exports = {
   SetImage,
   getImage,
@@ -667,6 +710,7 @@ module.exports = {
   unblockProfile,
   isUserBlockedProfile,
   reportProfile,
+  isProfileExists,
   getFameRate,
   recordVisitedProfiles,
   getHistory,
@@ -676,5 +720,6 @@ module.exports = {
   clearUserNotifications,
   updateNotifications,
   getUnseenNotificationsCount,
-  isOnOFUserBlockedBy
+  isOnOFUserBlockedBy,
+  getOnline
 };
