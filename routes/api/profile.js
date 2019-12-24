@@ -253,7 +253,7 @@ router.delete("/removeImage", [middleware.auth], async (req, res) => {
           if (filed !== "profile_Image")
             profileModel.imagesCounter(id, "delete");
           await unlinkAsync(`${uploadPath}/uploads/${photo}`);
-          await profileModel.setImageCover(id, "cover_holder.png");
+          await profileModel.setImageCover(id, "cover_holder.jpg");
           return res.json({
             success: true,
             errorMsg: "Your image hass been Deleted 🗑️",
