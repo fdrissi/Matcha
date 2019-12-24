@@ -16,7 +16,7 @@ async function validateEmail(req) {
       return "Email already exists";
     else {
       let regex = /\S+@\S+\.\S+/;
-      if (!regex.test(req.body.email) || req.body.email.length >= 256)
+      if (!regex.test(req.body.email) || req.body.email.length > 100)
         return "Enter valid Email";
     }
   }
@@ -30,7 +30,7 @@ async function validateUsername(req) {
     if (await userModel.findByUsername(req.body.userName))
       return "Username already exists";
     else {
-      let regex = /^[a-z0-9]{3,20}$/;
+      let regex = /^[a-z0-9]{3,15}$/;
       if (!regex.test(req.body.userName)) return "Enter valid Username";
     }
   }
@@ -51,7 +51,7 @@ function validatePassword(req) {
 function validateFirstName(req) {
   req.body.firstName = req.body.firstName.trim();
   let firstName = "";
-  let regex = /^[A-Za-z]{3,30}$/;
+  let regex = /^[A-Za-z]{3,20}$/;
   firstName = !regex.test(req.body.firstName) ? "Enter valid First Name" : "";
   return firstName;
 }
@@ -59,7 +59,7 @@ function validateFirstName(req) {
 function validateLastName(req) {
   req.body.lastName = req.body.lastName.trim();
   let lastName = "";
-  let regex = /^[A-Za-z]{3,30}$/;
+  let regex = /^[A-Za-z]{3,20}$/;
   lastName = !regex.test(req.body.lastName) ? "Enter valid Last Name" : "";
   return lastName;
 }
@@ -325,7 +325,8 @@ module.exports = middleware = {
           errors.email = "This email is taken by another user";
         } else {
           let regex = /\S+@\S+\.\S+/;
-          if (!regex.test(req.body.email)) errors.email = "enter valid email";
+          if (!regex.test(req.body.email) || req.body.email.length > 100)
+            errors.email = "enter valid email";
         }
       }
 
@@ -337,7 +338,7 @@ module.exports = middleware = {
         if (await userModel.findByUsername(req.body.userName)) {
           errors.userName = "This User Name is taken by another user";
         } else {
-          let regex = /^[a-z0-9]{3,10}$/;
+          let regex = /^[a-z0-9]{3,15}$/;
           if (!regex.test(req.body.userName))
             errors.userName =
               "user name must be between 3 and 10 characters without special characters";
