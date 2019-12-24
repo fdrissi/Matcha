@@ -6,7 +6,8 @@ import {
   getUserInfo,
   updateUserInfo,
   getpreedefined,
-  setUserLocation
+  setUserLocation,
+  getAllUserTags
 } from "../../actions/profileAction";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import PropTypes from "prop-types";
@@ -196,8 +197,8 @@ class ReactAutosuggest extends React.Component {
     textFieldInput: ""
   };
 
-  handleSuggestionsFetchRequested = ({ value }) => {
-    const suggestions = ["hello", "world", "this", "Fadel"];
+  handleSuggestionsFetchRequested = async ({ value }) => {
+    const suggestions = await getAllUserTags();
     this.setState({
       suggestions: getSuggestions(value, suggestions)
     });
