@@ -120,6 +120,7 @@ function Recover() {
                 type="text"
                 onChange={handleInputChange}
                 autoFocus
+                inputProps={{ maxLength: 100 }}
               />
             </Grid>
           </Grid>

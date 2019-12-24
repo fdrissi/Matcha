@@ -197,6 +197,11 @@ router.get(
       const id = req.user.id;
       const { filter } = req.query;
       const { age_range, tags, location, fame_rating } = JSON.parse(filter);
+
+      tags.forEach(function(part, index) {
+        this[index] = _.startCase(_.toLower(part));
+      }, tags);
+      const mytags = _.uniqWith(tags, _.isEqual);
       const sort_by = "Location";
       const gender = await browseModel.getUserInfoByRow(id, "user_gender");
       const user_tags = await browseModel.getUserInfoByRow(id, "user_tags");
@@ -239,7 +244,7 @@ router.get(
                 el.fame_rate <= fame_rating * 20 &&
                 el.fame_rate > fame_rating * 20 - 20
               ) ||
-              _.difference(tags, JSON.parse(el.user_tags)) != 0 ||
+              _.difference(mytags, JSON.parse(el.user_tags)) != 0 ||
               el.user_birth < age_range[0] ||
               el.user_birth > age_range[1]
             );

@@ -43,6 +43,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Alert from "../inc/Alert";
 import { FormHelperText } from "@material-ui/core";
 import { usePosition } from "../inc/usePosition";
+let _ = require("lodash");
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -230,10 +231,11 @@ function EditProfile() {
   };
 
   const handleAddChip = chip => {
+    chip = _.startCase(_.toLower(chip));
     stableDispatch({
       type: REMOVE_ALERT
     });
-    if (chip.length > 10) return false;
+    if (chip.length > 10 || _.includes(mydata.user_tags, chip)) return false;
     setData(previousData => ({
       ...previousData,
       user_tags: previousData.user_tags.concat(chip)

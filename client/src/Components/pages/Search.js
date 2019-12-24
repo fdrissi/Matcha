@@ -35,6 +35,7 @@ import Slider from "@material-ui/core/Slider";
 import Rating from "@material-ui/lab/Rating";
 import { useUserStore } from "../../Context/appStore";
 import { Link } from "react-router-dom";
+let _ = require("lodash");
 
 const useStyles = makeStyles(theme => ({
   avatar: {
@@ -358,7 +359,8 @@ const SearchBy = () => {
   };
 
   const handleAddChip = chip => {
-    if (chip.length > 10) return false;
+    chip = _.startCase(_.toLower(chip));
+    if (chip.length > 10 || _.includes(filter.tags, chip)) return false;
     setFilter(previousData => ({
       ...previousData,
       tags: previousData.tags.concat(chip)
