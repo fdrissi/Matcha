@@ -299,7 +299,6 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
     const blocked = await profileModel.isUserBlockedProfile(+req.user.id, id);
     const matched = await profileModel.areMatched(+req.user.id, +id);
     const loginTime = await profileModel.getLastLogin(+id);
-    const tags_list = await profileModel.getAllTags();
     const [lastYear, LastMonth, lastDay, lastHour, lastMinute] = loginTime
       ? loginTime.split("-")
       : "";
@@ -309,12 +308,6 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
           ["YYYY-MM-DD-HH-mm"]
         ).fromNow()
       : null;
-    let FinalResult = [];
-    tags_list.forEach((item, index) => {
-      JSON.parse(item.user_tags).forEach((element, indexx) => {
-        if (FinalResult.indexOf(element) === -1) FinalResult.push(element);
-      });
-    });
     var obj = JSON.parse(result.user_tags);
     const [year, month, day] = result.user_birth
       ? result.user_birth.split("-")
@@ -341,7 +334,6 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
       user_gender_interest: result.user_gender_interest,
       user_birth_year: year,
       user_age: age,
-      user_tags_suggestions: FinalResult,
       user_city: result.user_city,
       user_biography: result.user_biography,
       user_online: result.online,
@@ -867,5 +859,25 @@ router.get("/checkIsVerified", middleware.auth, async (req, res) => {
     success: true,
     isVerified: isEmpty
   });
+});
+router.get("/getSuggestions", middleware.auth, async (req, res) => {
+  try {
+    const tags_list = await profileModel.getAllTags();
+    let tagsSuggestion = [];
+    tags_list.forEach((item, index) => {
+      JSON.parse(item.user_tags).forEach((element, indexx) => {
+        if (tagsSuggestion.indexOf(element) === -1)
+          tagsSuggestion.push(element);
+      });
+    });
+    return res.json({
+      success: true,
+      tagsSuggestion
+    });
+  } catch (error) {
+    return res.json({
+      success: false
+    });
+  }
 });
 module.exports = router;
