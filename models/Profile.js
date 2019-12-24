@@ -697,6 +697,16 @@ async function getLastLogin(id) {
   }
 }
 
+async function getAllTags() {
+  try {
+    const sql = "SELECT `user_tags` from user_info";
+    const [result] = await pool.query(sql);
+    return result;
+  } catch (error) {
+    return false;
+  }
+}
+
 module.exports = {
   SetImage,
   getImage,
@@ -735,5 +745,6 @@ module.exports = {
   getUnseenNotificationsCount,
   isOnOFUserBlockedBy,
   getOnline,
-  getLastLogin
+  getLastLogin,
+  getAllTags
 };

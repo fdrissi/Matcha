@@ -406,3 +406,18 @@ export const recordVisitedProfiles = async profileId => {
     return false;
   }
 };
+
+export const getAllUserTags = async () => {
+  const config = {
+    header: {
+      "Content-Type": "application/json"
+    }
+  };
+  try {
+    const res = await axios.post("/api/profile/getSuggestions", config);
+    if (res.data.success) return res.data.tagsSuggestion;
+    else return [];
+  } catch (error) {
+    return [];
+  }
+};
