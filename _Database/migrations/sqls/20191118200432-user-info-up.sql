@@ -25,6 +25,7 @@ user_lng VARCHAR
 user_biography VARCHAR
 (255),
 set_from_map boolean DEFAULT FALSE,
+last_login DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 info_verified boolean DEFAULT FALSE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 

@@ -190,6 +190,9 @@ const ProfileImage = () => {
           border: color
         }}
       />
+      {color === "gray 5px solid" && (
+        <p style={{ fontSize: "8px" }}>{profile.info.user_last_login}</p>
+      )}
     </>
   );
 };

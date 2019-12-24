@@ -297,6 +297,16 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
     const liked = await profileModel.isUserLikedProfile(+req.user.id, +id);
     const blocked = await profileModel.isUserBlockedProfile(+req.user.id, id);
     const matched = await profileModel.areMatched(+req.user.id, +id);
+    const loginTime = await profileModel.getLastLogin(+id);
+    const [lastYear, LastMonth, lastDay, lastHour, lastMinute] = loginTime
+      ? loginTime.split("-")
+      : "";
+    const last_login = loginTime
+      ? moment(
+          `[${lastYear}-${LastMonth}-${lastDay}-${lastHour}-${lastMinute}]`,
+          ["YYYY-MM-DD-HH-mm"]
+        ).fromNow()
+      : null;
     var obj = JSON.parse(result.user_tags);
     const [year, month, day] = result.user_birth
       ? result.user_birth.split("-")
@@ -330,6 +340,7 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
         lat: parseFloat(result.user_lat, 10),
         lng: parseFloat(result.user_lng, 10)
       },
+      user_last_login: last_login,
       user_fame_rate: fameRate,
       user_set_from_map: result.set_from_map
     };

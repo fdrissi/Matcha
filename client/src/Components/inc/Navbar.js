@@ -244,6 +244,48 @@ const NavCircle = () => {
   );
 };
 
+const LoggedMenu = () => {
+  const classes = useStyles();
+  return (
+    <>
+      <MenuItem>
+        <NavNotifications />
+        <p>Notifications</p>
+      </MenuItem>
+
+      <MenuItem>
+        <NavMessage />
+        <p>Messages</p>
+      </MenuItem>
+
+      <MenuItem>
+        <NavCircle />
+        <p>Profile</p>
+      </MenuItem>
+    </>
+  );
+};
+
+const UnLoggedMenu = () => {
+  const classes = useStyles();
+  return (
+    <>
+      <Route>
+        <Link style={{ textDecoration: "none", color: "black" }} to="/login">
+          <MenuItem>
+            <p>Login</p>
+          </MenuItem>
+        </Link>
+        <Link style={{ textDecoration: "none", color: "black" }} to="/register">
+          <MenuItem>
+            <p>Register</p>
+          </MenuItem>
+        </Link>
+      </Route>
+    </>
+  );
+};
+
 export default function PrimarySearchAppBar() {
   const classes = useStyles();
   const [{ auth }] = useUserStore();
@@ -294,20 +336,7 @@ export default function PrimarySearchAppBar() {
         open={isMobileMenuOpen}
         onClose={handleMobileMenuClose}
       >
-        <MenuItem>
-          <NavNotifications />
-          <p>Notifications</p>
-        </MenuItem>
-
-        <MenuItem>
-          <NavMessage />
-          <p>Messages</p>
-        </MenuItem>
-
-        <MenuItem>
-          <NavCircle user={auth.userInfo.username} />
-          <p>Profile</p>
-        </MenuItem>
+        {auth.isAuthenticated ? <LoggedMenu /> : <UnLoggedMenu />}
       </Menu>
     </>
   );
@@ -325,7 +354,7 @@ export default function PrimarySearchAppBar() {
               <>
                 <NavNotifications />
                 <NavMessage />
-                <NavCircle user={auth.userInfo.username} />
+                <NavCircle />
               </>
             ) : (
               <>

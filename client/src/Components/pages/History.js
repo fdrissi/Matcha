@@ -12,6 +12,7 @@ import { CssBaseline, Container, Fab, Grid } from "@material-ui/core";
 import HistoryIcon from "@material-ui/icons/History";
 import DeleteIcon from "@material-ui/icons/Delete";
 import axios from "axios";
+import { useUserStore } from "../../Context/appStore";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -157,17 +158,20 @@ const HistoryHolder = ({ history, setHistory }) => {
 };
 
 export const History = () => {
+  const [{ profile }] = useUserStore();
   const [load, setLoad] = useState(false);
   const [history, setHistory] = useState([]);
   useEffect(() => {
     (async () => {
-      const result = await axios.get("/api/profile/getUserHistory");
-      if (result.data.success) {
-        setHistory(result.data.history);
-        setLoad(true);
+      if (profile.Verification.isVrified) {
+        const result = await axios.get("/api/profile/getUserHistory");
+        if (result.data.success) {
+          setHistory(result.data.history);
+          setLoad(true);
+        }
       }
     })();
-  }, []);
+  }, [profile.Verification.isVrified]);
   if (!load) return null;
   return (
     <div>

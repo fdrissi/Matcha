@@ -173,21 +173,25 @@ const NotificationsHoler = ({ notifications, setNotifications }) => {
 export const Notifications = () => {
   const [load, setLoad] = useState(true);
   const [notifications, setNotifications] = useState([]);
-  const [{ auth }] = useUserStore();
+  const [{ auth, profile }] = useUserStore();
   const socket = useSocketStore();
 
   useEffect(() => {
     (async () => {
-      const result = await axios.get("/api/profile/getUserNotifications");
-      if (result.data.success) {
-        setNotifications(result.data.notifications);
-        setLoad(false);
+      if (profile.Verification.isVrified) {
+        const result = await axios.get("/api/profile/getUserNotifications");
+        if (result.data.success) {
+          setNotifications(result.data.notifications);
+          setLoad(false);
+        }
       }
     })();
     (async () => {
-      await axios.get("/api/profile/updateNotifications");
+      if (profile.Verification.isVrified) {
+        await axios.get("/api/profile/updateNotifications");
+      }
     })();
-  }, [auth.userInfo.id]);
+  }, [profile.Verification.isVrified]);
   socket.emit("clearNotifications", { id: auth.userInfo.id });
 
   if (load) return null;
