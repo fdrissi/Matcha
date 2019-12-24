@@ -4,6 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import { Grid } from "@material-ui/core";
 import Image from "material-ui-image";
 import axios from "axios";
+import { useSocketStore } from "../../Context/appStore";
 
 const useStyle = makeStyles({
   section: {
@@ -55,14 +56,25 @@ const Title = () => {
 
 const Section = () => {
   const classes = useStyle();
-  const [totalMembers, setTotalMembers] = useState();
+  const socket = useSocketStore();
+  const [totalMembers, setTotalMembers] = useState(0);
+  const [online, setOnline] = useState(0);
   useEffect(() => {
     async function setTotal() {
-      const res = await axios.get("/api/users/getTotal");
+      let res = await axios.get("/api/users/getTotal");
       setTotalMembers(res.data.total);
+      res = await axios.get("/api/profile/online");
+      if (res.data.success) setOnline(res.data.count);
     }
     setTotal();
-  }, [totalMembers]);
+  }, []);
+
+  if (socket.listeners("login").length < 1) {
+    socket.on("login", users => {
+      setOnline(Object.keys(users).length);
+    });
+  }
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -80,7 +92,7 @@ const Section = () => {
         <Widget
           classes={classes}
           img="./img/online.png"
-          title={"500"}
+          title={online}
           text={"Online"}
         />
       </Grid>
@@ -88,7 +100,7 @@ const Section = () => {
         <Widget
           classes={classes}
           img="./img/men.png"
-          title={"300"}
+          title={Math.floor(online * 0.4)}
           text={"Men Online"}
         />
       </Grid>
@@ -96,7 +108,7 @@ const Section = () => {
         <Widget
           classes={classes}
           img="./img/women.png"
-          title={"200"}
+          title={Math.ceil(online * 0.6)}
           text={"Women  Online"}
         />
       </Grid>

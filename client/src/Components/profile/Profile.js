@@ -163,7 +163,7 @@ const UserInfo = () => {
             value={circle}
             size={30}
             style={{
-              color: "#2e3c43",
+              color: "#FFD700",
               verticalAlign: "middle"
             }}
           />

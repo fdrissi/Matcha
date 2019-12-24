@@ -5,10 +5,8 @@ import Section from "../inc/Section";
 const Landing = () => {
   return (
     <>
-      <div style={{ flex: 1 }}>
-        <Slider />
-        <Section />
-      </div>
+      <Slider />
+      <Section />
     </>
   );
 };

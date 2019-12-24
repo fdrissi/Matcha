@@ -4,6 +4,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Slide from "@material-ui/core/Slide";
 import Fab from "@material-ui/core/Fab";
+import { Loading } from "../inc/Loading";
+import { useUserStore } from "../../Context/appStore";
 
 const slides = [
   {
@@ -69,6 +71,24 @@ const TextOnSlide = ({ classes, animation, children }) => {
   );
 };
 
+const TextOnSlideAuth = ({ classes, animation, children }) => {
+  return (
+    <Slide direction={animation} in={true} mountOnEnter unmountOnExit>
+      <Typography
+        variant="h4"
+        color="textSecondary"
+        align="center"
+        className={classes.slideText}
+      >
+        Browse, <span className={classes.redText}>Match</span>
+        <br />
+        Chat, <span className={classes.redText}>Date</span>
+        {children}
+      </Typography>
+    </Slide>
+  );
+};
+
 export const FabButton = ({ className, text }) => {
   return (
     <Fab
@@ -85,16 +105,29 @@ export const FabButton = ({ className, text }) => {
 
 export const Slider = () => {
   const classes = useStyles();
+  const [{ auth }] = useUserStore();
   const image = slides[Math.floor(Math.random() * slides.length)];
 
+  if (auth.loading) return <Loading text="Landing" />;
   return (
     <div className={classes.imgDiv}>
       <img src={image.imgPath} alt={image.label} className={classes.img} />
-      <TextOnSlide classes={classes} animation="up">
-        <Link to="/register" style={{ textDecoration: "none" }}>
-          <FabButton className={classes.registerButton} text="Registeration" />
-        </Link>
-      </TextOnSlide>
+      {auth.isAuthenticated ? (
+        <TextOnSlideAuth classes={classes} animation="up">
+          <Link to="/browse" style={{ textDecoration: "none" }}>
+            <FabButton className={classes.registerButton} text="Browse" />
+          </Link>
+        </TextOnSlideAuth>
+      ) : (
+        <TextOnSlide classes={classes} animation="up">
+          <Link to="/register" style={{ textDecoration: "none" }}>
+            <FabButton
+              className={classes.registerButton}
+              text="Registeration"
+            />
+          </Link>
+        </TextOnSlide>
+      )}
     </div>
   );
 };
