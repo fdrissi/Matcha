@@ -234,6 +234,7 @@ async function updateUserInfo(data, id) {
         : true;
     const mytags = _.uniqWith(user_tags, _.isEqual);
     const tags = JSON.stringify(mytags);
+    console.log(tags);
     if (user_birth_day && user_birth_month && user_birth_day)
       user_bith = `${user_birth_year}-${user_birth_month}-${user_birth_day}`;
     else user_bith = null;
@@ -291,6 +292,7 @@ async function updateUserInfo(data, id) {
       return false;
     }
   } catch (error) {
+    console.log(error);
     return false;
   }
 }
@@ -697,6 +699,17 @@ async function getLastLogin(id) {
   }
 }
 
+async function getAllTags() {
+  try {
+    const sql = "SELECT `user_tags` from user_info";
+    const [result] = await pool.query(sql);
+    return result;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
 module.exports = {
   SetImage,
   getImage,
@@ -735,5 +748,6 @@ module.exports = {
   getUnseenNotificationsCount,
   isOnOFUserBlockedBy,
   getOnline,
-  getLastLogin
+  getLastLogin,
+  getAllTags
 };
