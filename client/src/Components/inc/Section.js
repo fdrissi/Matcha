@@ -76,7 +76,7 @@ const Section = () => {
   }
 
   return (
-    <Grid container spacing={2}>
+    <Grid container>
       <Grid item xs={12}>
         <Title />
       </Grid>

@@ -686,6 +686,17 @@ async function getOnline() {
   }
 }
 
+async function getLastLogin(id) {
+  try {
+    const sql =
+      "SELECT DATE_FORMAT(last_login, '%Y-%m-%d-%H-%i') as last_login FROM `user_info` WHERE `id` = ? ";
+    const [result] = await pool.query(sql, [id]);
+    return result[0].last_login;
+  } catch (error) {
+    return false;
+  }
+}
+
 module.exports = {
   SetImage,
   getImage,
@@ -723,5 +734,6 @@ module.exports = {
   updateNotifications,
   getUnseenNotificationsCount,
   isOnOFUserBlockedBy,
-  getOnline
+  getOnline,
+  getLastLogin
 };

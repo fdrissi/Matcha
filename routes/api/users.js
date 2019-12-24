@@ -37,12 +37,13 @@ router.post("/login", [middleware.login], async (req, res) => {
 
     const expiration = remember ? 3600 * 24 * 14 : 3600;
 
-    jwt.sign(payload, key, { expiresIn: expiration }, (err, token) => {
+    jwt.sign(payload, key, { expiresIn: expiration }, async (err, token) => {
       if (err) throw err;
       res.cookie("token", token, {
         httpOnly: true,
         maxAge: expiration * 1000
       }); //one hour or 2 weeks
+      await userModel.setLastLogin(user.id);
       res.json({ success: true });
     });
   } catch (error) {

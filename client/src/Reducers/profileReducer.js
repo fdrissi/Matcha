@@ -44,6 +44,7 @@ export const profileInitState = {
     user_online: false,
     user_set_from_map: null,
     user_fame_rate: 0,
+    user_last_login: false,
     user_location: {
       lat: "",
       lng: ""

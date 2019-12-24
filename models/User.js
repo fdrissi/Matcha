@@ -241,10 +241,21 @@ async function updatePassword(password, id) {
     return false;
   }
 }
+
 async function getTotalUser() {
   let sql = "SELECT COUNT(*) AS total FROM users";
   const [result] = await pool.query(sql);
   return result[0];
+}
+
+async function setLastLogin(id) {
+  try {
+    let sql = "UPDATE `user_info` SET `last_login` = NOW() WHERE id = ?";
+    const [result] = await pool.query(sql, [id]);
+    return !!result.affectedRows;
+  } catch (error) {
+    return false;
+  }
 }
 
 module.exports = {
@@ -265,5 +276,6 @@ module.exports = {
   updatePassword,
   findByToken,
   findUserByRecovery,
-  getTotalUser
+  getTotalUser,
+  setLastLogin
 };
