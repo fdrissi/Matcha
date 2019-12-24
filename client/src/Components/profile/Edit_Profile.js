@@ -43,7 +43,225 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Alert from "../inc/Alert";
 import { FormHelperText } from "@material-ui/core";
 import { usePosition } from "../inc/usePosition";
+import Autosuggest from "react-autosuggest";
+import match from "autosuggest-highlight/match";
+import parse from "autosuggest-highlight/parse";
+import Paper from "@material-ui/core/Paper";
+import MenuItem from "@material-ui/core/MenuItem";
 let _ = require("lodash");
+
+/* autocomplete */
+
+const suggestions = [
+  "Afghanistan",
+  "Aland Islands",
+  "Albania",
+  "Algeria",
+  "American Samoa",
+  "Andorra",
+  "Angola",
+  "Anguilla",
+  "Antarctica",
+  "Antigua and Barbuda",
+  "Argentina",
+  "Armenia",
+  "Aruba",
+  "Australia",
+  "Austria",
+  "Azerbaijan",
+  "Bahamas",
+  "Bahrain",
+  "Bangladesh",
+  "Barbados",
+  "Belarus",
+  "Belgium",
+  "Belize",
+  "Benin",
+  "Bermuda",
+  "Bhutan",
+  "Bolivia, Plurinational State of",
+  "Bonaire, Sint Eustatius and Saba",
+  "Bosnia and Herzegovina",
+  "Botswana",
+  "Bouvet Island",
+  "Brazil",
+  "British Indian Ocean Territory",
+  "Brunei Darussalam"
+];
+
+function renderInput(inputProps) {
+  const { value, onChange, chips, ref, ...other } = inputProps;
+
+  return (
+    <ChipInput
+      clearInputValueOnChange
+      onUpdateInput={onChange}
+      value={chips}
+      inputRef={ref}
+      {...other}
+    />
+  );
+}
+
+function renderSuggestion(suggestion, { query, isHighlighted }) {
+  const matches = match(suggestion, query);
+  const parts = parse(suggestion, matches);
+
+  return (
+    <MenuItem
+      selected={isHighlighted}
+      component="div"
+      onMouseDown={e => e.preventDefault()} // prevent the click causing the input to be blurred
+    >
+      <div>
+        {parts.map((part, index) => {
+          return part.highlight ? (
+            <span key={String(index)} style={{ fontWeight: 500 }}>
+              {part.text}
+            </span>
+          ) : (
+            <span key={String(index)}>{part.text}</span>
+          );
+        })}
+      </div>
+    </MenuItem>
+  );
+}
+
+function renderSuggestionsContainer(options) {
+  const { containerProps, children } = options;
+
+  return (
+    <Paper {...containerProps} square>
+      {children}
+    </Paper>
+  );
+}
+
+function getSuggestionValue(suggestion) {
+  return suggestion;
+}
+
+function getSuggestions(value, suggestions) {
+  const inputValue = value.trim().toLowerCase();
+  const inputLength = inputValue.length;
+  let count = 0;
+
+  return inputLength === 0
+    ? []
+    : suggestions.filter(suggestion => {
+        const keep =
+          count < 5 &&
+          suggestion.toLowerCase().slice(0, inputLength) === inputValue;
+
+        if (keep) {
+          count += 1;
+        }
+
+        return keep;
+      });
+}
+
+const styles = theme => ({
+  container: {
+    flexGrow: 1,
+    position: "relative"
+  },
+  suggestionsContainerOpen: {
+    position: "absolute",
+    marginTop: theme.spacing.unit,
+    marginBottom: theme.spacing.unit * 3,
+    left: 0,
+    right: 0,
+    zIndex: 1
+  },
+  suggestion: {
+    display: "block"
+  },
+  suggestionsList: {
+    margin: 0,
+    padding: 0,
+    listStyleType: "none"
+  },
+  textField: {
+    width: "100%"
+  }
+});
+
+class ReactAutosuggest extends React.Component {
+  state = {
+    // value: '',
+    suggestions: [],
+    value: [],
+    textFieldInput: ""
+  };
+
+  handleSuggestionsFetchRequested = ({ value }) => {
+    const suggestions = ["hello", "world", "this", "Fadel"];
+    this.setState({
+      suggestions: getSuggestions(value, suggestions)
+    });
+  };
+
+  handleSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: []
+    });
+  };
+
+  handletextFieldInputChange = (event, { newValue }) => {
+    this.setState({
+      textFieldInput: newValue
+    });
+  };
+
+  handleAddChip(chip) {
+    if (this.props.allowDuplicates || this.state.value.indexOf(chip) < 0) {
+      this.setState(({ value }) => ({
+        value: [...value, chip],
+        textFieldInput: ""
+      }));
+    }
+  }
+
+  render() {
+    const { classes, value, onAdd, onDelete, ...other } = this.props;
+
+    return (
+      <Autosuggest
+        theme={{
+          container: classes.container,
+          suggestionsContainerOpen: classes.suggestionsContainerOpen,
+          suggestionsList: classes.suggestionsList,
+          suggestion: classes.suggestion
+        }}
+        renderInputComponent={renderInput}
+        suggestions={this.state.suggestions}
+        onSuggestionsFetchRequested={this.handleSuggestionsFetchRequested}
+        onSuggestionsClearRequested={this.handleSuggestionsClearRequested}
+        renderSuggestionsContainer={renderSuggestionsContainer}
+        getSuggestionValue={getSuggestionValue}
+        renderSuggestion={renderSuggestion}
+        onSuggestionSelected={(e, { suggestionValue }) => {
+          this.handleAddChip(suggestionValue);
+          onAdd(suggestionValue);
+          e.preventDefault();
+        }}
+        focusInputOnSuggestionClick
+        inputProps={{
+          chips: value,
+          value: this.state.textFieldInput,
+          onChange: this.handletextFieldInputChange,
+          onAdd: chip => onAdd(chip),
+          onDelete: (chip, index) => onDelete(chip, index),
+          ...other
+        }}
+      />
+    );
+  }
+}
+
+/* finish auto complete */
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -697,11 +915,17 @@ function EditProfile() {
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  <ChipInput
+                  <ReactAutosuggest
                     value={mydata.user_tags}
                     onAdd={chip => handleAddChip(chip)}
                     onDelete={(chip, index) => handleDeleteChip(chip, index)}
+                    classes={styles}
                   />
+                  {/* <ChipInput
+                    value={mydata.user_tags}
+                    onAdd={chip => handleAddChip(chip)}
+                    onDelete={(chip, index) => handleDeleteChip(chip, index)}
+                  /> */}
                 </Grid>
                 {operations.errors.tags && (
                   <FormHelperText className={classes.helperText}>
