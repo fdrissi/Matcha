@@ -16,6 +16,7 @@ var _ = require("lodash");
 const config = require("config");
 const uploadPath = config.get("uploadPath");
 const unlinkAsync = promisify(fs.unlink);
+const { sendReport } = require("../../helpers/emailSender");
 
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -653,7 +654,7 @@ router.post(
     try {
       //if profile not already reported, report it
       let result = await profileModel.reportProfile(id, profile.id);
-
+      sendReport(profile.id, id);
       return res.json({
         success: result
       });

@@ -2,6 +2,7 @@ const { pool } = require("../config/db");
 const empty = require("is-empty");
 const publicIp = require("public-ip");
 const iplocation = require("iplocation").default;
+let _ = require("lodash");
 
 async function SetImage(id, photoname, counter) {
   try {
@@ -231,7 +232,8 @@ async function updateUserInfo(data, id) {
       user_location.lng === responde.longitude
         ? false
         : true;
-    const tags = JSON.stringify(user_tags);
+    const mytags = _.uniqWith(user_tags, _.isEqual);
+    const tags = JSON.stringify(mytags);
     if (user_birth_day && user_birth_month && user_birth_day)
       user_bith = `${user_birth_year}-${user_birth_month}-${user_birth_day}`;
     else user_bith = null;
