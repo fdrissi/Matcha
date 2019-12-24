@@ -171,6 +171,7 @@ function SignUp() {
                     onChange={handleInputChange}
                     value={userName}
                     autoFocus
+                    inputProps={{ maxLength: 15 }}
                   />
                   {operations.errors.userName && (
                     <FormHelperText className={classes.helperText}>
@@ -188,6 +189,7 @@ function SignUp() {
                     onChange={handleInputChange}
                     value={firstName}
                     label="First Name"
+                    inputProps={{ maxLength: 20 }}
                   />
                   {operations.errors.firstName && (
                     <FormHelperText className={classes.helperText}>
@@ -207,6 +209,7 @@ function SignUp() {
                     autoComplete="lname"
                     onChange={handleInputChange}
                     value={lastName}
+                    inputProps={{ maxLength: 20 }}
                   />
                   {operations.errors.lastName && (
                     <FormHelperText className={classes.helperText}>
@@ -225,6 +228,7 @@ function SignUp() {
                     autoComplete="email"
                     onChange={handleInputChange}
                     value={email}
+                    inputProps={{ maxLength: 100 }}
                   />
                   {operations.errors.email && (
                     <FormHelperText className={classes.helperText}>

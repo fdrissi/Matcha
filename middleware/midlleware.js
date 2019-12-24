@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const predefined = require("../routes/globals");
 const moment = require("moment");
 const Jimp = require("jimp");
+let _ = require("lodash");
 
 async function validateEmail(req) {
   req.body.email = req.body.email.toLowerCase().trim();
@@ -684,9 +685,12 @@ module.exports = middleware = {
         data.user_tags.map(function(word) {
           if (!regex.test(word)) {
             errors.tags =
-              "Every tag should be between 3 and 14 character without space or ";
+              "Every tag should be between 3 and 14 character without space or special characters";
           }
         });
+        data.user_tags.forEach(function(part, index) {
+          this[index] = _.startCase(_.toLower(part));
+        }, data.user_tags);
       }
       if (!checkProperties(errors))
         return res.json({
