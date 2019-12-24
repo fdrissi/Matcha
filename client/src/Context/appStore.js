@@ -14,7 +14,7 @@ import { profileReducer, profileInitState } from "../Reducers/profileReducer";
 import { matchedReducer, matchedInitState } from "../Reducers/matchedReducer";
 import { chatReducer, chatInitState } from "../Reducers/chatReducer";
 import io from "socket.io-client";
-const socket = io("http://10.12.7.10:5000");
+const socket = io("http://localhost:5000");
 
 export const appStore = React.createContext();
 export const socketStore = React.createContext();

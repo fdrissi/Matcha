@@ -126,7 +126,8 @@ const SubmitBox = ({ selected }) => {
 
   const handleSubmit = form => {
     form.preventDefault();
-    if (message) {
+    if (message.length > 255) setMessage("");
+    else if (message) {
       sendMessage(auth.userInfo.id, profileId, message, dispatch, socket);
       setMessage("");
     }
