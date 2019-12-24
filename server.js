@@ -29,16 +29,17 @@ app.use("/api/profile", require("./routes/api/profile"));
 app.use("/api/browse", require("./routes/api/browse"));
 app.use("/api/chat", require("./routes/api/chat"));
 
+app.use(express.static("client/build"));
+app.get(/%/, (req, res) => {
+  res.redirect("/");
+});
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+});
 // // Handle not valid route
 // app.use("*", (req, res) => {
 //   res.status(404).json({ status: false, message: "Endpoint Not Found" });
 // });
-
-app.use(express.static("client/build"));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-});
 
 const PORT = process.env.PORT || 5000;
 

@@ -860,4 +860,24 @@ router.get("/checkIsVerified", middleware.auth, async (req, res) => {
     isVerified: isEmpty
   });
 });
+router.get("/getSuggestions", middleware.auth, async (req, res) => {
+  try {
+    const tags_list = await profileModel.getAllTags();
+    let tagsSuggestion = [];
+    tags_list.forEach((item, index) => {
+      JSON.parse(item.user_tags).forEach((element, indexx) => {
+        if (tagsSuggestion.indexOf(element) === -1)
+          tagsSuggestion.push(element);
+      });
+    });
+    return res.json({
+      success: true,
+      tagsSuggestion
+    });
+  } catch (error) {
+    return res.json({
+      success: false
+    });
+  }
+});
 module.exports = router;
