@@ -3,7 +3,7 @@ A web app allowing two potential lovers to meet, from the registration to the fi
 A user will be able to register, connect, fill his/her profile, search and look intothe profile of other users, like them 1, chat with those that “liked” back.
 
 # Configuration
-Create ```backend/_Database/config/dev.json``` contain:
+Create ```_Database/config/dev.json``` contain:
 ```
 {
   "dev": {
@@ -17,7 +17,7 @@ Create ```backend/_Database/config/dev.json``` contain:
   "sql-file": true
 }
 ```
-Create ```./config/dev.json``` contain:
+Create ```config/dev.json``` contain:
 ```
 {
   "database": {
