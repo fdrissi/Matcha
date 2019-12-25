@@ -885,11 +885,6 @@ function EditProfile() {
                     onDelete={(chip, index) => handleDeleteChip(chip, index)}
                     classes={styles}
                   />
-                  {/* <ChipInput
-                    value={mydata.user_tags}
-                    onAdd={chip => handleAddChip(chip)}
-                    onDelete={(chip, index) => handleDeleteChip(chip, index)}
-                  /> */}
                 </Grid>
                 {operations.errors.tags && (
                   <FormHelperText className={classes.helperText}>
