@@ -337,7 +337,7 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
       user_birth_year: year,
       user_age: age,
       user_city: result.user_city,
-      user_biography: result.user_biography,
+      user_biography: result.user_biography ? result.user_biography : "",
       user_online: result.online,
       user_location: {
         lat: parseFloat(result.user_lat, 10),
