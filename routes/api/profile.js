@@ -287,11 +287,13 @@ router.get("/getUserInfo/", [middleware.auth], async (req, res) => {
       req.query.id && (await userModel.findById(+req.query.id))
         ? +req.query.id
         : req.user.id;
-    id =
+    if (
       (await profileModel.isUserBlockedProfile(+req.user.id, id)) ||
       (await profileModel.isUserBlockedProfile(id, +req.user.id))
-        ? req.user.id
-        : id;
+    )
+      return res.json({
+        success: false
+      });
     id !== req.user.id &&
       (await profileModel.setNotification(id, req.user.id, "visit"));
     const result = await profileModel.getUserInfo(+id);

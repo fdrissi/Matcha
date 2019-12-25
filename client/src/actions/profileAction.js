@@ -180,7 +180,7 @@ export const getUserInfo = async (dispatch, id = null) => {
         type: INFO_SUCCESS,
         payload: res.data.info
       });
-    }
+    } else window.location = "/profile";
   } catch (error) {
     return false;
   }
