@@ -1,4 +1,6 @@
 # Matcha
+**First Project using ReactJs/ExpressJs**
+# About
 A web app allowing two potential lovers to meet, from the registration to the final encounter.
 A user will be able to register, connect, fill his/her profile, search and look intothe profile of other users, like them 1, chat with those that “liked” back.
 
