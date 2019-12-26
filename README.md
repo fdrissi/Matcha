@@ -49,6 +49,8 @@ Here's the technical stack this project was made with:
 - Socket.io
 
 # Run
+Modules: ```npm i && cd client npm i```
+Db : ```cd _Database && db-migrate up --config ./config/dev.json```
 Run: ```npm run build```
 
 # View
