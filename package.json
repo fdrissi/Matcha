@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/fdrissi/matcha#readme",
   "dependencies": {
-    "bcrypt": "^3.0.7",
+    "bcrypt": "^5.0.0",
     "bcryptjs": "^2.4.3",
     "config": "^3.2.4",
     "cookie": "^0.4.0",
